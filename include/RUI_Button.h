@@ -2,6 +2,7 @@
 
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_image.h>
+#include<iostream>
 #include<string>
 #include<vector>
 
@@ -15,10 +16,7 @@ class Button
         SDL_Texture* hoverTexture;
         SDL_Texture* clickTexture;
 
-        void ButtonRender(SDL_Renderer* Renderer)
-        {
-            
-        }
+        virtual void ButtonRender(SDL_Renderer* Renderer){};
         void setPosition(int mx, int my, int mw, int mh)
         {
             desRect = {mx, my ,mw, mh};
@@ -38,9 +36,9 @@ class Button
         }
 
         virtual void loadTexture(int id){};
-        virtual void ClickApplication(int id){};
+        virtual void ClickApplication(){};
 
-        bool isHovered(int mx, int my)
+        bool RUI_isHovered(int mx, int my)
         {
             if(mx >= x && mx <= x + w)
             {
@@ -51,7 +49,7 @@ class Button
             }
             return false;
         }
-        bool isClicked(int mx, int my, SDL_Event& event)
+        bool RUI_isClicked(int mx, int my, SDL_Event& event)
         {
             if(mx >= x && mx <= x + w)
             {
@@ -64,11 +62,13 @@ class Button
             return false;
         }
 
-        private:
+        protected:
             int x,y,w,h;
-            int id;
+            int id;           
             bool isHovered;
             bool isClicked;
             SDL_Rect desRect;
             std::string text;
+
+        private:
 };
