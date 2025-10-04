@@ -15,6 +15,14 @@ class Button
         SDL_Texture* normalTexture;
         SDL_Texture* hoverTexture;
         SDL_Texture* clickTexture;
+        SDL_Texture* TextTexture;
+
+        SDL_Rect ButtonRect;
+        SDL_Rect TextRect;
+
+        SDL_Color TextColor;
+
+        TTF_Font *TextFont;
 
         virtual void ButtonRender(SDL_Renderer* Renderer){};
         void setPosition(int mx, int my, int mw, int mh)
@@ -60,6 +68,11 @@ class Button
                 }
             }
             return false;
+        }
+
+        void setTextColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+        {
+            TextColor = {r,g,b,a};
         }
 
         protected:

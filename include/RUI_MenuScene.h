@@ -8,6 +8,8 @@
 #include"RUI_SceneManager.h"
 
 extern RUI_SceneManager SceneManager;
+extern int WindowWidth;
+
 
 class RUI_MenuScene: public RUI_Scene
 {
@@ -19,9 +21,9 @@ class RUI_MenuScene: public RUI_Scene
 
         void onEnter()
         {
-            Btns[0] = new MenuButton(50,50,320,64,"test",0);
-            Btns[1] = new MenuButton(50,150,320,64,"test2",1);
-            Btns[2] = new MenuButton(50,250,320,64,"test3",2);
+            Btns[0] = new MenuButton((WindowWidth-320)/2,350,320,64,"开始游戏",0);
+            Btns[1] = new MenuButton((WindowWidth-320)/2,420,320,64,"设置",1);
+            Btns[2] = new MenuButton((WindowWidth-320)/2,490,320,64,"退出游戏",2);
         }
         void onUpdate()
         {
