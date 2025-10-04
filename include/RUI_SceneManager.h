@@ -5,6 +5,7 @@
 
 extern RUI_Scene* MenuScene;
 extern RUI_Scene* GameScene;
+extern RUI_Scene* SettingScene;
 
 class RUI_SceneManager
 {
@@ -16,7 +17,8 @@ class RUI_SceneManager
     enum class SceneType
     {
         Menu,
-        Game
+        Game,
+        Setting
     };
 
     void SetSceneStage(RUI_Scene* scene)
@@ -36,6 +38,9 @@ class RUI_SceneManager
         case SceneType::Game:
             CurrentScene = GameScene;
             break;
+        case SceneType::Setting:
+            CurrentScene = SettingScene;
+            break;
         default:
             break;
         }
@@ -49,9 +54,9 @@ class RUI_SceneManager
         {
             CurrentScene->onRender(Renderer);
         }
-    void onInput(const SDL_Event& event)
+    void onInput(const SDL_Event& event,SDL_Renderer* Renderer,bool& running)
         {
-            CurrentScene->onInput(event);
+            CurrentScene->onInput(event,Renderer,running);
         }
 
     private:

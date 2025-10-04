@@ -8,6 +8,7 @@
 #include"include/RUI_Scene.h"
 #include"include/RUI_MenuScene.h"
 #include"include/RUI_GameScene.h"
+#include"include/RUI_SettingScene.h"
 #include"include/RUI_SceneManager.h"
 
 int WindowWidth = 800;
@@ -16,6 +17,7 @@ bool running = true;
 SDL_Event event;
 RUI_Scene* MenuScene = nullptr;
 RUI_Scene* GameScene = nullptr;
+RUI_Scene* SettingScene = nullptr;
 RUI_SceneManager SceneManager;
 const int FPS = 30;
 
@@ -36,6 +38,7 @@ int main(int argc, char* argv[])
 
     MenuScene = new RUI_MenuScene();
     GameScene = new RUI_GameScene();
+    SettingScene = new RUI_SettingScene();
 
     SceneManager.SetSceneStage(MenuScene);
     while(running)
@@ -53,7 +56,7 @@ int main(int argc, char* argv[])
                 default:
                 break;
             }
-            SceneManager.onInput(event);
+            SceneManager.onInput(event,Renderer,running);
         }
         SceneManager.onUpdate();
         SceneManager.onRender(Renderer);

@@ -1,22 +1,23 @@
 #pragma once
 
-#include<SDL2/SDL.h>
 #include"RUI_Scene.h"
+#include"RUI_SceneManager.h"
+#include<SDL2/SDL.h>
 
 extern RUI_SceneManager SceneManager;
 
-class RUI_GameScene: public RUI_Scene
+class RUI_SettingScene:public RUI_Scene
 {
     public:
-        RUI_GameScene() = default;
-        ~RUI_GameScene() = default;
-        void onEnter()
+    RUI_SettingScene() = default;
+    ~RUI_SettingScene() = default;
+            void onEnter()
         {
-            SDL_Log("进入游戏场景");
+            SDL_Log("进入设置场景");
         }
         void onUpdate()
         {
-            SDL_Log("更新游戏场景");
+            SDL_Log("更新设置场景");
         }
         void onRender(SDL_Renderer* Renderer)
         {
@@ -34,8 +35,7 @@ class RUI_GameScene: public RUI_Scene
         }
         void onExit()
         {
-            SDL_Log("退出游戏场景");
+            SDL_Log("退出设置场景");
         }
-        private:
 
 };

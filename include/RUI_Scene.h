@@ -10,7 +10,7 @@ class RUI_Scene
         virtual void onEnter(){};
         virtual void onUpdate(){};
         virtual void onRender(SDL_Renderer* Renderer){};
-        virtual void onInput(const SDL_Event& event){};
+        virtual void onInput(const SDL_Event& event, SDL_Renderer* Renderer,bool &running){};
         virtual void onExit(){};
 
     private:

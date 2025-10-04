@@ -25,6 +25,10 @@ class Button
         TTF_Font *TextFont;
 
         virtual void ButtonRender(SDL_Renderer* Renderer){};
+        virtual void HoveredButtonRender(SDL_Renderer* Renderer){};
+        virtual void ClickedButtonRender(SDL_Renderer* Renderer){};
+        
+
         void setPosition(int mx, int my, int mw, int mh)
         {
             desRect = {mx, my ,mw, mh};
@@ -43,6 +47,26 @@ class Button
             text = t;
         }
 
+        void setClicked(bool b)
+        {
+            isClicked = b;
+        }
+
+        void setHovered(bool b)
+        {
+            isHovered = b;
+        }
+
+        bool getClicked()
+        {
+            return isClicked;
+        }
+
+        bool getHovered()
+        {
+            return isHovered;
+        }
+
         virtual void loadTexture(int id){};
         virtual void ClickApplication(){};
 
@@ -57,14 +81,13 @@ class Button
             }
             return false;
         }
-        bool RUI_isClicked(int mx, int my, SDL_Event& event)
+        bool RUI_isClicked(int mx, int my)
         {
             if(mx >= x && mx <= x + w)
             {
                 if(my >= y && my <= y + h)
                 {
-                    if(event.type == SDL_MOUSEBUTTONDOWN)
-                        return true;
+                    return true;
                 }
             }
             return false;
