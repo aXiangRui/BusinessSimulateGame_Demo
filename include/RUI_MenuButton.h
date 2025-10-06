@@ -58,7 +58,7 @@ class MenuButton: public Button
             SDL_RenderCopy(Renderer,texture,nullptr,&ButtonRect);
 
             TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
-            setTextColor(0,0,0,255);
+            setTextColor(10,10,10,255);
             SDL_Surface* textSurface = TTF_RenderUTF8_Blended(TextFont,text.c_str(),TextColor);
             int tw = textSurface->w;
             int th = textSurface->h;

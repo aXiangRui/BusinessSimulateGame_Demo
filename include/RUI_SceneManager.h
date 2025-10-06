@@ -6,6 +6,7 @@
 extern RUI_Scene* MenuScene;
 extern RUI_Scene* GameScene;
 extern RUI_Scene* SettingScene;
+extern RUI_Scene* SavingScene;
 
 class RUI_SceneManager
 {
@@ -18,7 +19,8 @@ class RUI_SceneManager
     {
         Menu,
         Game,
-        Setting
+        Setting,
+        Saving
     };
 
     void SetSceneStage(RUI_Scene* scene)
@@ -40,6 +42,9 @@ class RUI_SceneManager
             break;
         case SceneType::Setting:
             CurrentScene = SettingScene;
+            break;
+        case SceneType::Saving:
+            CurrentScene = SavingScene;
             break;
         default:
             break;
