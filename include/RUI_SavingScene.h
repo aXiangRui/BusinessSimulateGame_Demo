@@ -40,6 +40,7 @@ class RUI_SavingScene : public RUI_Scene
             SDL_RenderClear(Renderer);
           
             SDL_RenderCopy(Renderer,texture,nullptr,&rect);
+            SDL_DestroyTexture(texture);
             for(int i = 0; i < Btns.size(); i++)
             {
                 if(Btns[i].getClicked() == true)

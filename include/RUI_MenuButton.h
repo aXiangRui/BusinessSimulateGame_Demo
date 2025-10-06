@@ -35,7 +35,9 @@ class MenuButton: public Button
         SDL_Surface* image = IMG_Load("./resources/texture/button/buttonDemo.png");
         SDL_Texture* texture = SDL_CreateTextureFromSurface(Renderer,image);        
         ButtonRect = {x,y,w,h};
+        SDL_FreeSurface(image);
         SDL_RenderCopy(Renderer,texture,nullptr,&ButtonRect);
+        SDL_DestroyTexture(texture);
 
         TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
         setTextColor(0,0,0,255);
@@ -47,7 +49,9 @@ class MenuButton: public Button
         TextRect = {tx,ty,tw,th};
         TextTexture = SDL_CreateTextureFromSurface(Renderer,textSurface);
         SDL_FreeSurface(textSurface);
+        TTF_CloseFont(TextFont);
         SDL_RenderCopy(Renderer,TextTexture,nullptr,&TextRect);
+        SDL_DestroyTexture(TextTexture);
     }
 
     void HoveredButtonRender(SDL_Renderer* Renderer)
@@ -57,6 +61,8 @@ class MenuButton: public Button
             SDL_Texture* texture = SDL_CreateTextureFromSurface(Renderer,image);        
             ButtonRect = {x,y,w,h};
             SDL_RenderCopy(Renderer,texture,nullptr,&ButtonRect);
+            SDL_FreeSurface(image);
+            SDL_DestroyTexture(texture);
 
             TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
             setTextColor(10,10,10,255);
@@ -69,6 +75,8 @@ class MenuButton: public Button
             TextTexture = SDL_CreateTextureFromSurface(Renderer,textSurface);
             SDL_FreeSurface(textSurface);
             SDL_RenderCopy(Renderer,TextTexture,nullptr,&TextRect);
+            SDL_DestroyTexture(TextTexture);
+            TTF_CloseFont(TextFont);
     }
 
     void ClickedButtonRender(SDL_Renderer* Renderer)
@@ -87,8 +95,14 @@ class MenuButton: public Button
             int ty = y + (h - th) / 2;
             TextRect = {tx,ty,tw,th};
             TextTexture = SDL_CreateTextureFromSurface(Renderer,textSurface);
+
+            SDL_FreeSurface(image);
             SDL_FreeSurface(textSurface);
             SDL_RenderCopy(Renderer,TextTexture,nullptr,&TextRect);
+
+            SDL_DestroyTexture(texture);
+            SDL_DestroyTexture(TextTexture);
+            TTF_CloseFont(TextFont);
     }
         
 

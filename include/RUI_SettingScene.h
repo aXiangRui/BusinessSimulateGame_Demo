@@ -31,6 +31,9 @@ class RUI_SettingScene:public RUI_Scene
             SDL_RenderCopy(Renderer,texture,nullptr,&rect);
 
             SDL_RenderPresent(Renderer);
+
+            SDL_FreeSurface(image);
+            SDL_DestroyTexture(texture);
         }
         void onInput(const SDL_Event& event,SDL_Renderer* Renderer, bool& running)
         {

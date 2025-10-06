@@ -1,6 +1,8 @@
 #pragma once
 
 #include<SDL2/SDL.h>
+#include<SDL2/SDL_image.h>
+#include<iostream>
 #include<string>
 
 class RUI_Icon
@@ -8,9 +10,20 @@ class RUI_Icon
     RUI_Icon() = default;
     ~RUI_Icon() = default;
 
-    virtual void IconRender(SDL_Renderer* Renderer,std::string);
-    virtual void IconHoverRender(SDL_Renderer* Renderer,std::string);
-    virtual void IconClickRender(SDL_Renderer* Renderer,std::string);
+    void IconRender(SDL_Renderer* Renderer)
+    {
+        SDL_Surface* image = IMG_Load(address.c_str());
+        if(!image)
+        {
+            std::cout<<"error! cannot find "<< address << std::endl;
+        }
+        SDL_Texture* IconTexture = SDL_CreateTextureFromSurface(Renderer,image);
+        SDL_FreeSurface(image);
+        SDL_RenderCopy(Renderer,IconTexture,nullptr,&Rect);
+    }
+    
+    virtual void IconHoverRender(SDL_Renderer* Renderer,std::string address);
+    virtual void IconClickRender(SDL_Renderer* Renderer,std::string address);
 
     void InitIcon(int mx, int my, int mw, int mh, int i, std::string add)
     {
