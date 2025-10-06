@@ -14,6 +14,7 @@ class RUI_SettingScene:public RUI_Scene
             void onEnter()
         {
             SDL_Log("进入设置场景");
+            SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
         }
         void onUpdate()
         {
@@ -21,8 +22,14 @@ class RUI_SettingScene:public RUI_Scene
         }
         void onRender(SDL_Renderer* Renderer)
         {
+            SDL_Surface* image = IMG_Load("./resources/texture/saving/saving.png");
+            SDL_Texture* texture = SDL_CreateTextureFromSurface(Renderer,image);
+            SDL_Rect rect = {150,60,500,500};
             SDL_SetRenderDrawColor(Renderer,135,100,235,255);
             SDL_RenderClear(Renderer);
+
+            SDL_RenderCopy(Renderer,texture,nullptr,&rect);
+
             SDL_RenderPresent(Renderer);
         }
         void onInput(const SDL_Event& event,SDL_Renderer* Renderer, bool& running)

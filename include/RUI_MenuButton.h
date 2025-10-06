@@ -31,6 +31,7 @@ class MenuButton: public Button
     }
     void ButtonRender(SDL_Renderer* Renderer)
     {
+        
         SDL_Surface* image = IMG_Load("./resources/texture/button/buttonDemo.png");
         SDL_Texture* texture = SDL_CreateTextureFromSurface(Renderer,image);        
         ButtonRect = {x,y,w,h};
