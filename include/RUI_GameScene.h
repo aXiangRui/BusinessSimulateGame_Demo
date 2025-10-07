@@ -1,6 +1,7 @@
 #pragma once
 
 #include<SDL2/SDL.h>
+#include<SDL2/SDL_mixer.h>
 #include"RUI_Scene.h"
 
 extern RUI_SceneManager SceneManager;
@@ -10,6 +11,9 @@ class RUI_GameScene: public RUI_Scene
     public:
         RUI_GameScene() = default;
         ~RUI_GameScene() = default;
+
+        Mix_Music* music;
+
         void onEnter()
         {
             SDL_Log("进入游戏场景");

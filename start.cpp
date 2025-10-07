@@ -11,6 +11,7 @@
 #include"include/RUI_SettingScene.h"
 #include"include/RUI_SavingScene.h"
 #include"include/RUI_SceneManager.h"
+#include"include/RUI_MusicManager.h"
 
 int WindowWidth = 800;
 int WindowHeight = 600;
@@ -21,11 +22,13 @@ RUI_Scene* GameScene = nullptr;
 RUI_Scene* SettingScene = nullptr;
 RUI_Scene* SavingScene = nullptr;
 RUI_SceneManager SceneManager;
+MusicPlayer BackgroundMusic;
 const int FPS = 30;
 
 int main(int argc, char* argv[]) 
 {
     SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_AUDIO);
     TTF_Init();
     IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
     SDL_Window* window = SDL_CreateWindow(
@@ -33,8 +36,9 @@ int main(int argc, char* argv[])
         SDL_WINDOWPOS_CENTERED,           // 水平位置（居中）
         SDL_WINDOWPOS_CENTERED,           // 垂直位置（居中）
         WindowWidth,WindowHeight,                   // 窗口宽高（像素）
-        SDL_WINDOW_SHOWN           // 显示窗口（必选）
+        SDL_WINDOW_BORDERLESS           // 显示窗口（必选）
     );
+    Mix_Init(MIX_INIT_MP3 | MIX_INIT_FLAC);
 
     SDL_Renderer* Renderer = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);
 
@@ -44,6 +48,9 @@ int main(int argc, char* argv[])
     SavingScene = new RUI_SavingScene();
 
     SceneManager.SetSceneStage(MenuScene);
+    BackgroundMusic.LoadMusic("./resources/music/backgroundmusic.mp3");
+    BackgroundMusic.play(1);
+
     while(running)
     {
         int StartTime = SDL_GetTicks();
@@ -54,6 +61,7 @@ int main(int argc, char* argv[])
                 case SDL_QUIT:
                 {
                     running = false;
+                    BackgroundMusic.quit();
                     break;
                 }
                 default:

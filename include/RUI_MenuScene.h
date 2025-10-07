@@ -1,15 +1,17 @@
 #pragma once
 
 #include<SDL2/SDL.h>
+#include<SDL2/SDL_mixer.h>
 #include<vector>
 #include"RUI_Button.h"
 #include"RUI_MenuButton.h"
 #include"RUI_Scene.h"
 #include"RUI_SceneManager.h"
+#include"RUI_MusicManager.h"
 
 extern RUI_SceneManager SceneManager;
 extern int WindowWidth;
-
+extern MusicPlayer BackgroundMusic;
 
 class RUI_MenuScene: public RUI_Scene
 {
@@ -19,6 +21,7 @@ class RUI_MenuScene: public RUI_Scene
   
         // Button* Btns[3];
         std::vector<MenuButton>Btns;
+        MusicPlayer Music;
 
         void onEnter()
         {
@@ -29,6 +32,13 @@ class RUI_MenuScene: public RUI_Scene
             Btns.push_back(Btn0);
             Btns.push_back(Btn1);
             Btns.push_back(Btn2);
+
+            //BackgroundMusic.LoadMusic("./resources/music/backgroundmusic.mp3");
+            //BackgroundMusic.play(1);
+            
+            // Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
+            // music = Mix_LoadMUS("./resources/music/backgroundmusic.mp3");
+            // Mix_PlayMusic(music, 1);
         }
         void onUpdate()
         {
@@ -89,6 +99,7 @@ class RUI_MenuScene: public RUI_Scene
                                 }
                                 case 2:
                                 {
+                                    onExit();
                                     running = false;
                                     break;
                                 }
