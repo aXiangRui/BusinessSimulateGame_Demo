@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
         SDL_WINDOWPOS_CENTERED,           // 水平位置（居中）
         SDL_WINDOWPOS_CENTERED,           // 垂直位置（居中）
         WindowWidth,WindowHeight,         // 窗口宽高（像素）
-        SDL_WINDOW_BORDERLESS             // 显示窗口（必选）
+        SDL_WINDOW_SHOWN            // 显示窗口（必选）
     );
     Mix_Init(MIX_INIT_MP3 | MIX_INIT_FLAC );
 

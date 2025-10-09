@@ -25,6 +25,7 @@ class RUI_GameScene: public RUI_Scene
         Uint32 LastTime;
 
         Clock TestClock;
+        const int HourTime = 1000;
 
         void onEnter()
         {
@@ -32,30 +33,28 @@ class RUI_GameScene: public RUI_Scene
             Btns.push_back(Btn0);
             BackgroundMusic.quit();
             LastTime = SDL_GetTicks();
-            TestClock.SetStartTime(5);
+            TestClock.SetStartTime(6);
             SDL_Log("进入游戏场景");
         }
         void onUpdate()
         {
             //SDL_Log("更新游戏场景");
             CurrentTime = SDL_GetTicks();
-            // SDL_Log("%d %d",CurrentTime,LastTime);
-            if(CurrentTime - LastTime >= 1000)
-            {
-                //SDL_Log("时间过去1秒");               
+            if(CurrentTime - LastTime >= HourTime)
+            {          
                 LastTime = CurrentTime;
                 TestClock.UpdateTime();
-                SDL_Log("%d",TestClock.ReturnHour());
             }
         }
         void onRender(SDL_Renderer* Renderer)
         {
-            SDL_SetRenderDrawColor(Renderer,135,100,235,255);
+            SDL_SetRenderDrawColor(Renderer,80,80,235,255);
             SDL_RenderClear(Renderer);
             for(int i = 0; i < Btns.size(); i++)
             {
                 Btns[i].ButtonRender(Renderer);
             }
+            TestClock.RenderHour(Renderer);
             SDL_RenderPresent(Renderer);
         }
         void onInput(const SDL_Event& event,SDL_Renderer* Renderer, bool& running)
