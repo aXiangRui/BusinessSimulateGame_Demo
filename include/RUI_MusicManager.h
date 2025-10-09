@@ -26,6 +26,11 @@ class MusicPlayer
         Mix_PlayMusic(Music, i);
     }
 
+    void pause()
+    {
+        Mix_PauseMusic();
+    }
+
     void quit()
     {
         Mix_FreeMusic(Music);

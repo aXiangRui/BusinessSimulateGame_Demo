@@ -13,12 +13,12 @@ class RUI_SettingScene:public RUI_Scene
     ~RUI_SettingScene() = default;
             void onEnter()
         {
-            SDL_Log("进入设置场景");
+            //SDL_Log("进入设置场景");
             SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
         }
         void onUpdate()
         {
-            SDL_Log("更新设置场景");
+            //SDL_Log("更新设置场景");
         }
         void onRender(SDL_Renderer* Renderer)
         {
@@ -39,7 +39,7 @@ class RUI_SettingScene:public RUI_Scene
         {
             if(event.type == SDL_MOUSEBUTTONDOWN)
             {
-                SDL_Log("切换场景");
+                //SDL_Log("切换场景");
                 SceneManager.ChooseScene(RUI_SceneManager::SceneType::Menu);
             }    
         }

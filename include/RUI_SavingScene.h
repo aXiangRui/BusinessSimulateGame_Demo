@@ -23,12 +23,14 @@ class RUI_SavingScene : public RUI_Scene
             SDL_Log("进入存档场景");
             SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
             MenuButton Btn0((WindowWidth-320)/2,520,320,64,"返回首页",0);
+            MenuButton Btn1((WindowWidth-320)/2,120,320,64,"开始游戏",1);
             Btns.push_back(Btn0);
+            Btns.push_back(Btn1);
 
         }
         void onUpdate()
         {
-            SDL_Log("更新存档场景");
+            //SDL_Log("更新存档场景");
         }
         void onRender(SDL_Renderer* Renderer)
         {
@@ -77,6 +79,11 @@ class RUI_SavingScene : public RUI_Scene
                                 case 0:
                                 {
                                     SceneManager.ChooseScene(RUI_SceneManager::SceneType::Menu);
+                                    break;
+                                }
+                                case 1:
+                                {
+                                    SceneManager.ChooseScene(RUI_SceneManager::SceneType::Game);
                                     break;
                                 }
                                 default:

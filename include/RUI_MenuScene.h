@@ -12,6 +12,7 @@
 extern RUI_SceneManager SceneManager;
 extern int WindowWidth;
 extern MusicPlayer BackgroundMusic;
+extern bool running;
 
 class RUI_MenuScene: public RUI_Scene
 {
@@ -25,7 +26,7 @@ class RUI_MenuScene: public RUI_Scene
 
         void onEnter()
         {
-            SDL_Log(("进入菜单"));
+            //SDL_Log(("进入菜单"));
             MenuButton Btn0((WindowWidth-320)/2,370,320,64,"开始",0);
             MenuButton Btn1((WindowWidth-320)/2,430,320,64,"设置",1);
             MenuButton Btn2((WindowWidth-320)/2,490,320,64,"退出",2);
@@ -35,18 +36,19 @@ class RUI_MenuScene: public RUI_Scene
 
             //BackgroundMusic.LoadMusic("./resources/music/backgroundmusic.mp3");
             //BackgroundMusic.play(1);
-            
-            // Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
-            // music = Mix_LoadMUS("./resources/music/backgroundmusic.mp3");
-            // Mix_PlayMusic(music, 1);
+            if(!Mix_PlayingMusic())
+            {
+                BackgroundMusic.LoadMusic("./resources/music/backgroundmusic.mp3");
+                BackgroundMusic.play(-1);
+            }
         }
         void onUpdate()
         {
-            SDL_Log("更新菜单场景");
+            //SDL_Log("更新菜单场景");
         }
         void onRender(SDL_Renderer* Renderer)
         {
-            SDL_Log("渲染菜单中");
+            //SDL_Log("渲染菜单中");
 
             SDL_SetRenderDrawColor(Renderer,105,100,235,255);
             SDL_RenderClear(Renderer);
@@ -99,8 +101,8 @@ class RUI_MenuScene: public RUI_Scene
                                 }
                                 case 2:
                                 {
-                                    onExit();
                                     running = false;
+                                    onExit();
                                     break;
                                 }
                             }
@@ -145,7 +147,11 @@ class RUI_MenuScene: public RUI_Scene
         }
         void onExit()
         {
-            SDL_Log("退出菜单场景");
+            //SDL_Log("退出菜单场景");
+            if(running == false)
+            {
+                BackgroundMusic.quit();
+            }           
             Btns.clear();
         }
 

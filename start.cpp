@@ -32,13 +32,13 @@ int main(int argc, char* argv[])
     TTF_Init();
     IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
     SDL_Window* window = SDL_CreateWindow(
-        "Test",                           // 窗口标题
+        "Test甜品店",                           // 窗口标题
         SDL_WINDOWPOS_CENTERED,           // 水平位置（居中）
         SDL_WINDOWPOS_CENTERED,           // 垂直位置（居中）
-        WindowWidth,WindowHeight,                   // 窗口宽高（像素）
-        SDL_WINDOW_BORDERLESS           // 显示窗口（必选）
+        WindowWidth,WindowHeight,         // 窗口宽高（像素）
+        SDL_WINDOW_BORDERLESS             // 显示窗口（必选）
     );
-    Mix_Init(MIX_INIT_MP3 | MIX_INIT_FLAC);
+    Mix_Init(MIX_INIT_MP3 | MIX_INIT_FLAC );
 
     SDL_Renderer* Renderer = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);
 
@@ -48,8 +48,9 @@ int main(int argc, char* argv[])
     SavingScene = new RUI_SavingScene();
 
     SceneManager.SetSceneStage(MenuScene);
+
     BackgroundMusic.LoadMusic("./resources/music/backgroundmusic.mp3");
-    BackgroundMusic.play(1);
+    BackgroundMusic.play(-1);
 
     while(running)
     {
