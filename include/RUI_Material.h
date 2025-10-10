@@ -9,12 +9,19 @@ class Material
         Material() = default;
         ~Material() = default;
 
+        SDL_Texture* MaterialTexture;
+
         void InitLevel(int materialid, int SweetNumber, int FullNumber, int TasteNumber)
         {
             MaterialID = materialid;
             SweetLevel = SweetNumber;
             FullLevel = FullNumber;
             TasteLevel = TasteNumber;
+        }
+
+        void SetLoadPath(std::string path)
+        {
+            LoadPath = path;
         }
 
         void AddSweetNumber(int SweetNumber)
@@ -56,11 +63,36 @@ class Material
         {
             return Name;
         }
+
+        std::string GetPath()
+        {
+            return LoadPath;
+        }
+
+        void SetRenderPosition(int mx, int my)
+        {
+            x = mx;
+            y = my;
+        }
+
+        int GetXPosition()
+        {
+            return x;
+        }
+
+        int GetYPosition()
+        {
+            return y;
+        }
+
+        virtual void RenderMaterial(SDL_Renderer* Renderer){};
         
     private:
         int SweetLevel;
         int FullLevel;
         int TasteLevel;
         int MaterialID;
+        int x,y;
+        std::string LoadPath;
         std::string Name;
 };

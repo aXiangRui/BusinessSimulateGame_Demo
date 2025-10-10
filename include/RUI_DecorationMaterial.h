@@ -1,14 +1,14 @@
 #pragma once
 
-#include"RUI_Material.h"
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_image.h>
+#include"RUI_Material.h"
 
-class BaseMaterial : public Material
+class DecorationMaterial : public Material
 {
     public:
-        BaseMaterial() = default;
-        ~BaseMaterial() = default;
+        DecorationMaterial() = default;
+        ~DecorationMaterial() = default;
 
         void RenderMaterial(SDL_Renderer* Renderer)
         {
