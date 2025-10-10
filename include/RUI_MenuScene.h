@@ -8,6 +8,7 @@
 #include"RUI_Scene.h"
 #include"RUI_SceneManager.h"
 #include"RUI_MusicManager.h"
+#include"RUI_ResourceManager.h"
 
 extern RUI_SceneManager SceneManager;
 extern int WindowWidth;
@@ -26,19 +27,17 @@ class RUI_MenuScene: public RUI_Scene
 
         void onEnter()
         {
-            //SDL_Log(("进入菜单"));
+            SDL_Log(("进入菜单"));
             MenuButton Btn0((WindowWidth-320)/2,370,320,64,"开始",0);
             MenuButton Btn1((WindowWidth-320)/2,430,320,64,"设置",1);
             MenuButton Btn2((WindowWidth-320)/2,490,320,64,"退出",2);
             Btns.push_back(Btn0);
             Btns.push_back(Btn1);
             Btns.push_back(Btn2);
-
-            //BackgroundMusic.LoadMusic("./resources/music/backgroundmusic.mp3");
-            //BackgroundMusic.play(1);
             if(!Mix_PlayingMusic())
             {
-                BackgroundMusic.LoadMusic("./resources/music/backgroundmusic.mp3");
+                if(!BackgroundMusic.isPrepared())
+                    BackgroundMusic.setMusic(ResourceManager::instance()->FindMusic("backgroundmusic"));
                 BackgroundMusic.play(-1);
             }
         }

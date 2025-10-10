@@ -8,6 +8,7 @@
 #include"RUI_MusicManager.h"
 #include"RUI_MenuButton.h"
 #include"RUI_Clock.h"
+#include"RUI_ResourceManager.h"
 
 extern RUI_SceneManager SceneManager;
 extern MusicPlayer BackgroundMusic;
@@ -25,7 +26,7 @@ class RUI_GameScene: public RUI_Scene
         Uint32 LastTime;
 
         Clock TestClock;
-        const int HourTime = 1000;
+        const int HourTime = 100;
 
         void onEnter()
         {
@@ -34,7 +35,7 @@ class RUI_GameScene: public RUI_Scene
             BackgroundMusic.quit();
             if(!Mix_PlayingMusic())
             {           
-                gamemusic.LoadMusic("./resources/music/gamemusic.mp3");
+                gamemusic.setMusic(ResourceManager::instance()->FindMusic("gamemusic"));
                 gamemusic.play(-1);
             }
             LastTime = SDL_GetTicks();
@@ -57,7 +58,7 @@ class RUI_GameScene: public RUI_Scene
             else
             {                            
                 CurrentTime = SDL_GetTicks();
-                if(CurrentTime - LastTime >= HourTime * 2)
+                if(CurrentTime - LastTime >= HourTime * 10)
                 {          
                     LastTime = CurrentTime;
                     TestClock.UpdateTime();

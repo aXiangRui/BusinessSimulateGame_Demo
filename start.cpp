@@ -50,11 +50,12 @@ int main(int argc, char* argv[])
     SettingScene = new RUI_SettingScene();
     SavingScene = new RUI_SavingScene();
 
-    SceneManager.SetSceneStage(MenuScene);
-    ResourceManager::instance()->load(Renderer);
+    SDL_SetRenderDrawColor(Renderer,200,200,200,255);
+    SDL_RenderClear(Renderer);
+    SDL_RenderPresent(Renderer);
 
-    BackgroundMusic.LoadMusic("./resources/music/backgroundmusic.mp3");
-    BackgroundMusic.play(-1);
+    ResourceManager::instance()->load(Renderer);
+    SceneManager.SetSceneStage(MenuScene);
 
     while(running)
     {

@@ -29,6 +29,7 @@ class ResourceManager
             // stack of directories to visit
             std::vector<std::string> dirs;
             dirs.push_back("resources");
+            Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
 
             while(!dirs.empty())
             {
@@ -72,7 +73,24 @@ class ResourceManager
                         std::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c){ return std::tolower(c); });
                     }
 
-                    // read file into memory
+                    std::string key = name.substr(0, pos);
+                    // For compressed music formats, prefer loading by file path instead of RW
+                    if(ext == ".mp3" || ext == ".flac" || ext == ".mod")
+                    {
+                        Mix_Music* mus = Mix_LoadMUS(full.c_str());
+                        if(mus)
+                        {
+                            MusicPool[key] = mus;
+                            SDL_Log("    loaded music (file): %s", key.c_str());
+                        }
+                        else
+                        {
+                            SDL_Log("    Mix_LoadMUS failed for %s: %s", full.c_str(), Mix_GetError());
+                        }
+                        continue;
+                    }
+
+                    // read file into memory for textures and sample audio
                     std::ifstream in(full, std::ios::binary);
                     if(!in)
                     {
@@ -94,7 +112,6 @@ class ResourceManager
                         continue;
                     }
 
-                    std::string key = name.substr(0, pos);
                     if(ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".bmp")
                     {
                         SDL_Texture* texture = IMG_LoadTexture_RW(Renderer, rw, 1);
@@ -157,7 +174,7 @@ class ResourceManager
             auto it = MusicPool.find(path);
             return it != MusicPool.end() ? it->second : nullptr;
         }
-        SDL_Texture* Texture(const std::string path)
+        SDL_Texture* FindTexture(const std::string path)
         {
             auto it = TexturePool.find(path);
             return it != TexturePool.end() ? it->second : nullptr;

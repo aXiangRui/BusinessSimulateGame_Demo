@@ -1,6 +1,7 @@
 #pragma once
 
 #include"RUI_Button.h"
+#include"RUI_ResourceManager.h"
 
 class MenuButton: public Button
 {
@@ -30,80 +31,101 @@ class MenuButton: public Button
         }
     }
     void ButtonRender(SDL_Renderer* Renderer)
-    {
-        
-        SDL_Surface* image = IMG_Load("./resources/texture/button/buttonDemo.png");
-        SDL_Texture* texture = SDL_CreateTextureFromSurface(Renderer,image);        
+    {     
+        // SDL_Surface* image = IMG_Load("./resources/texture/button/buttonDemo.png");
+        SDL_Texture* texture = ResourceManager::instance()->FindTexture("buttonDemo");        
         ButtonRect = {x,y,w,h};
-        SDL_FreeSurface(image);
-        SDL_RenderCopy(Renderer,texture,nullptr,&ButtonRect);
-        SDL_DestroyTexture(texture);
+        if(texture)
+            SDL_RenderCopy(Renderer,texture,nullptr,&ButtonRect);
 
         TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
-        setTextColor(0,0,0,255);
-        SDL_Surface* textSurface = TTF_RenderUTF8_Blended(TextFont,text.c_str(),TextColor);
-        int tw = textSurface->w;
-        int th = textSurface->h;
-        int tx = x + (w - tw) / 2;
-        int ty = y + (h - th) / 2;
-        TextRect = {tx,ty,tw,th};
-        TextTexture = SDL_CreateTextureFromSurface(Renderer,textSurface);
-        SDL_FreeSurface(textSurface);
-        TTF_CloseFont(TextFont);
-        SDL_RenderCopy(Renderer,TextTexture,nullptr,&TextRect);
-        SDL_DestroyTexture(TextTexture);
+        if(!TextFont)
+        {
+            SDL_Log("TTF_OpenFont failed: %s", TTF_GetError());
+        }
+        else
+        {
+            setTextColor(0,0,0,255);
+            SDL_Surface* textSurface = TTF_RenderUTF8_Blended(TextFont,text.c_str(),TextColor);
+            if(textSurface)
+            {
+                TextTexture = SDL_CreateTextureFromSurface(Renderer,textSurface);
+                int tw = textSurface->w;
+                int th = textSurface->h;
+                TextRect = {x+(w-tw)/2,y+(h-th)/2,tw,th};
+                SDL_FreeSurface(textSurface);
+                SDL_RenderCopy(Renderer,TextTexture,nullptr,&TextRect);
+                if(!TextTexture)
+                    SDL_Log("CreateTextTexture failed: %s", SDL_GetError());
+            }
+            else
+            {
+                SDL_Log("TTF_RenderUTF8_Blended failed: %s", TTF_GetError());
+            }
+        }
     }
 
     void HoveredButtonRender(SDL_Renderer* Renderer)
     {
-            SDL_Surface* image = IMG_Load("./resources/texture/button/buttonDemo_hovered.png");
-
-            SDL_Texture* texture = SDL_CreateTextureFromSurface(Renderer,image);        
+            SDL_Texture* texture = ResourceManager::instance()->FindTexture("buttonDemo_hovered");
             ButtonRect = {x,y,w,h};
-            SDL_RenderCopy(Renderer,texture,nullptr,&ButtonRect);
-            SDL_FreeSurface(image);
-            SDL_DestroyTexture(texture);
-
-            TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
-            setTextColor(10,10,10,255);
-            SDL_Surface* textSurface = TTF_RenderUTF8_Blended(TextFont,text.c_str(),TextColor);
-            int tw = textSurface->w;
-            int th = textSurface->h;
-            int tx = x + (w - tw) / 2;
-            int ty = y + (h - th) / 2;
-            TextRect = {tx,ty,tw,th};
-            TextTexture = SDL_CreateTextureFromSurface(Renderer,textSurface);
-            SDL_FreeSurface(textSurface);
-            SDL_RenderCopy(Renderer,TextTexture,nullptr,&TextRect);
-            SDL_DestroyTexture(TextTexture);
-            TTF_CloseFont(TextFont);
+            if(texture)
+                SDL_RenderCopy(Renderer,texture,nullptr,&ButtonRect);
+            if(!TextFont)
+            {
+                SDL_Log("TTF_OpenFont failed: %s", TTF_GetError());
+            }
+            else
+            {
+                setTextColor(0,0,0,255);
+                SDL_Surface* textSurface = TTF_RenderUTF8_Blended(TextFont,text.c_str(),TextColor);
+                if(textSurface)
+                {
+                    TextTexture = SDL_CreateTextureFromSurface(Renderer,textSurface);
+                    int tw = textSurface->w;
+                    int th = textSurface->h;
+                    TextRect = {x+(w-tw)/2,y+(h-th)/2,tw,th};
+                    SDL_FreeSurface(textSurface);
+                    SDL_RenderCopy(Renderer,TextTexture,nullptr,&TextRect);
+                    if(!TextTexture)
+                        SDL_Log("CreateTextTexture failed: %s", SDL_GetError());
+                }
+                else
+                {
+                    SDL_Log("TTF_RenderUTF8_Blended failed: %s", TTF_GetError());
+                }
+            }
     }
 
     void ClickedButtonRender(SDL_Renderer* Renderer)
     {
-            SDL_Surface* image = IMG_Load("./resources/texture/button/buttonDemo_clicked.png");
-            SDL_Texture* texture = SDL_CreateTextureFromSurface(Renderer,image);        
+            SDL_Texture* texture = ResourceManager::instance()->FindTexture("buttonDemo_clicked");
             ButtonRect = {x,y,w,h};
-            SDL_RenderCopy(Renderer,texture,nullptr,&ButtonRect);
-
-            TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
-            setTextColor(0,0,0,255);
-            SDL_Surface* textSurface = TTF_RenderUTF8_Blended(TextFont,text.c_str(),TextColor);
-            int tw = textSurface->w;
-            int th = textSurface->h;
-            int tx = x + (w - tw) / 2;
-            int ty = y + (h - th) / 2;
-            TextRect = {tx,ty,tw,th};
-            TextTexture = SDL_CreateTextureFromSurface(Renderer,textSurface);
-
-            SDL_FreeSurface(image);
-            SDL_FreeSurface(textSurface);
-            SDL_RenderCopy(Renderer,TextTexture,nullptr,&TextRect);
-
-            SDL_DestroyTexture(texture);
-            SDL_DestroyTexture(TextTexture);
-            TTF_CloseFont(TextFont);
-    }
-        
-
+            if(texture)
+                SDL_RenderCopy(Renderer,texture,nullptr,&ButtonRect);
+            else
+            {
+                SDL_Log("TTF_OpenFont failed: %s", TTF_GetError());
+            }
+  
+            
+                setTextColor(0,0,0,255);
+                SDL_Surface* textSurface = TTF_RenderUTF8_Blended(TextFont,text.c_str(),TextColor);
+                if(textSurface)
+                {
+                    TextTexture = SDL_CreateTextureFromSurface(Renderer,textSurface);
+                    int tw = textSurface->w;
+                    int th = textSurface->h;
+                    TextRect = {x+(w-tw)/2,y+(h-th)/2,tw,th};
+                    SDL_FreeSurface(textSurface);
+                    SDL_RenderCopy(Renderer,TextTexture,nullptr,&TextRect);
+                    if(!TextTexture)
+                        SDL_Log("CreateTextTexture failed: %s", SDL_GetError());
+                }
+                else
+                {
+                    SDL_Log("TTF_RenderUTF8_Blended failed: %s", TTF_GetError());
+                }
+            
+    }      
 };
