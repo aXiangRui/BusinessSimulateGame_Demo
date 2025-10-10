@@ -18,7 +18,7 @@ class RUI_GameScene: public RUI_Scene
         RUI_GameScene() = default;
         ~RUI_GameScene() = default;
 
-        Mix_Music* music;
+        MusicPlayer gamemusic;
         std::vector<MenuButton> Btns;
 
         Uint32 CurrentTime;
@@ -32,6 +32,11 @@ class RUI_GameScene: public RUI_Scene
             MenuButton Btn0((WindowWidth-320)/2,520,320,64,"返回首页",0);
             Btns.push_back(Btn0);
             BackgroundMusic.quit();
+            if(!Mix_PlayingMusic())
+            {           
+                gamemusic.LoadMusic("./resources/music/gamemusic.mp3");
+                gamemusic.play(-1);
+            }
             LastTime = SDL_GetTicks();
             TestClock.SetStartTime(6);
             SDL_Log("进入游戏场景");
@@ -39,11 +44,24 @@ class RUI_GameScene: public RUI_Scene
         void onUpdate()
         {
             //SDL_Log("更新游戏场景");
-            CurrentTime = SDL_GetTicks();
-            if(CurrentTime - LastTime >= HourTime)
-            {          
-                LastTime = CurrentTime;
-                TestClock.UpdateTime();
+            int PresentTime = TestClock.ReturnHour();
+            if(PresentTime >= 6 && PresentTime <= 22)
+            {
+                CurrentTime = SDL_GetTicks();
+                if(CurrentTime - LastTime >= HourTime)
+                {          
+                    LastTime = CurrentTime;
+                    TestClock.UpdateTime();
+                }
+            }
+            else
+            {                            
+                CurrentTime = SDL_GetTicks();
+                if(CurrentTime - LastTime >= HourTime * 10)
+                {          
+                    LastTime = CurrentTime;
+                    TestClock.UpdateTime();
+                }
             }
         }
         void onRender(SDL_Renderer* Renderer)
@@ -122,6 +140,7 @@ class RUI_GameScene: public RUI_Scene
         void onExit()
         {
             SDL_Log("退出游戏场景");
+            gamemusic.quit();
         }
         private:
 

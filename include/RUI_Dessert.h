@@ -10,8 +10,9 @@ class Dessert
        ~Dessert() = default;
     SDL_Texture* DessertTexture;
 
-    void InitLevel(int SweetNumber, int FullNumber, int TasteNumber)
+    void InitLevel(int dessertid, int SweetNumber, int FullNumber, int TasteNumber)
     {
+        DessertID = dessertid;
         SweetLevel = SweetNumber;
         FullLevel = FullNumber;
         TasteLevel = TasteNumber;
@@ -61,5 +62,6 @@ class Dessert
     int SweetLevel;
     int FullLevel;
     int TasteLevel;
+    int DessertID;
     std::string Name;
 };

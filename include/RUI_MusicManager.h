@@ -36,5 +36,11 @@ class MusicPlayer
         Mix_FreeMusic(Music);
     }
 
+    bool isLoaded()
+    {
+        if(address.c_str() == nullptr)
+            return false;
+        return true;
+    }
 
 };
