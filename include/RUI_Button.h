@@ -2,6 +2,7 @@
 
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_image.h>
+#include<SDL2/SDL_ttf.h>
 #include<iostream>
 #include<string>
 #include<vector>
@@ -24,9 +25,15 @@ class Button
 
         TTF_Font *TextFont;
 
-        virtual void ButtonRender(SDL_Renderer* Renderer){};
-        virtual void HoveredButtonRender(SDL_Renderer* Renderer){};
-        virtual void ClickedButtonRender(SDL_Renderer* Renderer){};
+    virtual void ButtonRender(SDL_Renderer* Renderer){};
+    virtual void HoveredButtonRender(SDL_Renderer* Renderer){};
+    virtual void ClickedButtonRender(SDL_Renderer* Renderer){};
+
+    // state accessors
+    void setHovered(bool v) { isHovered = v; }
+    void setClicked(bool v) { isClicked = v; }
+    bool getHovered() const { return isHovered; }
+    bool getClicked() const { return isClicked; }
         
 
         void setPosition(int mx, int my, int mw, int mh)
@@ -45,16 +52,6 @@ class Button
         void setTitle(std::string t)
         {
             text = t;
-        }
-
-        void setClicked(bool b)
-        {
-            isClicked = b;
-        }
-
-        void setHovered(bool b)
-        {
-            isHovered = b;
         }
 
         bool getClicked()
@@ -101,8 +98,8 @@ class Button
         protected:
             int x,y,w,h;
             int id;           
-            bool isHovered;
-            bool isClicked;
+            bool isHovered = false;
+            bool isClicked = false;
             SDL_Rect desRect;
             std::string text;
 

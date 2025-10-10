@@ -12,6 +12,7 @@
 #include"include/RUI_SavingScene.h"
 #include"include/RUI_SceneManager.h"
 #include"include/RUI_MusicManager.h"
+#include"include/RUI_ResourceManager.h"
 
 int WindowWidth = 800;
 int WindowHeight = 600;
@@ -23,6 +24,8 @@ RUI_Scene* SettingScene = nullptr;
 RUI_Scene* SavingScene = nullptr;
 RUI_SceneManager SceneManager;
 MusicPlayer BackgroundMusic;
+// Define ResourceManager singleton storage to satisfy linker
+ResourceManager* ResourceManager::Manager = nullptr;
 const int FPS = 30;
 
 int main(int argc, char* argv[]) 
@@ -36,7 +39,7 @@ int main(int argc, char* argv[])
         SDL_WINDOWPOS_CENTERED,           // 水平位置（居中）
         SDL_WINDOWPOS_CENTERED,           // 垂直位置（居中）
         WindowWidth,WindowHeight,         // 窗口宽高（像素）
-        SDL_WINDOW_SHOWN            // 显示窗口（必选）
+        SDL_WINDOW_SHOWN                  // 显示窗口（必选）
     );
     Mix_Init(MIX_INIT_MP3 | MIX_INIT_FLAC );
 
@@ -48,6 +51,7 @@ int main(int argc, char* argv[])
     SavingScene = new RUI_SavingScene();
 
     SceneManager.SetSceneStage(MenuScene);
+    ResourceManager::instance()->load(Renderer);
 
     BackgroundMusic.LoadMusic("./resources/music/backgroundmusic.mp3");
     BackgroundMusic.play(-1);

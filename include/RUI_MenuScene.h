@@ -80,8 +80,8 @@ class RUI_MenuScene: public RUI_Scene
             {               
                 case SDL_MOUSEBUTTONDOWN:
                 {            
-                    int mx = event.motion.x;
-                    int my = event.motion.y;
+                        int mx = event.button.x;
+                        int my = event.button.y;
                     for(int i = 0; i < Btns.size(); i++)
                     {
                         if(Btns[i].RUI_isClicked(mx,my))

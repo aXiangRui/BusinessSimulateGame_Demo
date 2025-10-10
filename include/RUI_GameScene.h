@@ -45,7 +45,7 @@ class RUI_GameScene: public RUI_Scene
         {
             //SDL_Log("更新游戏场景");
             int PresentTime = TestClock.ReturnHour();
-            if(PresentTime >= 6 && PresentTime <= 22)
+            if(PresentTime >= 6 && PresentTime < 22)
             {
                 CurrentTime = SDL_GetTicks();
                 if(CurrentTime - LastTime >= HourTime)
@@ -57,7 +57,7 @@ class RUI_GameScene: public RUI_Scene
             else
             {                            
                 CurrentTime = SDL_GetTicks();
-                if(CurrentTime - LastTime >= HourTime * 10)
+                if(CurrentTime - LastTime >= HourTime * 2)
                 {          
                     LastTime = CurrentTime;
                     TestClock.UpdateTime();
