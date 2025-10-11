@@ -13,6 +13,7 @@
 #include"include/RUI_SceneManager.h"
 #include"include/RUI_MusicManager.h"
 #include"include/RUI_ResourceManager.h"
+#include"include/RUI_LoadingScene.h"
 
 int WindowWidth = 800;
 int WindowHeight = 600;
@@ -50,11 +51,8 @@ int main(int argc, char* argv[])
     SettingScene = new RUI_SettingScene();
     SavingScene = new RUI_SavingScene();
 
-    SDL_SetRenderDrawColor(Renderer,200,200,200,255);
-    SDL_RenderClear(Renderer);
-    SDL_RenderPresent(Renderer);
+    LoadingSc(Renderer);
 
-    ResourceManager::instance()->load(Renderer);
     SceneManager.SetSceneStage(MenuScene);
 
     while(running)

@@ -2,13 +2,14 @@
 
 #include<SDL2/SDL.h>
 #include<string>
+#include"RUI_ResourceManager.h"
 
 class Customer
 {
     public:
         Customer() = default;
         ~Customer() = default;
-
+        std::vector<SDL_Texture*>CustomerTexture;
 
         void InitCustomer(int id, int preferid, std::string name)
         {
@@ -50,6 +51,16 @@ class Customer
         int GetQuitTime()
         {
             return QuitTime;
+        }
+
+        void loadTexture(std::string path)
+        {
+            CustomerTexture.push_back(ResourceManager::instance()->FindTexture(path));
+        }
+
+        void OnRender(SDL_Renderer* Renderer)
+        {
+            
         }
 
     private:

@@ -11,6 +11,8 @@ class GameEvent
     GameEvent() = default;
     ~GameEvent() = default;
 
+    int test = 0;
+
     void AddCustomer(Customer cus)
     {
         Customers.push_back(cus);
@@ -31,6 +33,7 @@ class GameEvent
             {
                 SwapCustomer(Customers[i],Customers[Customers.size()-1]);
                 Customers.pop_back();
+                SDL_Log("%d",id);
             }
         }
     }
@@ -51,10 +54,11 @@ class GameEvent
                 if(j <= 3)
                 {
                     Customer a;
-                    a.InitCustomer(Customers.size(),0,"testcustomer");
+                    a.InitCustomer(test,0,"testcustomer");
                     a.SetEnterTime(CurrentTime);
                     AddCustomer(a);
                     SDL_Log("增加顾客，当前%d人",Customers.size());
+                    test++;
                 }
                 LastTime = CurrentTime;
             }          
@@ -63,7 +67,7 @@ class GameEvent
         {
             // if(CurrentTime - LastTime >= 1000)
             //     SDL_Log("%d",Customers[i].GetCustomerID());
-            if(CurrentTime - Customers[i].GetEnterTime() >= 10000) {
+            if(CurrentTime - Customers[i].GetEnterTime() >= (10000 + rand()%5000 - 2500)) {
                 DeleteCustomer(Customers[i].GetCustomerID());  // 删除下标i的元素
                 SDL_Log("顾客离开，剩下%d人", Customers.size());
             }
