@@ -14,6 +14,11 @@ class Clock
     TTF_Font* TimeFont;
     SDL_Color TextColor = {10, 10, 10, 255};
 
+    void SetClockTime(int time)
+    {
+        ClockTime = time;
+    }
+
     void SetStartTime(int i)
     {
         ClockTime = i;
@@ -32,6 +37,11 @@ class Clock
     int ReturnDay()
     {
         return (ClockTime / 24) + 1;
+    }
+
+    int ReturnAllHour()
+    {
+        return ClockTime;
     }
 
     void RenderHour(SDL_Renderer* Renderer)

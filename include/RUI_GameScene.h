@@ -4,6 +4,7 @@
 #include<SDL2/SDL_mixer.h>
 #include<string>
 #include<vector>
+#include<fstream>
 #include"RUI_Scene.h"
 #include"RUI_MusicManager.h"
 #include"RUI_MenuButton.h"
@@ -33,6 +34,7 @@ class RUI_GameScene: public RUI_Scene
 
         void onEnter()
         {
+            TestEvent.Load();
             MenuButton Btn0((WindowWidth-320)/2,520,320,64,"返回首页",0);
             Btns.push_back(Btn0);
             BackgroundMusic.quit();
@@ -42,7 +44,7 @@ class RUI_GameScene: public RUI_Scene
                 gamemusic.play(-1);
             }
             LastTime = SDL_GetTicks();
-            TestClock.SetStartTime(6);
+            TestClock.SetStartTime(TestEvent.ReturnClockTime());
             SDL_Log("进入游戏场景");
         }
         void onUpdate()
@@ -61,7 +63,7 @@ class RUI_GameScene: public RUI_Scene
             else
             {                            
                 CurrentTime = SDL_GetTicks();
-                if(CurrentTime - LastTime >= HourTime * 1)
+                if(CurrentTime - LastTime >= HourTime * 2)
                 {          
                     LastTime = CurrentTime;
                     TestClock.UpdateTime();
@@ -146,6 +148,7 @@ class RUI_GameScene: public RUI_Scene
         void onExit()
         {
             SDL_Log("退出游戏场景");
+            TestEvent.Save();
             gamemusic.quit();
         }
         private:

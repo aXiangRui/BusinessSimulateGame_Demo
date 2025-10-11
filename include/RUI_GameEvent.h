@@ -4,6 +4,8 @@
 #include"RUI_Clock.h"
 #include<vector>
 #include<string>
+#include<fstream>
+#include<sstream>
 
 class GameEvent
 {
@@ -73,6 +75,64 @@ class GameEvent
             }
         }
     }
+
+    int ReturnClockTime()
+    {
+        return timeClock.ReturnAllHour();
+    }
+
+    void Load()
+    {
+        std::ifstream file("./save/test.txt");
+        if(!file)
+        {
+            SDL_Log("Load: failed to open save file");
+            return;
+        }
+        std::vector<int> tokens;
+        std::string line;
+        while(std::getline(file, line))
+        {
+            std::istringstream iss(line);
+            int v;
+            while(iss >> v)
+                tokens.push_back(v);
+        }
+        file.close();
+
+        if(tokens.empty())
+        {
+            SDL_Log("Load: no data in save file");
+            return;
+        }
+        timeClock.SetClockTime(tokens[0]);
+        for(size_t k = 1; k + 1 < tokens.size(); k += 2)
+        {
+            int id = tokens[k];
+            int ent = tokens[k+1];
+            Customer a;
+            a.InitCustomer(id, 0, "test");
+            a.SetEnterTime(ent);
+            Customers.push_back(a);
+        }
+    }
+
+    void Save()
+    {
+        std::ofstream file("./save/test.txt");
+        if(!file)
+        {
+            SDL_Log("Save: failed to open save file for writing");
+            return;
+        }
+        file << timeClock.ReturnAllHour() << std::endl;
+        for(size_t i = 0; i < Customers.size(); ++i)
+        {
+            file << Customers[i].GetCustomerID() << " " << Customers[i].GetEnterTime() << std::endl;
+        }
+        file.close();
+    }
+
     private:
         std::vector<Customer>Customers;
         Clock timeClock;
