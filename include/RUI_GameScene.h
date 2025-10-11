@@ -9,6 +9,7 @@
 #include"RUI_MenuButton.h"
 #include"RUI_Clock.h"
 #include"RUI_ResourceManager.h"
+#include"RUI_GameEvent.h"
 
 extern RUI_SceneManager SceneManager;
 extern MusicPlayer BackgroundMusic;
@@ -26,7 +27,9 @@ class RUI_GameScene: public RUI_Scene
         Uint32 LastTime;
 
         Clock TestClock;
-        const int HourTime = 100;
+        const int HourTime = 1000;
+
+        GameEvent TestEvent;
 
         void onEnter()
         {
@@ -64,6 +67,8 @@ class RUI_GameScene: public RUI_Scene
                     TestClock.UpdateTime();
                 }
             }
+            TestEvent.SetClock(TestClock);
+            TestEvent.onUpdate();
         }
         void onRender(SDL_Renderer* Renderer)
         {

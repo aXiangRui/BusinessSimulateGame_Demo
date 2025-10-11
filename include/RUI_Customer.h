@@ -32,8 +32,31 @@ class Customer
             return CustomerName;
         }
 
+        void SetEnterTime(int time)
+        {
+            EnterTime = time;
+        }
+
+        void SetQuitTime(int time)
+        {
+            QuitTime = time;
+        }
+
+        int GetEnterTime()
+        {
+            return EnterTime;
+        }
+
+        int GetQuitTime()
+        {
+            return QuitTime;
+        }
+
     private:
         std::string CustomerName;
         int CustomerID;
         int PreferDessertID;
+        int x,y;
+        int EnterTime;
+        int QuitTime;
 };
