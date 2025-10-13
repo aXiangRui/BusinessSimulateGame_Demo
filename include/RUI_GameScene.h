@@ -50,6 +50,20 @@ class RUI_GameScene: public RUI_Scene
         void onUpdate()
         {
             //SDL_Log("更新游戏场景");
+            if(true)
+            {  
+                TimeChange();
+                TestEvent.SetClock(TestClock);
+                TestEvent.onUpdate();
+            }
+            else
+            {
+                
+            }
+        }
+
+        void TimeChange()
+        {
             int PresentTime = TestClock.ReturnHour();
             if(PresentTime >= 6 && PresentTime < 22)
             {
@@ -69,9 +83,8 @@ class RUI_GameScene: public RUI_Scene
                     TestClock.UpdateTime();
                 }
             }
-            TestEvent.SetClock(TestClock);
-            TestEvent.onUpdate();
         }
+
         void onRender(SDL_Renderer* Renderer)
         {
             SDL_SetRenderDrawColor(Renderer,80,80,235,255);
