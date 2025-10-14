@@ -9,6 +9,7 @@
 #include"RUI_SceneManager.h"
 #include"RUI_MusicManager.h"
 #include"RUI_ResourceManager.h"
+#include"RUI_Customer.h"
 
 extern RUI_SceneManager SceneManager;
 extern int WindowWidth;
@@ -67,8 +68,7 @@ class RUI_MenuScene: public RUI_Scene
                 {
                     //SDL_Log("%d正在渲染",i);
                     Btns[i].ButtonRender(Renderer);                  
-                }
-                
+                }      
             }
                 
             SDL_RenderPresent(Renderer);

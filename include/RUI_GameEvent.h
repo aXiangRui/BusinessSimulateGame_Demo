@@ -29,13 +29,14 @@ class GameEvent
 
     void DeleteCustomer(int id)
     {
-        for(int i = 0; i < Customers.size(); i++)
+        for(size_t i = 0; i < Customers.size(); i++)
         {
             if(Customers[i].GetCustomerID() == id)
             {
-                SwapCustomer(Customers[i],Customers[Customers.size()-1]);
+                SwapCustomer(Customers[i], Customers[Customers.size()-1]);
                 Customers.pop_back();
-                SDL_Log("%d",id);
+                SDL_Log("删除顾客: removed id=%d", id);
+                return; // stop after removing to avoid invalid indices
             }
         }
     }
@@ -56,7 +57,7 @@ class GameEvent
                 if(j <= 3)
                 {
                     Customer a;
-                    a.InitCustomer(test,0,"testcustomer");
+                    a.InitCustomer(test,0,"XiaoHuang");
                     a.SetEnterTime(CurrentTime);
                     AddCustomer(a);
                     SDL_Log("增加顾客，当前%d人",Customers.size());
@@ -65,14 +66,24 @@ class GameEvent
                 LastTime = CurrentTime;
             }          
         }
-        for(int i = Customers.size() - 1; i >= 0; i--) 
+        // iterate backwards safely: cast size to int so empty vector leads to -1 start
+        for(int i = (int)Customers.size() - 1; i >= 0; --i)
         {
             // if(CurrentTime - LastTime >= 1000)
             //     SDL_Log("%d",Customers[i].GetCustomerID());
             if(CurrentTime - Customers[i].GetEnterTime() >= (10000 + rand()%5000 - 2500)) {
-                DeleteCustomer(Customers[i].GetCustomerID());  // 删除下标i的元素
-                SDL_Log("顾客离开，剩下%d人", Customers.size());
+                int id = Customers[i].GetCustomerID();
+                DeleteCustomer(id);  // 删除特定 id 的元素 (DeleteCustomer 会返回)
+                SDL_Log("顾客离开，剩下%d人", (int)Customers.size());
             }
+        }
+    }
+
+    void onRender(SDL_Renderer* Renderer)
+    {
+        for(int i = 0;i < Customers.size(); i++)
+        {
+            Customers[i].OnRender(Renderer);
         }
     }
 
@@ -111,7 +122,7 @@ class GameEvent
             int id = tokens[k];
             int ent = tokens[k+1];
             Customer a;
-            a.InitCustomer(id, 0, "test");
+            a.InitCustomer(id, 0, "XiaoHuang");
             a.SetEnterTime(ent);
             Customers.push_back(a);
         }
