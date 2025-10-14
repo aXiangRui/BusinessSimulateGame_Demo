@@ -2,6 +2,7 @@
 
 #include"RUI_Customer.h"
 #include"RUI_Clock.h"
+#include"RUI_Cabinet.h"
 #include<vector>
 #include<string>
 #include<fstream>
@@ -46,19 +47,19 @@ class GameEvent
         timeClock = c;
     }
 
-    void onUpdate(std::vector<Chair>& Chairs)
+    void onUpdate(std::vector<Chair>& Chairs,std::vector<Cabinet>& Cabinets)
     {
         CurrentTime = SDL_GetTicks();
         if(timeClock.ReturnHour()>=6 && timeClock.ReturnHour() < 22)
         {
-            if(CurrentTime - LastTime >= 1000 + (rand()%1000) - 500)
+            if(CurrentTime - LastTime >= 2500 + (rand()%2000) - 1000)
             {
                 int j = rand() % 4;
                 if(j <= 3)
                 {
                     Customer a;
                     a.InitCustomer(test,0,"XiaoHuang");
-                    a.SetEnterTime(CurrentTime);
+                    a.SetChooseTime(CurrentTime);
                     AddCustomer(a);
                     SDL_Log("增加顾客，当前%d人",Customers.size());
                     test++;
@@ -68,7 +69,8 @@ class GameEvent
         }
         for(int i = (int)Customers.size() - 1; i >= 0; --i)
         {    
-            Customers[i].Update(Chairs, CurrentTime);
+            Customers[i].Update(Chairs, CurrentTime, Cabinets);
+            //差点找不到顾客类刷新了哈哈哈哈
             if(Customers[i].GetQuit()) {
                 DeleteCustomer(Customers[i].GetCustomerID());  // 删除特定 id 的元素 (DeleteCustomer 会返回)
                 SDL_Log("顾客离开，剩下%d人", (int)Customers.size());
@@ -120,7 +122,7 @@ class GameEvent
             int ent = tokens[k+1];
             Customer a;
             a.InitCustomer(id, 0, "XiaoHuang");
-            a.SetEnterTime(ent);
+            a.SetChooseTime(ent);
             Customers.push_back(a);
         }
     }
@@ -136,7 +138,7 @@ class GameEvent
         file << timeClock.ReturnAllHour() << std::endl;
         for(size_t i = 0; i < Customers.size(); ++i)
         {
-            file << Customers[i].GetCustomerID() << " " << Customers[i].GetEnterTime() << std::endl;
+            file << Customers[i].GetCustomerID() << " " << Customers[i].GetChooseTime() << std::endl;
         }
         file.close();
     }

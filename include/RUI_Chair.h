@@ -81,3 +81,31 @@ class Chair
     SDL_Texture* ChairTexture = nullptr;
 
 };
+
+class Desk
+{
+    public:
+    Desk() = default;
+    ~Desk() = default;
+
+    void initDesk(int id)
+    {
+        DeskID = id;
+        x = (DeskID / 4)* 200 + 490;
+        y = (DeskID % 4) * 100; 
+    }
+    void onRender(SDL_Renderer* Renderer)
+    {
+        if(!DeskTexture)
+        {
+            DeskTexture = ResourceManager::instance()->FindTexture("desk");
+        }
+        SDL_Rect Rect = {x,y,64,64};
+        SDL_RenderCopy(Renderer,DeskTexture,nullptr,&Rect);
+    }
+
+    private:
+    int DeskID;
+    int x,y;
+    SDL_Texture* DeskTexture = nullptr;
+};

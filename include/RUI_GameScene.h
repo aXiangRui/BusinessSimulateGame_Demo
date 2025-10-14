@@ -12,6 +12,7 @@
 #include"RUI_Clock.h"
 #include"RUI_ResourceManager.h"
 #include"RUI_GameEvent.h"
+#include"RUI_Cabinet.h"
 
 extern RUI_SceneManager SceneManager;
 extern MusicPlayer BackgroundMusic;
@@ -27,6 +28,8 @@ class RUI_GameScene: public RUI_Scene
         MusicPlayer gamemusic;
         std::vector<MenuButton> Btns;
         std::vector<Chair> Chairs;
+        std::vector<Desk> Desks;
+        std::vector<Cabinet> Cabinets;
 
         Uint32 CurrentTime;
         Uint32 LastTime;
@@ -56,6 +59,20 @@ class RUI_GameScene: public RUI_Scene
                 Chairs.push_back(chair);
             }
 
+            for(int i = 0; i < 24; i++)
+            {
+                Cabinet cabinet;
+                cabinet.InitCabinet(i);
+                Cabinets.push_back(cabinet);
+            }
+
+            for(int i = 0; i < 8; i++)
+            {
+                Desk desk;
+                desk.initDesk(i);
+                Desks.push_back(desk);
+            }
+
             LastTime = SDL_GetTicks();
             TestClock.SetStartTime(TestEvent.ReturnClockTime());
             SDL_Log("进入游戏场景");
@@ -67,7 +84,7 @@ class RUI_GameScene: public RUI_Scene
             {  
                 TimeChange();
                 TestEvent.SetClock(TestClock);
-                TestEvent.onUpdate(Chairs);
+                TestEvent.onUpdate(Chairs,Cabinets);
             }
             else
             {
@@ -115,6 +132,17 @@ class RUI_GameScene: public RUI_Scene
             {
                 Chairs[i].onRender(Renderer);
             }
+
+            for(int i = 0; i < Desks.size(); i++)
+            {
+                Desks[i].onRender(Renderer);
+            }
+
+            for(int i = 0; i < Cabinets.size(); i++)
+            {
+                Cabinets[i].onRender(Renderer);
+            }
+
             TestClock.RenderHour(Renderer);
             TestEvent.onRender(Renderer);
             SDL_RenderPresent(Renderer);

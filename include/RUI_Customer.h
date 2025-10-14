@@ -5,6 +5,7 @@
 #include<vector>
 #include"RUI_ResourceManager.h"
 #include"RUI_Chair.h"
+#include"RUI_Cabinet.h"
 
 enum class CustomerStage
 {
@@ -30,8 +31,8 @@ class Customer
             CustomerName = name;
             x = 800;
             y = 450;
-            EnterTime = 0;
-            QuitTime = 0;
+            SitTime = 0;
+            ChooseTime = 0;
 
             CurrentStage = CustomerStage::Enter;
             EnterFinish = 0;
@@ -58,24 +59,24 @@ class Customer
             return CustomerName;
         }
 
-        void SetEnterTime(int time)
+        void SetSitTime(int time)
         {
-            EnterTime = time;
+            SitTime = time;
         }
 
-        void SetQuitTime(int time)
+        void SetChooseTime(int time)
         {
-            QuitTime = time;
+            ChooseTime = time;
         }
 
-        int GetEnterTime()
+        int GetSitTime()
         {
-            return EnterTime;
+            return SitTime;
         }
 
-        int GetQuitTime()
+        int GetChooseTime()
         {
-            return QuitTime;
+            return ChooseTime;
         }
 
         void loadTexture(std::string path)
@@ -108,18 +109,18 @@ class Customer
             
         }
 
-        void Update(std::vector<Chair>& Chairs,int currentTime)
+        void Update(std::vector<Chair>& Chairs,int currentTime, std::vector<Cabinet>& Cabtines)
         {
             switch(CurrentStage)
             {
                 case CustomerStage::Enter:
                 {
-                    EnterStore();
+                    EnterStore(currentTime);
                     break;
                 }
                 case CustomerStage::Choose:
                 {
-                    ChooseDessert();
+                    ChooseDessert(Cabtines,currentTime);
                     break;
                 }
                 case CustomerStage::Buy:
@@ -140,7 +141,7 @@ class Customer
             }
         }
 
-        void EnterStore()
+        void EnterStore(int currentTime)
         {
             if(x >= 450)
             {
@@ -162,50 +163,53 @@ class Customer
             }
             if(x < 200 && y < 400)
             {
+                SetChooseID(rand()%24);
+                ChooseTime = currentTime;
                 CurrentStage = CustomerStage::Choose;
             }
         }
 
-        void ChooseDessert()
+        void ChooseDessert(std::vector<Cabinet>&Cabinets, int currentTime)
         {
-            switch(1)
+            if(x < Cabinets[chooseID].GetX() + 32)
             {
-                case 1:
-                case 2:
-                default:
+                x = x + speed;
+            }
+            else if(x > Cabinets[chooseID].GetX() + 32)
+            {
+                x = x - speed;
+            }
+            else if(y < Cabinets[chooseID].GetY() - 16)
+            {
+                y = y + speed;
+            }
+            else if(y > Cabinets[chooseID].GetY() - 16)
+            {
+                y = y - speed;
+            }
+            else if(x == Cabinets[chooseID].GetX() + 32 && y == Cabinets[chooseID].GetY() - 16)
+            {
+                if(currentTime - ChooseTime >= 5000 + rand() % 500 - 250)
                 {
-                    if(x >= 100)
-                    {
-                        toward = 0;
-                        x = x - speed;
-                    }
-                    if(x < 100 && y >= 150)
-                    {
-                        y = y - speed;
-                    }
-                    if(x < 100 && y < 150)
-                    {
-                        CurrentStage = CustomerStage::Buy;
-                    }
-                    break;
+                    CurrentStage = CustomerStage::Buy;
                 }
             }
         }
 
         void Pay(int CurrentTime)
         {
-            if(x <= 400)
+            if(y >= 150)
+            {
+                y = y - speed;
+            }
+            else if(x <= 350)
             {
                 toward = 1;
                 x = x + speed;
             }
-            else if(y >= 150)
+            if(x > 350 && y < 150)
             {
-                y = y - speed;
-            }
-            if(x > 400 && y < 150)
-            {
-                EnterTime = CurrentTime;
+                SitTime = CurrentTime;
                 CurrentStage = CustomerStage::Eat;
             }
         }
@@ -216,7 +220,6 @@ class Customer
             {
                 for(int i = 0; i < Chairs.size(); i++)
                 {
-                    SDL_Log("%d",Chairs[i].GetUsing());
                     if(isEating != -1)
                         break;
                     else
@@ -237,7 +240,7 @@ class Customer
             {
                 if( x != Chairs[isEating].GetX())
                 {
-                    if(x - Chairs[isEating].GetX() > 0)
+                    if(x - Chairs[isEating].GetX() >= 0)
                     {
                         x = x - speed;
                         toward = 0;
@@ -250,7 +253,7 @@ class Customer
                 }
                 else if( y != Chairs[isEating].GetY())
                 {
-                    if(y - Chairs[isEating].GetY() > 0)
+                    if(y - Chairs[isEating].GetY() >= 0)
                     {
                         y = y - speed;
                     }
@@ -270,19 +273,28 @@ class Customer
                         toward = 0;
                     }
                     
-                    if(CurrentTime - EnterTime >= 10000 + rand()% 2000 - 1000)
-                    { 
-                        CurrentStage = CustomerStage::Leave;
+                    if(CurrentTime - SitTime >= 10000 + rand()% 5000 - 2500)
+                    {    
                         Chairs[isEating].SetUsing(0);
+                        CurrentStage = CustomerStage::Leave;
                     }
                 }
             }
             //CurrentStage = CustomerStage::Leave;
         }
 
+        void SetChooseID(int i)
+        {
+            chooseID = i;
+        }
+
         void LeaveStore()
         {
-            if(y <= 350)
+            if(x <= 400)
+            {
+                x = x + speed;
+            }
+            else if(y <= 350)
             {
                 y = y + speed;
             }
@@ -312,9 +324,11 @@ class Customer
         int CustomerID;
         int PreferDessertID;
         int x,y;
-        int EnterTime;
-        int QuitTime;
+        int SitTime;
+        int ChooseTime;
         CustomerStage CurrentStage;
+
+        int chooseID;
 
         bool EnterFinish;
         bool ChooseFinish;
@@ -323,5 +337,5 @@ class Customer
         bool QuitFinish;
         int isEating;
         bool toward;
-        int speed = 10;
+        int speed = 2;
 };
