@@ -21,6 +21,8 @@ class RUI_GameScene: public RUI_Scene
         RUI_GameScene() = default;
         ~RUI_GameScene() = default;
 
+        SDL_Texture* Background;
+
         MusicPlayer gamemusic;
         std::vector<MenuButton> Btns;
 
@@ -43,6 +45,8 @@ class RUI_GameScene: public RUI_Scene
                 gamemusic.setMusic(ResourceManager::instance()->FindMusic("gamemusic"));
                 gamemusic.play(-1);
             }
+            Background = ResourceManager::instance()->FindTexture("hall");
+
             LastTime = SDL_GetTicks();
             TestClock.SetStartTime(TestEvent.ReturnClockTime());
             SDL_Log("进入游戏场景");
@@ -87,8 +91,12 @@ class RUI_GameScene: public RUI_Scene
 
         void onRender(SDL_Renderer* Renderer)
         {
-            SDL_SetRenderDrawColor(Renderer,80,80,235,255);
+            //SDL_SetRenderDrawColor(Renderer,80,80,235,255);
             SDL_RenderClear(Renderer);
+
+            SDL_Rect BackGroundRect = {0,0,800,600};
+            SDL_RenderCopy(Renderer,Background,nullptr,&BackGroundRect);
+
             for(int i = 0; i < Btns.size(); i++)
             {
                 Btns[i].ButtonRender(Renderer);

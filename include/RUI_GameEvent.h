@@ -66,14 +66,11 @@ class GameEvent
                 LastTime = CurrentTime;
             }          
         }
-        // iterate backwards safely: cast size to int so empty vector leads to -1 start
         for(int i = (int)Customers.size() - 1; i >= 0; --i)
-        {
-            // if(CurrentTime - LastTime >= 1000)
-            //     SDL_Log("%d",Customers[i].GetCustomerID());
-            if(CurrentTime - Customers[i].GetEnterTime() >= (10000 + rand()%5000 - 2500)) {
-                int id = Customers[i].GetCustomerID();
-                DeleteCustomer(id);  // 删除特定 id 的元素 (DeleteCustomer 会返回)
+        {    
+            Customers[i].Update();
+            if(Customers[i].GetQuit()) {
+                DeleteCustomer(Customers[i].GetCustomerID());  // 删除特定 id 的元素 (DeleteCustomer 会返回)
                 SDL_Log("顾客离开，剩下%d人", (int)Customers.size());
             }
         }
