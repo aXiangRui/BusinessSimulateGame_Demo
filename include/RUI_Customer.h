@@ -157,11 +157,11 @@ class Customer
                 toward = 0;
                 x = x - speed;
             }
-            else if(x < 200 && y >= 400)
+            else if(x < 200 && y >= 450)
             {
                 y = y - speed;
             }
-            if(x < 200 && y < 400)
+            if(x < 200 && y < 450)
             {
                 SetChooseID(rand()%24);
                 ChooseTime = currentTime;
@@ -303,7 +303,7 @@ class Customer
                 toward = 1;
                 x = x + speed;
             }
-            if(x > 800)
+            if(x > 800 && y > 350 && CurrentStage == CustomerStage::Leave)
             {
                 QuitFinish = 1;
             }
@@ -317,6 +317,16 @@ class Customer
         bool GetToward()
         {
             return toward;
+        }
+
+        int getX()
+        {
+            return x;
+        }
+
+        int getY()
+        {
+            return y;
         }
 
     private:

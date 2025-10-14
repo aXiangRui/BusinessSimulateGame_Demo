@@ -71,7 +71,7 @@ class GameEvent
         {    
             Customers[i].Update(Chairs, CurrentTime, Cabinets);
             //差点找不到顾客类刷新了哈哈哈哈
-            if(Customers[i].GetQuit()) {
+            if(Customers[i].GetQuit() && Customers[i].getX() > 800 && Customers[i].getY() > 350) {
                 DeleteCustomer(Customers[i].GetCustomerID());  // 删除特定 id 的元素 (DeleteCustomer 会返回)
                 SDL_Log("顾客离开，剩下%d人", (int)Customers.size());
             }

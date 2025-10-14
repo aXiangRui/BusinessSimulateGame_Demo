@@ -138,13 +138,14 @@ class RUI_GameScene: public RUI_Scene
                 Desks[i].onRender(Renderer);
             }
 
+            TestClock.RenderHour(Renderer);
+            TestEvent.onRender(Renderer);
+ 
             for(int i = 0; i < Cabinets.size(); i++)
             {
                 Cabinets[i].onRender(Renderer);
             }
 
-            TestClock.RenderHour(Renderer);
-            TestEvent.onRender(Renderer);
             SDL_RenderPresent(Renderer);
         }
         void onInput(const SDL_Event& event,SDL_Renderer* Renderer, bool& running)
