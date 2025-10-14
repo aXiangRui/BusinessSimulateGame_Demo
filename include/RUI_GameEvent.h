@@ -46,7 +46,7 @@ class GameEvent
         timeClock = c;
     }
 
-    void onUpdate()
+    void onUpdate(std::vector<Chair>& Chairs)
     {
         CurrentTime = SDL_GetTicks();
         if(timeClock.ReturnHour()>=6 && timeClock.ReturnHour() < 22)
@@ -68,7 +68,7 @@ class GameEvent
         }
         for(int i = (int)Customers.size() - 1; i >= 0; --i)
         {    
-            Customers[i].Update();
+            Customers[i].Update(Chairs, CurrentTime);
             if(Customers[i].GetQuit()) {
                 DeleteCustomer(Customers[i].GetCustomerID());  // 删除特定 id 的元素 (DeleteCustomer 会返回)
                 SDL_Log("顾客离开，剩下%d人", (int)Customers.size());

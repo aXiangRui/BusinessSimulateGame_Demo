@@ -4,7 +4,7 @@
 #include<string>
 #include<vector>
 #include"RUI_ResourceManager.h"
-
+#include"RUI_Chair.h"
 
 enum class CustomerStage
 {
@@ -39,6 +39,8 @@ class Customer
             BuyFinish = 0;
             EatFinsih = 0;
             QuitFinish = 0;
+            toward = 0;
+            isEating = -1;
         }
 
         int GetCustomerID()
@@ -95,13 +97,18 @@ class Customer
                 return;
             }
             SDL_Rect Rect = {x,y,64,64};
-            if(SDL_RenderCopy(Renderer, NormalTexture, nullptr, &Rect) != 0)
+            if(toward == 0)
             {
-                SDL_Log("OnRender: SDL_RenderCopy failed for id=%d name=%s error=%s", CustomerID, CustomerName.c_str(), SDL_GetError());
+                SDL_RenderCopy(Renderer,NormalTexture,nullptr,&Rect);
             }
+            else
+            {
+                SDL_RenderCopyEx(Renderer,NormalTexture,nullptr,&Rect,0,0,SDL_FLIP_HORIZONTAL);
+            }
+            
         }
 
-        void Update()
+        void Update(std::vector<Chair>& Chairs,int currentTime)
         {
             switch(CurrentStage)
             {
@@ -117,12 +124,12 @@ class Customer
                 }
                 case CustomerStage::Buy:
                 {
-                    Pay();
+                    Pay(currentTime);
                     break;
                 }
                 case CustomerStage::Eat:
                 {
-                    Eat();
+                    Eat(Chairs, currentTime);
                     break;
                 }
                 case CustomerStage::Leave:
@@ -137,19 +144,21 @@ class Customer
         {
             if(x >= 450)
             {
-                x = x - 5;
+                toward = 0;
+                x = x - speed;
             }
             else if(x < 450 && y <= 500 && x >=200 )
             {
-                y = y + 5;
+                y = y + speed;
             }
             else if(x >= 200 && x < 450 && y > 500)
             {
-                x = x - 5;
+                toward = 0;
+                x = x - speed;
             }
             else if(x < 200 && y >= 400)
             {
-                y = y - 5;
+                y = y - speed;
             }
             if(x < 200 && y < 400)
             {
@@ -167,11 +176,12 @@ class Customer
                 {
                     if(x >= 100)
                     {
-                        x = x - 5;
+                        toward = 0;
+                        x = x - speed;
                     }
                     if(x < 100 && y >= 150)
                     {
-                        y = y - 5;
+                        y = y - speed;
                     }
                     if(x < 100 && y < 150)
                     {
@@ -182,36 +192,104 @@ class Customer
             }
         }
 
-        void Pay()
+        void Pay(int CurrentTime)
         {
             if(x <= 400)
             {
-                x = x + 5;
+                toward = 1;
+                x = x + speed;
             }
             else if(y >= 150)
             {
-                y = y - 5;
+                y = y - speed;
             }
             if(x > 400 && y < 150)
             {
+                EnterTime = CurrentTime;
                 CurrentStage = CustomerStage::Eat;
             }
         }
 
-        void Eat()
+        void Eat(std::vector<Chair>& Chairs, int CurrentTime)
         {
-            CurrentStage = CustomerStage::Leave;
+            if(isEating == -1)
+            {
+                for(int i = 0; i < Chairs.size(); i++)
+                {
+                    SDL_Log("%d",Chairs[i].GetUsing());
+                    if(isEating != -1)
+                        break;
+                    else
+                    {
+                        if(Chairs[i].GetUsing() == 0)
+                        {
+                            Chairs[i].SetUsing(1);
+                            isEating = i;
+                        }
+                    } 
+                }             
+                if(isEating == -1)
+                {
+                    CurrentStage = CustomerStage::Leave;
+                }
+            }
+            else
+            {
+                if( x != Chairs[isEating].GetX())
+                {
+                    if(x - Chairs[isEating].GetX() > 0)
+                    {
+                        x = x - speed;
+                        toward = 0;
+                    }
+                    else
+                    {
+                        x = x + speed;
+                        toward = 1;
+                    }
+                }
+                else if( y != Chairs[isEating].GetY())
+                {
+                    if(y - Chairs[isEating].GetY() > 0)
+                    {
+                        y = y - speed;
+                    }
+                    else
+                    {
+                        y = y + speed;
+                    }        
+                }
+                if(x == Chairs[isEating].GetX() && y == Chairs[isEating].GetY())
+                {
+                    if(isEating % 2 == 0)
+                    {
+                        toward = 1;
+                    }
+                    else
+                    {
+                        toward = 0;
+                    }
+                    
+                    if(CurrentTime - EnterTime >= 10000 + rand()% 2000 - 1000)
+                    { 
+                        CurrentStage = CustomerStage::Leave;
+                        Chairs[isEating].SetUsing(0);
+                    }
+                }
+            }
+            //CurrentStage = CustomerStage::Leave;
         }
 
         void LeaveStore()
         {
             if(y <= 350)
             {
-                y = y + 5;
+                y = y + speed;
             }
             else if(x <= 800)
             {
-                x = x + 5;
+                toward = 1;
+                x = x + speed;
             }
             if(x > 800)
             {
@@ -222,6 +300,11 @@ class Customer
         bool GetQuit()
         {
             return QuitFinish;
+        }
+
+        bool GetToward()
+        {
+            return toward;
         }
 
     private:
@@ -238,4 +321,7 @@ class Customer
         bool BuyFinish;
         bool EatFinsih;
         bool QuitFinish;
+        int isEating;
+        bool toward;
+        int speed = 10;
 };

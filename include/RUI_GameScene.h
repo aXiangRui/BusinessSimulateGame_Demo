@@ -5,6 +5,7 @@
 #include<string>
 #include<vector>
 #include<fstream>
+#include"RUI_Chair.h"
 #include"RUI_Scene.h"
 #include"RUI_MusicManager.h"
 #include"RUI_MenuButton.h"
@@ -25,12 +26,13 @@ class RUI_GameScene: public RUI_Scene
 
         MusicPlayer gamemusic;
         std::vector<MenuButton> Btns;
+        std::vector<Chair> Chairs;
 
         Uint32 CurrentTime;
         Uint32 LastTime;
 
         Clock TestClock;
-        const int HourTime = 1000;
+        const int HourTime = 10000;
 
         GameEvent TestEvent;
 
@@ -47,6 +49,13 @@ class RUI_GameScene: public RUI_Scene
             }
             Background = ResourceManager::instance()->FindTexture("hall");
 
+            for(int i = 0; i < 16; i++)
+            {
+                Chair chair;
+                chair.InitChair(i);
+                Chairs.push_back(chair);
+            }
+
             LastTime = SDL_GetTicks();
             TestClock.SetStartTime(TestEvent.ReturnClockTime());
             SDL_Log("进入游戏场景");
@@ -58,7 +67,7 @@ class RUI_GameScene: public RUI_Scene
             {  
                 TimeChange();
                 TestEvent.SetClock(TestClock);
-                TestEvent.onUpdate();
+                TestEvent.onUpdate(Chairs);
             }
             else
             {
@@ -100,6 +109,11 @@ class RUI_GameScene: public RUI_Scene
             for(int i = 0; i < Btns.size(); i++)
             {
                 Btns[i].ButtonRender(Renderer);
+            }
+
+            for(int i = 0; i < Chairs.size(); i++)
+            {
+                Chairs[i].onRender(Renderer);
             }
             TestClock.RenderHour(Renderer);
             TestEvent.onRender(Renderer);
