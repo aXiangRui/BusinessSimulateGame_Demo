@@ -45,6 +45,10 @@ class Customer
             QuitFinish = 0;
             toward = 0;
             isEating = -1;
+            isGoingPay = 0;
+            PayTime = 0;
+            isFront = 0;
+            Queue = 0;
         }
 
         int GetCustomerID()
@@ -216,19 +220,27 @@ class Customer
 
         void Pay(int CurrentTime)
         {
-            if(y >= 150)
+            if(y >= 150 + Queue * 2)
             {
                 y = y - speed;
             }
-            else if(x <= 350)
+            else if(x <= 350 - Queue * 20)
             {
                 toward = 1;
                 x = x + speed;
             }
+            else if(x > 350 - Queue * 20 + 10)
+            {
+                toward = 0;
+                x = x - speed;
+            }
             if(x > 350 && y < 150)
             {
-                SitTime = CurrentTime;
-                CurrentStage = CustomerStage::Eat;
+                if(CurrentTime - PayTime >= 1500 + rand()% 100 && isGoingPay == 1)
+                {
+                    SitTime = CurrentTime;
+                    CurrentStage = CustomerStage::Eat;
+                }
             }
         }
 
@@ -251,7 +263,7 @@ class Customer
                 }             
                 if(isEating == -1)
                 {
-                    CurrentStage = CustomerStage::Leave;
+                    // CurrentStage = CustomerStage::Leave;
                 }
             }
             else
@@ -291,7 +303,7 @@ class Customer
                         toward = 0;
                     }
                     
-                    if(CurrentTime - SitTime >= 10000 + rand()% 5000 - 2500)
+                    if(CurrentTime - SitTime >= 20000 + rand()% 5000 - 2500)
                     {    
                         Chairs[isEating].SetUsing(0);
                         preference = preference + 5;
@@ -354,6 +366,49 @@ class Customer
             return y;
         }
 
+        bool isGoingToPay(int CurrentTime)
+        {
+            if( CurrentStage == CustomerStage::Buy && isGoingPay == 0)
+            {
+                return 1;
+            }
+            return 0;
+        }
+
+        bool hasPayed()
+        {
+            if( CurrentStage == CustomerStage::Eat)
+            {
+                return 1;
+            }
+            return 0;
+        }
+
+        void setIsGoingToPay(bool x)
+        {
+            isGoingPay = x;
+        }
+
+        void setIsfront(bool x)
+        {
+            isFront = x;
+        }
+
+        int GetPayTime()
+        {
+            return PayTime;
+        }
+
+        void SetPayTime(int time)
+        {
+            PayTime = time;
+        }
+
+        void SetQueueNumber(int number)
+        {
+            Queue = number;
+        }
+
     private:
         std::string CustomerName;
         std::string PathName;
@@ -375,5 +430,10 @@ class Customer
         bool toward;
         int preference;
         int speed = 2;
+        int Queue;
+
+        bool isGoingPay;
+        bool isFront;
+        int PayTime;
 };
 
