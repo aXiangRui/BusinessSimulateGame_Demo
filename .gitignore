@@ -1,0 +1,10 @@
+# 忽略SDL2相关文件夹
+SDL2/
+
+# 忽略MinGW相关文件夹
+MinGW/
+
+# 可选：忽略编译生成的exe、obj等文件
+*.exe
+*.obj
+*.o
