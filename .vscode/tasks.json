@@ -10,6 +10,8 @@
                 "${file}",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe",
+                "-static-libgcc",
+                "-static-libstdc++",
                 "-I",
                 "${fileDirname}\\SDL2\\include",
                 "-L",
@@ -19,7 +21,9 @@
                 "-l", "SDL2_image",
                 "-l", "SDL2_mixer",                
                 "-l", "SDL2",
-                "-mwindows"
+                "-mwindows",
+                "-l", "ole32",
+                "-l", "winmm"
             ],
             "options": {
                 "cwd": "${fileDirname}"

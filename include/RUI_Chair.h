@@ -109,3 +109,27 @@ class Desk
     int x,y;
     SDL_Texture* DeskTexture = nullptr;
 };
+
+class Register
+{
+    public:
+    Register() = default;
+    ~Register() = default;
+
+    void InitRegister()
+    {
+        x = 350;
+        y = 120;
+        RegisterTexture = ResourceManager::instance()->FindTexture("register");
+    }
+
+    void onRender(SDL_Renderer* Renderer)
+    {
+        SDL_Rect Rect = {x,y,64,64};
+        SDL_RenderCopy(Renderer,RegisterTexture,nullptr,&Rect);
+    }
+
+    private:
+    SDL_Texture* RegisterTexture;
+    int x,y;
+};

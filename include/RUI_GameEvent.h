@@ -171,35 +171,27 @@ class GameEvent
     void Load()
     {
         std::ifstream file("./save/Time.txt");
-        if(!file)
+        std::string string;
+        int line = 0;
+        int time;
+        while(std::getline(file,string))
         {
-            SDL_Log("Load: failed to open save file");
-            return;
-        }
-        std::vector<int> tokens;
-        std::string line;
-        while(std::getline(file, line))
-        {
-            std::istringstream iss(line);
-            int v;
-            while(iss >> v)
-                tokens.push_back(v);
-        }
-        file.close();
-
-        if(tokens.empty())
-        {
-            SDL_Log("Load: no data in save file");
-            return;
-        }
-        timeClock.SetClockTime(tokens[0]);
-        for(size_t k = 1; k + 1 < tokens.size(); k += 2)
-        {
-            int id = tokens[k];
-            int ent = tokens[k+1];
-            Customer a;
-            a.InitCustomer(id, 0, "小黄","XiaoHuang",0);
-            Customers.push_back(a);
+            line++;
+            if(line == 1)
+            {
+                file >> time;
+                test = time;
+            }
+            else if(line >= 3)
+            { 
+                std::istringstream iss(string);
+                int cID;
+                std::string cPath;
+                iss >> cID >> cPath;
+                Customer a;
+                a.InitCustomer((int)cID, 0, "cName", cPath.c_str(), 0);
+                Customers.push_back(a);
+            }
         }
         file.close();
 
@@ -218,11 +210,13 @@ class GameEvent
             return;
         }
         file << timeClock.ReturnAllHour() << std::endl;
+
         for(size_t i = 0; i < Customers.size(); ++i)
         {
-            file << Customers[i].GetCustomerID() << std::endl;
+            file << Customers[i].GetCustomerID() << " " << Customers[i].GetCustomerPath() << std::endl;
         }
         file.close();
+
         std::ofstream file01("./save/Total.txt");
         file01 << test <<std::endl;
         file01.close();

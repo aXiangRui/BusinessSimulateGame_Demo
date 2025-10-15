@@ -78,7 +78,9 @@ class MenuButton: public Button
             else
             {
                 setTextColor(0,0,0,255);
-                SDL_Surface* textSurface = TTF_RenderUTF8_Blended(TextFont,text.c_str(),TextColor);
+                SDL_Surface* textSurface = nullptr;
+                if(TextFont != nullptr)
+                    textSurface = TTF_RenderUTF8_Blended(TextFont,text.c_str(),TextColor);
                 if(textSurface)
                 {
                     TextTexture = SDL_CreateTextureFromSurface(Renderer,textSurface);

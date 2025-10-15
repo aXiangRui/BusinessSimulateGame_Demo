@@ -25,6 +25,7 @@ class RUI_GameScene: public RUI_Scene
         ~RUI_GameScene() = default;
 
         SDL_Texture* Background;
+        SDL_Texture* BackgroundWall;
         CustomerManager customerManager;
 
         MusicPlayer gamemusic;
@@ -32,6 +33,7 @@ class RUI_GameScene: public RUI_Scene
         std::vector<Chair> Chairs;
         std::vector<Desk> Desks;
         std::vector<Cabinet> Cabinets;
+        Register reg;
 
         Uint32 CurrentTime;
         Uint32 LastTime;
@@ -47,6 +49,7 @@ class RUI_GameScene: public RUI_Scene
             MenuButton Btn0((WindowWidth-320)/2,520,320,64,"返回首页",0);
             Btns.push_back(Btn0);
             BackgroundMusic.quit();
+            reg.InitRegister();
             if(!Mix_PlayingMusic())
             {           
                 gamemusic.setMusic(ResourceManager::instance()->FindMusic("gamemusic"));
@@ -54,6 +57,7 @@ class RUI_GameScene: public RUI_Scene
             }
             customerManager.InitCustomerManager();
             Background = ResourceManager::instance()->FindTexture("hall");
+            BackgroundWall = ResourceManager::instance()->FindTexture("hallwall");
 
             for(int i = 0; i < 16; i++)
             {
@@ -110,7 +114,7 @@ class RUI_GameScene: public RUI_Scene
             else
             {                            
                 CurrentTime = SDL_GetTicks();
-                if(CurrentTime - LastTime >= HourTime * 2)
+                if(CurrentTime - LastTime >= HourTime / 10)
                 {          
                     LastTime = CurrentTime;
                     TestClock.UpdateTime();
@@ -141,6 +145,8 @@ class RUI_GameScene: public RUI_Scene
                 Desks[i].onRender(Renderer);
             }
 
+            reg.onRender(Renderer);
+
             TestClock.RenderHour(Renderer);
             TestEvent.onRender(Renderer);
  
@@ -148,6 +154,8 @@ class RUI_GameScene: public RUI_Scene
             {
                 Cabinets[i].onRender(Renderer);
             }
+            SDL_Rect BackGroundWallRect = {0,6,800,600};
+            SDL_RenderCopy(Renderer,BackgroundWall,nullptr,&BackGroundWallRect);
 
             SDL_RenderPresent(Renderer);
         }

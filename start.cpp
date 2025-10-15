@@ -33,7 +33,6 @@ int main(int argc, char* argv[])
 {
     SDL_Init(SDL_INIT_VIDEO);
     SDL_Init(SDL_INIT_AUDIO);
-    TTF_Init();
     IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
     SDL_Window* window = SDL_CreateWindow(
         "Test甜品店",                           // 窗口标题
@@ -42,6 +41,7 @@ int main(int argc, char* argv[])
         WindowWidth,WindowHeight,         // 窗口宽高（像素）
         SDL_WINDOW_SHOWN                  // 显示窗口（必选）
     );
+    TTF_Init();
     Mix_Init(MIX_INIT_MP3 | MIX_INIT_FLAC );
 
     SDL_Renderer* Renderer = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);

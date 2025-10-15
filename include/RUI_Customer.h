@@ -224,19 +224,24 @@ class Customer
             {
                 y = y - speed;
             }
-            else if(x <= 350 - Queue * 20)
+            else if(x <= maxNumber(350 - Queue * 20 , 0))
             {
                 toward = 1;
                 x = x + speed;
+                if(x == 0)
+                    toward = 1;
             }
-            else if(x > 350 - Queue * 20 + 10)
+            else if(x > maxNumber(350 - Queue * 20 + 10 , -10))
             {
                 toward = 0;
                 x = x - speed;
+                if(x == 0)
+                    toward = 1;
             }
             if(x > 350 && y < 150)
             {
-                if(CurrentTime - PayTime >= 1500 + rand()% 100 && isGoingPay == 1)
+                toward = 1;
+                if(CurrentTime - PayTime >= 1000 && isGoingPay == 1)
                 {
                     SitTime = CurrentTime;
                     CurrentStage = CustomerStage::Eat;
@@ -263,6 +268,8 @@ class Customer
                 }             
                 if(isEating == -1)
                 {
+                    if(x <= 600)
+                        x = x + speed;
                     // CurrentStage = CustomerStage::Leave;
                 }
             }
@@ -303,7 +310,7 @@ class Customer
                         toward = 0;
                     }
                     
-                    if(CurrentTime - SitTime >= 20000 + rand()% 5000 - 2500)
+                    if(CurrentTime - SitTime >= 17000 + rand()% 5000)
                     {    
                         Chairs[isEating].SetUsing(0);
                         preference = preference + 5;
@@ -407,6 +414,13 @@ class Customer
         void SetQueueNumber(int number)
         {
             Queue = number;
+        }
+
+        int maxNumber(int a,int b)
+        {
+            if(a > b)
+                return a;
+            return b;
         }
 
     private:
