@@ -3,6 +3,7 @@
 #include<SDL2/SDL.h>
 #include<string>
 #include<vector>
+#include<fstream>
 #include"RUI_ResourceManager.h"
 #include"RUI_Chair.h"
 #include"RUI_Cabinet.h"
@@ -24,15 +25,17 @@ class Customer
         std::vector<SDL_Texture*>CustomerTexture;
         SDL_Texture* NormalTexture = nullptr;
 
-        void InitCustomer(int id, int preferid, std::string name)
+        void InitCustomer(int id, int preferid, std::string name, std::string path, int prefer)
         {
             CustomerID = id;
             PreferDessertID = preferid;
             CustomerName = name;
+            PathName = path;
             x = 800;
             y = 450;
             SitTime = 0;
             ChooseTime = 0;
+            preference = prefer;
 
             CurrentStage = CustomerStage::Enter;
             EnterFinish = 0;
@@ -57,6 +60,16 @@ class Customer
         std::string GetCustomerName()
         {
             return CustomerName;
+        }
+
+        std::string GetCustomerPath()
+        {
+            return PathName;
+        }
+
+        int GetCustomerPreference()
+        {
+            return preference;
         }
 
         void SetSitTime(int time)
@@ -91,7 +104,7 @@ class Customer
                 SDL_Log("OnRender: Renderer is null for customer id=%d name=%s", CustomerID, CustomerName.c_str());
                 return;
             }
-            NormalTexture = ResourceManager::instance()->FindTexture(CustomerName.c_str());
+            NormalTexture = ResourceManager::instance()->FindTexture(PathName.c_str());
             if(!NormalTexture)
             {
                 SDL_Log("OnRender: texture not found for customer id=%d name=%s", CustomerID, CustomerName.c_str());
@@ -173,22 +186,27 @@ class Customer
         {
             if(x < Cabinets[chooseID].GetX() + 32)
             {
+                toward = 1;
                 x = x + speed;
             }
             else if(x > Cabinets[chooseID].GetX() + 32)
             {
+                toward = 0;
                 x = x - speed;
             }
             else if(y < Cabinets[chooseID].GetY() - 16)
             {
+                toward = 0;
                 y = y + speed;
             }
             else if(y > Cabinets[chooseID].GetY() - 16)
             {
+                toward = 0;
                 y = y - speed;
             }
             else if(x == Cabinets[chooseID].GetX() + 32 && y == Cabinets[chooseID].GetY() - 16)
             {
+                toward = 0;
                 if(currentTime - ChooseTime >= 5000 + rand() % 500 - 250)
                 {
                     CurrentStage = CustomerStage::Buy;
@@ -276,6 +294,7 @@ class Customer
                     if(CurrentTime - SitTime >= 10000 + rand()% 5000 - 2500)
                     {    
                         Chairs[isEating].SetUsing(0);
+                        preference = preference + 5;
                         CurrentStage = CustomerStage::Leave;
                     }
                 }
@@ -290,9 +309,15 @@ class Customer
 
         void LeaveStore()
         {
-            if(x <= 400)
+            if(x <= 580 && y <= 350)
             {
+                toward = 1;
                 x = x + speed;
+            }
+            else if(x > 590 && y <= 350)
+            {
+                toward = 0;
+                x = x - speed;
             }
             else if(y <= 350)
             {
@@ -331,6 +356,7 @@ class Customer
 
     private:
         std::string CustomerName;
+        std::string PathName;
         int CustomerID;
         int PreferDessertID;
         int x,y;
@@ -347,5 +373,7 @@ class Customer
         bool QuitFinish;
         int isEating;
         bool toward;
+        int preference;
         int speed = 2;
 };
+

@@ -13,7 +13,7 @@ class Cabinet
     void InitCabinet(int id)
     {
         CabinetID = id;
-        x = (CabinetID / 12) * 200 + 120 * (CabinetID % 2);
+        x = (CabinetID / 12) * 200 + 100 * (CabinetID % 2) + 20;
         y = (CabinetID / 2 % 6) * 40 + 200; 
     }
 

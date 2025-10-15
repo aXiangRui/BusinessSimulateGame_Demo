@@ -1,0 +1,3 @@
+0 0 小黄 XiaoHuang 0
+1 0 小蓝 XiaoLan 0
+2 0 小红 XiaoHong 0

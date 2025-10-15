@@ -3,6 +3,7 @@
 #include"RUI_Customer.h"
 #include"RUI_Clock.h"
 #include"RUI_Cabinet.h"
+#include"RUI_CustomerManager.h"
 #include<vector>
 #include<string>
 #include<fstream>
@@ -47,19 +48,25 @@ class GameEvent
         timeClock = c;
     }
 
-    void onUpdate(std::vector<Chair>& Chairs,std::vector<Cabinet>& Cabinets)
+    void onUpdate(std::vector<Chair>& Chairs,std::vector<Cabinet>& Cabinets, CustomerManager customerManager)
     {
         CurrentTime = SDL_GetTicks();
         if(timeClock.ReturnHour()>=6 && timeClock.ReturnHour() < 22)
         {
-            if(CurrentTime - LastTime >= 2500 + (rand()%2000) - 1000)
+            if(CurrentTime - LastTime >= 1500 + (rand()%2000) - 1000)
             {
                 int j = rand() % 4;
                 if(j <= 3)
                 {
+                    int randIndex = rand()%customerManager.GetCustomersSize();
                     Customer a;
-                    a.InitCustomer(test,0,"XiaoHuang");
-                    a.SetChooseTime(CurrentTime);
+                    a.InitCustomer(
+                        test,
+                        customerManager.GetPreferDessertID(randIndex),
+                        customerManager.GetCustomerName(randIndex),
+                        customerManager.GetCustomerPath(randIndex),
+                        customerManager.GetCustomerPreference(randIndex)
+                    );
                     AddCustomer(a);
                     SDL_Log("增加顾客，当前%d人",Customers.size());
                     test++;
@@ -72,6 +79,7 @@ class GameEvent
             Customers[i].Update(Chairs, CurrentTime, Cabinets);
             //差点找不到顾客类刷新了哈哈哈哈
             if(Customers[i].GetQuit() && Customers[i].getX() > 800 && Customers[i].getY() > 350) {
+                SDL_Log("顾客准备离开，此时x:%d,y:%d",Customers[i].getX(),Customers[i].getY());
                 DeleteCustomer(Customers[i].GetCustomerID());  // 删除特定 id 的元素 (DeleteCustomer 会返回)
                 SDL_Log("顾客离开，剩下%d人", (int)Customers.size());
             }
@@ -93,7 +101,7 @@ class GameEvent
 
     void Load()
     {
-        std::ifstream file("./save/test.txt");
+        std::ifstream file("./save/Time.txt");
         if(!file)
         {
             SDL_Log("Load: failed to open save file");
@@ -121,15 +129,14 @@ class GameEvent
             int id = tokens[k];
             int ent = tokens[k+1];
             Customer a;
-            a.InitCustomer(id, 0, "XiaoHuang");
-            a.SetChooseTime(ent);
+            a.InitCustomer(id, 0, "小黄","XiaoHuang",0);
             Customers.push_back(a);
         }
     }
 
     void Save()
     {
-        std::ofstream file("./save/test.txt");
+        std::ofstream file("./save/Time.txt");
         if(!file)
         {
             SDL_Log("Save: failed to open save file for writing");
@@ -138,7 +145,7 @@ class GameEvent
         file << timeClock.ReturnAllHour() << std::endl;
         for(size_t i = 0; i < Customers.size(); ++i)
         {
-            file << Customers[i].GetCustomerID() << " " << Customers[i].GetChooseTime() << std::endl;
+            file << Customers[i].GetCustomerID() << std::endl;
         }
         file.close();
     }

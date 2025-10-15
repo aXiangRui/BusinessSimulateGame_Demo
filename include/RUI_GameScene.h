@@ -5,6 +5,7 @@
 #include<string>
 #include<vector>
 #include<fstream>
+#include"RUI_CustomerManager.h"
 #include"RUI_Chair.h"
 #include"RUI_Scene.h"
 #include"RUI_MusicManager.h"
@@ -24,6 +25,7 @@ class RUI_GameScene: public RUI_Scene
         ~RUI_GameScene() = default;
 
         SDL_Texture* Background;
+        CustomerManager customerManager;
 
         MusicPlayer gamemusic;
         std::vector<MenuButton> Btns;
@@ -50,6 +52,7 @@ class RUI_GameScene: public RUI_Scene
                 gamemusic.setMusic(ResourceManager::instance()->FindMusic("gamemusic"));
                 gamemusic.play(-1);
             }
+            customerManager.InitCustomerManager();
             Background = ResourceManager::instance()->FindTexture("hall");
 
             for(int i = 0; i < 16; i++)
@@ -84,7 +87,7 @@ class RUI_GameScene: public RUI_Scene
             {  
                 TimeChange();
                 TestEvent.SetClock(TestClock);
-                TestEvent.onUpdate(Chairs,Cabinets);
+                TestEvent.onUpdate(Chairs,Cabinets,customerManager);
             }
             else
             {
