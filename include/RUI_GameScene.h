@@ -3,6 +3,7 @@
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_mixer.h>
 #include<string>
+#include<queue>
 #include<vector>
 #include<fstream>
 #include"RUI_DessertManager.h"
@@ -15,6 +16,7 @@
 #include"RUI_ResourceManager.h"
 #include"RUI_GameEvent.h"
 #include"RUI_Cabinet.h"
+#include"RUI_ChatFrame.h"
 
 extern RUI_SceneManager SceneManager;
 extern MusicPlayer BackgroundMusic;
@@ -36,6 +38,7 @@ class RUI_GameScene: public RUI_Scene
         std::vector<Chair> Chairs;
         std::vector<Desk> Desks;
         std::vector<Cabinet> Cabinets;
+        std::queue<ChatFrame> ChatFrames;
         Register reg;
 
         Uint32 CurrentTime;
@@ -45,12 +48,13 @@ class RUI_GameScene: public RUI_Scene
         const int HourTime = 10000;
 
         int TotalMoney = 0;
+        int isChatFrameShowing = 0;
 
         GameEvent TestEvent;
 
         void onEnter()
         {
-            TestEvent.Load();
+            TestEvent.Load(TotalMoney);
             MenuButton Btn0((WindowWidth-320)/2,520,320,64,"返回首页",0);
             Btns.push_back(Btn0);
             BackgroundMusic.quit();
@@ -87,6 +91,11 @@ class RUI_GameScene: public RUI_Scene
                 Desks.push_back(desk);
             }
 
+            while(ChatFrames.size()!=0)
+            {
+                ChatFrames.pop();
+            }
+
             LastTime = SDL_GetTicks();
             TestClock.SetStartTime(TestEvent.ReturnClockTime());
             SDL_Log("进入游戏场景");
@@ -94,7 +103,7 @@ class RUI_GameScene: public RUI_Scene
         void onUpdate()
         {
             //SDL_Log("更新游戏场景");
-            if(true)
+            if(ChatFrames.size() == 0)
             {  
                 TimeChange();
                 TestEvent.SetClock(TestClock);
@@ -102,14 +111,14 @@ class RUI_GameScene: public RUI_Scene
             }
             else
             {
-                
+                isChatFrameShowing = 1;
             }
         }
 
         void TimeChange()
         {
             int PresentTime = TestClock.ReturnHour();
-            if(PresentTime >= 6 && PresentTime < 22)
+            if(PresentTime >= 7 && PresentTime < 22)
             {
                 CurrentTime = SDL_GetTicks();
                 if(CurrentTime - LastTime >= HourTime)
@@ -121,7 +130,7 @@ class RUI_GameScene: public RUI_Scene
             else
             {                            
                 CurrentTime = SDL_GetTicks();
-                if(CurrentTime - LastTime >= HourTime / 10)
+                if(CurrentTime - LastTime >= HourTime * 2)
                 {          
                     LastTime = CurrentTime;
                     TestClock.UpdateTime();
@@ -137,7 +146,7 @@ class RUI_GameScene: public RUI_Scene
             SDL_Color color = { 10, 10, 10, 255};
             std::string Title = "总金额" + std::to_string(TotalMoney);
             SDL_Surface* image = TTF_RenderUTF8_Blended(TextFont, Title.c_str(),color);
-            SDL_Rect TextRect = {150,10,image->w,image->h};
+            SDL_Rect TextRect = {200,10,image->w,image->h};
             SDL_Texture* MoneyTexture = SDL_CreateTextureFromSurface(Renderer,image);
             SDL_FreeSurface(image);
 
@@ -242,7 +251,7 @@ class RUI_GameScene: public RUI_Scene
         void onExit()
         {
             SDL_Log("退出游戏场景");
-            TestEvent.Save();
+            TestEvent.Save(TotalMoney);
             gamemusic.quit();
         }
         private:

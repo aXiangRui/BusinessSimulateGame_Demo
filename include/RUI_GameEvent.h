@@ -174,21 +174,18 @@ class GameEvent
         return timeClock.ReturnAllHour();
     }
 
-    void Load()
+    void Load(int& TotalMoney)
     {
         std::ifstream file("./save/Time.txt");
         std::string string;
-        int line = 0;
         int time;
+        file >> time;
+        timeClock.SetClockTime(time);
+        int line = 0;
         while(std::getline(file,string))
         {
             line++;
-            if(line == 1)
-            {
-                file >> time;
-                test = time;
-            }
-            else if(line >= 3)
+            if(line >= 2)
             { 
                 std::istringstream iss(string);
                 int cID;
@@ -203,11 +200,12 @@ class GameEvent
 
         std::ifstream file01("./save/Total.txt");
         file01 >> test;
+        file01 >> TotalMoney;
         SDL_Log("读取到总人数为%d",test);
         file.close();
     }
 
-    void Save()
+    void Save(int& TotalMoney)
     {
         std::ofstream file("./save/Time.txt");
         if(!file)
@@ -225,6 +223,7 @@ class GameEvent
 
         std::ofstream file01("./save/Total.txt");
         file01 << test <<std::endl;
+        file01 << TotalMoney << std::endl;
         file01.close();
     }
 

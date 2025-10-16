@@ -21,6 +21,11 @@ class Dessert
         Name = name;
         DessertTexture = ResourceManager::instance()->FindTexture(path.c_str());
         price = SweetLevel * 3 + FullLevel * 1 + TasteLevel * 2;
+
+        x = 0;
+        y = 0;
+        w = 64;
+        h = 64;
     }
 
     int GetDessertID()
@@ -83,6 +88,25 @@ class Dessert
         return Name;
     }
 
+    void SetPosition(int mx, int my)
+    {
+        x = mx;
+        y = my;
+    }
+
+    void SetWidth(int mw, int mh)
+    {
+        w = mw;
+        h = mh;
+    }
+
+    void onRender(SDL_Renderer* Renderer)
+    {
+        DessertTexture = ResourceManager::instance()->FindTexture(FilePath.c_str());
+        SDL_Rect Rect = {x,y,w,h};
+        SDL_RenderCopy(Renderer,DessertTexture,nullptr,&Rect);
+    }
+
     private:
     int SweetLevel;
     int FullLevel;
@@ -91,4 +115,6 @@ class Dessert
     int price;
     std::string Name;
     std::string FilePath;
+    int x,y;
+    int w,h;
 };

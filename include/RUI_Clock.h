@@ -49,11 +49,12 @@ class Clock
         if(!TimeFont)
             TimeFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
         std::string j;
+        j = "第" + std::to_string(ReturnDay()) + "天";
         if(ReturnHour() >= 10)
-            j = std::to_string(ReturnHour()) + ":00" ;
+            j = j + std::to_string(ReturnHour()) + ":00" ;
         else
         {
-            j = " " + std::to_string(ReturnHour()) + ":00" ;
+            j = j + " " + std::to_string(ReturnHour()) + ":00" ;
         }             
         SDL_Surface* image = TTF_RenderUTF8_Blended(TimeFont,j.c_str(),TextColor);
         int w = image->w;
