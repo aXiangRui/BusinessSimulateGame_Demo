@@ -17,7 +17,6 @@ class GameEvent
     GameEvent() = default;
     ~GameEvent() = default;
 
-    int test = 0;
     std::queue<int> payQueue;
 
     void AddCustomer(Customer cus)
@@ -41,9 +40,23 @@ class GameEvent
                 SwapCustomer(Customers[i], Customers[Customers.size()-1]);
                 Customers.pop_back();
                 SDL_Log("删除顾客: removed id=%d", id);
+                // 从队列中移除该 id，防止留下空洞
+                RemoveIdFromQueue(id);
                 return; // stop after removing to avoid invalid indices
             }
         }
+    }
+
+    void RemoveIdFromQueue(int id)
+    {
+        if (payQueue.empty()) return;
+        std::queue<int> newQ;
+        while(!payQueue.empty())
+        {
+            int v = payQueue.front(); payQueue.pop();
+            if (v != id) newQ.push(v);
+        }
+        payQueue = std::move(newQ);
     }
 
     void SetClock(Clock c)
@@ -55,18 +68,19 @@ class GameEvent
         std::vector<Cabinet>& Cabinets,
         CustomerManager customerManager,
         DessertManager dessertManager,
-        int& TotalMoney
+        int& TotalMoney,
+        int& TotalCustomers
         )
     {
-        if(test >= 10000000)
+        if(TotalCustomers >= 10000000)
         {
-            test = 0;
+            TotalCustomers = 0;
             //防溢出，不过基本上也没人能招待这么多吧...
         }
         CurrentTime = SDL_GetTicks();
         if(timeClock.ReturnHour()>=6 && timeClock.ReturnHour() < 22)
         {
-            if(CurrentTime - LastTime >= 2500 + (rand()%2000) - 1000)
+            if(CurrentTime - LastTime >= 3500 + (rand()%2000) - 1000)
             {
                 int j = rand() % 4;
                 if(j <= 3)
@@ -74,7 +88,7 @@ class GameEvent
                     int randIndex = rand()%customerManager.GetCustomersSize();
                     Customer a;
                     a.InitCustomer(
-                        test,
+                        TotalCustomers,
                         customerManager.GetPreferDessertID(randIndex),
                         customerManager.GetCustomerName(randIndex),
                         customerManager.GetCustomerPath(randIndex),
@@ -82,7 +96,7 @@ class GameEvent
                     );
                     AddCustomer(a);
                     SDL_Log("增加顾客，当前%d人",Customers.size());
-                    test++;
+                    TotalCustomers++;
                 }
                 LastTime = CurrentTime;
             }          
@@ -126,7 +140,18 @@ class GameEvent
         }
         
 
-        // 只处理队首顾客
+        // 只处理队首顾客（先清理队列中不存在的 id）
+        while(!payQueue.empty()) {
+            int peekId = payQueue.front();
+            bool exists = false;
+            for (int k = 0; k < (int)Customers.size(); ++k) {
+                if (Customers[k].GetCustomerID() == peekId) { exists = true; break; }
+            }
+            if (!exists) {
+                payQueue.pop();
+            } else break;
+        }
+
         if (!payQueue.empty())
         {
             int frontId = payQueue.front();
@@ -137,7 +162,7 @@ class GameEvent
             }
             if (idx == -1)
             {
-                // 顾客已被删除，安全弹出
+                // 顾客已被删除，安全弹出（防御）
                 payQueue.pop();
             }
             else
@@ -174,7 +199,7 @@ class GameEvent
         return timeClock.ReturnAllHour();
     }
 
-    void Load(int& TotalMoney)
+    void Load(int& TotalMoney, int& TotalCustomers)
     {
         std::ifstream file("./save/Time.txt");
         std::string string;
@@ -193,19 +218,26 @@ class GameEvent
                 iss >> cID >> cPath;
                 Customer a;
                 a.InitCustomer((int)cID, 0, "cName", cPath.c_str(), 0);
-                Customers.push_back(a);
+                bool overload = 0;
+                for(int i = 0; i < Customers.size(); i++)
+                {
+                    if(Customers[i].GetCustomerID() == cID)
+                    overload = 1;
+                }
+                if(!overload)
+                    Customers.push_back(a);
             }
         }
         file.close();
 
         std::ifstream file01("./save/Total.txt");
-        file01 >> test;
+        file01 >> TotalCustomers;
         file01 >> TotalMoney;
-        SDL_Log("读取到总人数为%d",test);
-        file.close();
+        SDL_Log("读取到总人数为%d",TotalCustomers);
+        file01.close();
     }
 
-    void Save(int& TotalMoney)
+    void Save(int& TotalMoney, int& TotalCustomers)
     {
         std::ofstream file("./save/Time.txt");
         if(!file)
@@ -222,7 +254,7 @@ class GameEvent
         file.close();
 
         std::ofstream file01("./save/Total.txt");
-        file01 << test <<std::endl;
+        file01 << TotalCustomers <<std::endl;
         file01 << TotalMoney << std::endl;
         file01.close();
     }

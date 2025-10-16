@@ -14,6 +14,7 @@
 #include"include/RUI_MusicManager.h"
 #include"include/RUI_ResourceManager.h"
 #include"include/RUI_LoadingScene.h"
+#include"include/RUI_CreateScene.h"
 
 int WindowWidth = 800;
 int WindowHeight = 600;
@@ -23,6 +24,7 @@ RUI_Scene* MenuScene = nullptr;
 RUI_Scene* GameScene = nullptr;
 RUI_Scene* SettingScene = nullptr;
 RUI_Scene* SavingScene = nullptr;
+RUI_Scene* CreateScene = nullptr;
 RUI_SceneManager SceneManager;
 MusicPlayer BackgroundMusic;
 // Define ResourceManager singleton storage to satisfy linker
@@ -50,6 +52,7 @@ int main(int argc, char* argv[])
     GameScene = new RUI_GameScene();
     SettingScene = new RUI_SettingScene();
     SavingScene = new RUI_SavingScene();
+    CreateScene = new RUI_CreateScene();
 
     LoadingSc(Renderer);
 

@@ -467,4 +467,3 @@ class Customer
         int ChooseNumber;
         int payPrice;
 };
-

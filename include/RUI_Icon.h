@@ -4,26 +4,16 @@
 #include<SDL2/SDL_image.h>
 #include<iostream>
 #include<string>
+#include"RUI_ResourceManager.h"
 
 class RUI_Icon
 {
+    public:
     RUI_Icon() = default;
     ~RUI_Icon() = default;
-
-    void IconRender(SDL_Renderer* Renderer)
-    {
-        SDL_Surface* image = IMG_Load(address.c_str());
-        if(!image)
-        {
-            std::cout<<"error! cannot find "<< address << std::endl;
-        }
-        SDL_Texture* IconTexture = SDL_CreateTextureFromSurface(Renderer,image);
-        SDL_FreeSurface(image);
-        SDL_RenderCopy(Renderer,IconTexture,nullptr,&Rect);
-    }
     
-    virtual void IconHoverRender(SDL_Renderer* Renderer,std::string address);
-    virtual void IconClickRender(SDL_Renderer* Renderer,std::string address);
+    // virtual void IconHoverRender(SDL_Renderer* Renderer,std::string address);
+    // virtual void IconClickRender(SDL_Renderer* Renderer,std::string address);
 
     void InitIcon(int mx, int my, int mw, int mh, int i, std::string add)
     {
@@ -36,10 +26,14 @@ class RUI_Icon
         address = add;
     }
 
-    bool isHovered(SDL_Event& Event)
+    void onRender(SDL_Renderer* Renderer)
     {
-        int mx = Event.motion.x;
-        int my = Event.motion.y;
+        IconTexture = ResourceManager::instance()->FindTexture(address.c_str());
+        SDL_RenderCopy(Renderer,IconTexture,nullptr,&Rect);
+    }
+
+    bool isHovered(int mx, int my)
+    {
         if(mx>=x && mx<=x+w)
         {
             if(my >= y && my <= y + h)
@@ -50,10 +44,8 @@ class RUI_Icon
         return false;
     }
 
-    bool isClicked(SDL_Event& Event)
+    bool isClicked(int mx, int my)
     {
-        int mx = Event.motion.x;
-        int my = Event.motion.y;
         if(mx>=x && mx<=x+w)
         {
             if(my >= y && my <= y + h)
@@ -69,5 +61,5 @@ class RUI_Icon
     SDL_Rect Rect;
     int id;
     std::string address;
-
+    SDL_Texture* IconTexture;
 };

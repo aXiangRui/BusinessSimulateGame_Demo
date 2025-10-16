@@ -6,6 +6,7 @@
 #include<queue>
 #include<vector>
 #include<fstream>
+#include"RUI_Icon.h"
 #include"RUI_DessertManager.h"
 #include"RUI_CustomerManager.h"
 #include"RUI_Chair.h"
@@ -39,6 +40,7 @@ class RUI_GameScene: public RUI_Scene
         std::vector<Desk> Desks;
         std::vector<Cabinet> Cabinets;
         std::queue<ChatFrame> ChatFrames;
+        std::vector<RUI_Icon> Icons;
         Register reg;
 
         Uint32 CurrentTime;
@@ -50,11 +52,14 @@ class RUI_GameScene: public RUI_Scene
         int TotalMoney = 0;
         int isChatFrameShowing = 0;
 
+        int TotalCustomers;
+
         GameEvent TestEvent;
 
         void onEnter()
         {
-            TestEvent.Load(TotalMoney);
+            TestEvent.Load(TotalMoney,TotalCustomers);
+            SDL_Log("我就不信总人数这么个小问题我还解决不了了%d",TotalCustomers);
             MenuButton Btn0((WindowWidth-320)/2,520,320,64,"返回首页",0);
             Btns.push_back(Btn0);
             BackgroundMusic.quit();
@@ -96,6 +101,14 @@ class RUI_GameScene: public RUI_Scene
                 ChatFrames.pop();
             }
 
+            RUI_Icon testicon;
+            testicon.InitIcon(10,10,50,50,0,"sun");
+            Icons.push_back(testicon);
+
+            RUI_Icon CookingIcon;
+            CookingIcon.InitIcon(10,500,50,50,1,"cooking");
+            Icons.push_back(CookingIcon);
+
             LastTime = SDL_GetTicks();
             TestClock.SetStartTime(TestEvent.ReturnClockTime());
             SDL_Log("进入游戏场景");
@@ -107,11 +120,12 @@ class RUI_GameScene: public RUI_Scene
             {  
                 TimeChange();
                 TestEvent.SetClock(TestClock);
-                TestEvent.onUpdate(Chairs,Cabinets,customerManager,dessertManager,TotalMoney);
+                TestEvent.onUpdate(Chairs,Cabinets,customerManager,dessertManager,TotalMoney,TotalCustomers);
             }
             else
             {
                 isChatFrameShowing = 1;
+
             }
         }
 
@@ -130,7 +144,7 @@ class RUI_GameScene: public RUI_Scene
             else
             {                            
                 CurrentTime = SDL_GetTicks();
-                if(CurrentTime - LastTime >= HourTime * 2)
+                if(CurrentTime - LastTime >= HourTime / 10)
                 {          
                     LastTime = CurrentTime;
                     TestClock.UpdateTime();
@@ -144,9 +158,9 @@ class RUI_GameScene: public RUI_Scene
             if(!TextFont)
                 TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
             SDL_Color color = { 10, 10, 10, 255};
-            std::string Title = "总金额" + std::to_string(TotalMoney);
+            std::string Title = "总金额" + std::to_string(TotalMoney/100) + "."+ std::to_string( TotalMoney % 100);
             SDL_Surface* image = TTF_RenderUTF8_Blended(TextFont, Title.c_str(),color);
-            SDL_Rect TextRect = {200,10,image->w,image->h};
+            SDL_Rect TextRect = {10,60,image->w,image->h};
             SDL_Texture* MoneyTexture = SDL_CreateTextureFromSurface(Renderer,image);
             SDL_FreeSurface(image);
 
@@ -172,6 +186,11 @@ class RUI_GameScene: public RUI_Scene
                 Desks[i].onRender(Renderer);
             }
 
+            for(int i = 0; i < Icons.size(); i++)
+            {
+                Icons[i].onRender(Renderer);
+            }
+
             reg.onRender(Renderer);
 
             TestClock.RenderHour(Renderer);
@@ -180,6 +199,11 @@ class RUI_GameScene: public RUI_Scene
             for(int i = 0; i < Cabinets.size(); i++)
             {
                 Cabinets[i].onRender(Renderer);
+            }
+
+            if(isChatFrameShowing)
+            {
+
             }
             // SDL_Rect BackGroundWallRect = {0,6,800,600};
             // SDL_RenderCopy(Renderer,BackgroundWall,nullptr,&BackGroundWallRect);
@@ -216,6 +240,22 @@ class RUI_GameScene: public RUI_Scene
                         }
                         
                     }
+                    for(int i = 0; i < Icons.size(); i++)
+                    {
+                        if(Icons[i].isClicked(mx,my))
+                        {
+                            switch(i)
+                            {
+                                case 1:
+                                {
+                                    SceneManager.ChooseScene(RUI_SceneManager::SceneType::Create);
+                                    break;
+                                }
+                                default:
+                                break;
+                            }
+                        }
+                    }
                     break;
                 }
                 case SDL_MOUSEMOTION:
@@ -251,7 +291,12 @@ class RUI_GameScene: public RUI_Scene
         void onExit()
         {
             SDL_Log("退出游戏场景");
-            TestEvent.Save(TotalMoney);
+            Btns.clear();
+            Chairs.clear();
+            Desks.clear();
+            Cabinets.clear();
+            Icons.clear();
+            TestEvent.Save(TotalMoney,TotalCustomers);
             gamemusic.quit();
         }
         private:
