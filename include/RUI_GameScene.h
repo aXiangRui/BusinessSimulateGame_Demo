@@ -59,9 +59,8 @@ class RUI_GameScene: public RUI_Scene
         void onEnter()
         {
             TestEvent.Load(TotalMoney,TotalCustomers);
-            SDL_Log("我就不信总人数这么个小问题我还解决不了了%d",TotalCustomers);
-            MenuButton Btn0((WindowWidth-320)/2,520,320,64,"返回首页",0);
-            Btns.push_back(Btn0);
+            // MenuButton Btn0((WindowWidth-320)/2,520,320,64,"返回首页",0);
+            // Btns.push_back(Btn0);
             BackgroundMusic.quit();
             reg.InitRegister();
             if(!Mix_PlayingMusic())
@@ -106,8 +105,12 @@ class RUI_GameScene: public RUI_Scene
             Icons.push_back(testicon);
 
             RUI_Icon CookingIcon;
-            CookingIcon.InitIcon(10,500,50,50,1,"cooking");
+            CookingIcon.InitIcon(10,430,50,50,1,"cooking");
             Icons.push_back(CookingIcon);
+
+            RUI_Icon exiticon;
+            exiticon.InitIcon(10,500,50,50,2,"exiticon");
+            Icons.push_back(exiticon);
 
             LastTime = SDL_GetTicks();
             TestClock.SetStartTime(TestEvent.ReturnClockTime());
@@ -144,11 +147,23 @@ class RUI_GameScene: public RUI_Scene
             else
             {                            
                 CurrentTime = SDL_GetTicks();
-                if(CurrentTime - LastTime >= HourTime / 10)
-                {          
-                    LastTime = CurrentTime;
-                    TestClock.UpdateTime();
+                if(TestEvent.GetCustomerNumber() == 0)
+                {      
+                    if(CurrentTime - LastTime >= HourTime / 10)
+                    {          
+                        LastTime = CurrentTime;
+                        TestClock.UpdateTime();
+                    }
                 }
+                else
+                {
+                    if(CurrentTime - LastTime >= HourTime * 10)
+                    {          
+                        LastTime = CurrentTime;
+                        TestClock.UpdateTime();
+                    }
+                }
+                
             }
         }
 
@@ -158,7 +173,7 @@ class RUI_GameScene: public RUI_Scene
             if(!TextFont)
                 TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
             SDL_Color color = { 10, 10, 10, 255};
-            std::string Title = "总金额" + std::to_string(TotalMoney/100) + "."+ std::to_string( TotalMoney % 100);
+            std::string Title = "总金额" + std::to_string(TotalMoney);
             SDL_Surface* image = TTF_RenderUTF8_Blended(TextFont, Title.c_str(),color);
             SDL_Rect TextRect = {10,60,image->w,image->h};
             SDL_Texture* MoneyTexture = SDL_CreateTextureFromSurface(Renderer,image);
@@ -186,11 +201,6 @@ class RUI_GameScene: public RUI_Scene
                 Desks[i].onRender(Renderer);
             }
 
-            for(int i = 0; i < Icons.size(); i++)
-            {
-                Icons[i].onRender(Renderer);
-            }
-
             reg.onRender(Renderer);
 
             TestClock.RenderHour(Renderer);
@@ -199,6 +209,11 @@ class RUI_GameScene: public RUI_Scene
             for(int i = 0; i < Cabinets.size(); i++)
             {
                 Cabinets[i].onRender(Renderer);
+            } 
+
+            for(int i = 0; i < Icons.size(); i++)
+            {
+                Icons[i].onRender(Renderer);
             }
 
             if(isChatFrameShowing)
@@ -251,6 +266,11 @@ class RUI_GameScene: public RUI_Scene
                                     SceneManager.ChooseScene(RUI_SceneManager::SceneType::Create);
                                     break;
                                 }
+                                case 2:
+                                {
+                                    SceneManager.ChooseScene(RUI_SceneManager::SceneType::Menu);
+                                    break;
+                                }
                                 default:
                                 break;
                             }
@@ -278,6 +298,19 @@ class RUI_GameScene: public RUI_Scene
                             Btns[i].setClicked(false);
                         }
                         if(!j)
+                        {
+                            SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
+                        }
+                    }
+                    int k = 0;
+                    for(int i = 0; i < Icons.size(); i++)
+                    {
+                        if(Icons[i].isHovered(mx,my))
+                        {
+                            SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                            k = 1;
+                        }
+                        if(!k)
                         {
                             SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
                         }

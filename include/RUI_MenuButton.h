@@ -18,6 +18,7 @@ class MenuButton: public Button
         h = mh;
         text = t;
         id = ID;
+        TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
     }
 
     void loadTexture(int id)
@@ -32,13 +33,11 @@ class MenuButton: public Button
     }
     void ButtonRender(SDL_Renderer* Renderer)
     {     
-        // SDL_Surface* image = IMG_Load("./resources/texture/button/buttonDemo.png");
         SDL_Texture* texture = ResourceManager::instance()->FindTexture("buttonDemo");        
         ButtonRect = {x,y,w,h};
         if(texture)
             SDL_RenderCopy(Renderer,texture,nullptr,&ButtonRect);
 
-        TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
         if(!TextFont)
         {
             SDL_Log("TTF_OpenFont failed: %s", TTF_GetError());

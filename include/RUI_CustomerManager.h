@@ -33,6 +33,7 @@ class CustomerManager
             SDL_Log("%d %d %s %s %d",cID,pID,cName.c_str(),cPath.c_str(),pre);
             Customer a;
             a.InitCustomer(cID,pID,cName,cPath,pre);
+            SDL_Log("%d",a.GetHasJoined());
             Customers.push_back(a);
         }
     }

@@ -9,6 +9,7 @@
 #include"RUI_ResourceManager.h"
 #include"RUI_Chair.h"
 #include"RUI_Cabinet.h"
+#include"RUI_Clock.h"
 
 enum class CustomerStage
 {
@@ -53,6 +54,8 @@ class Customer
             Queue = 0;
             ChooseNumber = 0;
             payPrice = 0;
+            hasJoined = 0;
+            RandomDelay = 1000 + rand() % 3000;
         }
 
         int GetCustomerID()
@@ -325,7 +328,7 @@ class Customer
                         toward = 0;
                     }
                     
-                    if(CurrentTime - SitTime >= 17000 + rand()% 5000)
+                    if(CurrentTime - SitTime >= 1000 + rand()% 5000)
                     {    
                         Chairs[isEating].SetUsing(0);
                         preference = preference + 5;
@@ -438,6 +441,45 @@ class Customer
             return b;
         }
 
+        bool WhetherAdd(int size, Clock clock)
+        {
+            if(hasJoined)
+                return 0;
+            else if(size >= (2 * clock.ReturnDay() + 10))
+            {
+                if(rand() % 8 >= 7)
+                {
+                    return true;
+                }
+                return false;
+            }
+            else
+            {
+            
+                if(rand() % 2 == 1)
+                {
+                    return true;
+                }
+                return false;
+            }
+            
+        }
+
+        int GetDelayTime()
+        {
+            return RandomDelay;
+        }
+
+        void SetHasJoined(bool a)
+        {
+            hasJoined = a;
+        }
+
+        int GetHasJoined()
+        {
+            return hasJoined;
+        }
+
     private:
         std::string CustomerName;
         std::string PathName;
@@ -466,4 +508,7 @@ class Customer
         int PayTime;
         int ChooseNumber;
         int payPrice;
+        int RandomDelay;
+
+        bool hasJoined;
 };
