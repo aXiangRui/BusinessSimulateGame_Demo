@@ -4,6 +4,8 @@ SDL2/
 # 忽略MinGW相关文件夹
 MinGW/
 
+mingw64/
+
 # 可选：忽略编译生成的exe、obj等文件
 *.exe
 *.obj
