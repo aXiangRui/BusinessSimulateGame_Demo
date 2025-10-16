@@ -4,6 +4,8 @@
 #include<string>
 #include<vector>
 #include<fstream>
+#include"RUI_Dessert.h"
+#include"RUI_DessertManager.h"
 #include"RUI_ResourceManager.h"
 #include"RUI_Chair.h"
 #include"RUI_Cabinet.h"
@@ -49,6 +51,8 @@ class Customer
             PayTime = 0;
             isFront = 0;
             Queue = 0;
+            ChooseNumber = 0;
+            payPrice = 0;
         }
 
         int GetCustomerID()
@@ -126,7 +130,12 @@ class Customer
             
         }
 
-        void Update(std::vector<Chair>& Chairs,int currentTime, std::vector<Cabinet>& Cabtines)
+        void Update(std::vector<Chair>& Chairs,
+            int currentTime, 
+            std::vector<Cabinet>& Cabtines,
+            DessertManager dessertManager,
+            int&  TotalMoney
+        )
         {
             switch(CurrentStage)
             {
@@ -137,12 +146,12 @@ class Customer
                 }
                 case CustomerStage::Choose:
                 {
-                    ChooseDessert(Cabtines,currentTime);
+                    ChooseDessert(Cabtines,currentTime,dessertManager);
                     break;
                 }
                 case CustomerStage::Buy:
                 {
-                    Pay(currentTime);
+                    Pay(currentTime,TotalMoney);
                     break;
                 }
                 case CustomerStage::Eat:
@@ -186,7 +195,7 @@ class Customer
             }
         }
 
-        void ChooseDessert(std::vector<Cabinet>&Cabinets, int currentTime)
+        void ChooseDessert(std::vector<Cabinet>&Cabinets, int currentTime, DessertManager dessertManager)
         {
             if(x < Cabinets[chooseID].GetX() + 32)
             {
@@ -213,12 +222,16 @@ class Customer
                 toward = 0;
                 if(currentTime - ChooseTime >= 5000 + rand() % 500 - 250)
                 {
+                    int dID = Cabinets[chooseID].GetDessertID();
+                    int price = dessertManager.GetDessertPrice(dID);
+                    ChooseNumber = rand() % 4 + 1;
+                    payPrice = price * ChooseNumber;
                     CurrentStage = CustomerStage::Buy;
                 }
             }
         }
 
-        void Pay(int CurrentTime)
+        void Pay(int CurrentTime, int& TotalMoney)
         {
             if(y >= 150 + Queue * 2)
             {
@@ -243,6 +256,8 @@ class Customer
                 toward = 1;
                 if(CurrentTime - PayTime >= 1000 && isGoingPay == 1)
                 {
+                    TotalMoney = TotalMoney + payPrice;
+                    SDL_Log("已付款，当前总金额:%d",TotalMoney);
                     SitTime = CurrentTime;
                     CurrentStage = CustomerStage::Eat;
                 }
@@ -449,5 +464,7 @@ class Customer
         bool isGoingPay;
         bool isFront;
         int PayTime;
+        int ChooseNumber;
+        int payPrice;
 };
 

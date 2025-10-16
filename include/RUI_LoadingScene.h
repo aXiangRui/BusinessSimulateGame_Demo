@@ -7,21 +7,24 @@
 
 void LoadingSc(SDL_Renderer* Renderer)
 {
-    SDL_Log("abababa");
     TTF_Font* Textfont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
     SDL_Color color = {15,15,15,255};
     SDL_Surface* image = TTF_RenderUTF8_Blended(Textfont,"正在加载中",color);
-    int w = image->w;
-    int h = image->h;
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(Renderer,image);
-    SDL_FreeSurface(image);
-    SDL_Rect Rect = {(800-w)/2,(600-h)/2,w,h};
+    if(image)
+    {    
+        int w = image->w;
+        int h = image->h;
+        SDL_Texture* texture = SDL_CreateTextureFromSurface(Renderer,image);
+        SDL_FreeSurface(image);
+        SDL_Rect Rect = {(800-w)/2,(600-h)/2,w,h};
+        
+        SDL_SetRenderDrawColor(Renderer,230,200,200,255);
+
+
+        SDL_RenderClear(Renderer); 
+        SDL_RenderCopy(Renderer,texture,nullptr,&Rect);  
+        SDL_RenderPresent(Renderer);
+    }
   
-    SDL_SetRenderDrawColor(Renderer,230,200,200,255);
-
-
-    SDL_RenderClear(Renderer); 
-    SDL_RenderCopy(Renderer,texture,nullptr,&Rect);  
-    SDL_RenderPresent(Renderer);
     ResourceManager::instance()->load(Renderer);
 }

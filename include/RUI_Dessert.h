@@ -2,6 +2,7 @@
 
 #include<SDL2/SDL.h>
 #include<string>
+#include"RUI_ResourceManager.h"
 
 class Dessert
 {
@@ -10,12 +11,36 @@ class Dessert
        ~Dessert() = default;
     SDL_Texture* DessertTexture;
 
-    void InitLevel(int dessertid, int SweetNumber, int FullNumber, int TasteNumber)
+    void InitLevel(int dessertid, int SweetNumber, int FullNumber, int TasteNumber, std::string name,std::string path)
     {
         DessertID = dessertid;
         SweetLevel = SweetNumber;
         FullLevel = FullNumber;
         TasteLevel = TasteNumber;
+        FilePath = path;
+        Name = name;
+        DessertTexture = ResourceManager::instance()->FindTexture(path.c_str());
+        price = SweetLevel * 3 + FullLevel * 1 + TasteLevel * 2;
+    }
+
+    int GetDessertID()
+    {
+        return DessertID;
+    }
+
+    std::string GetDessertName()
+    {
+        return Name;
+    }
+
+    std::string GetDessertPath()
+    {
+        return FilePath;
+    }
+
+    int GetDessertPrice()
+    {
+        return price;
     }
 
     void AddSweetNumber(int SweetNumber)
@@ -63,5 +88,7 @@ class Dessert
     int FullLevel;
     int TasteLevel;
     int DessertID;
+    int price;
     std::string Name;
+    std::string FilePath;
 };

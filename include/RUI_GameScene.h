@@ -5,6 +5,7 @@
 #include<string>
 #include<vector>
 #include<fstream>
+#include"RUI_DessertManager.h"
 #include"RUI_CustomerManager.h"
 #include"RUI_Chair.h"
 #include"RUI_Scene.h"
@@ -26,7 +27,9 @@ class RUI_GameScene: public RUI_Scene
 
         SDL_Texture* Background;
         SDL_Texture* BackgroundWall;
+        TTF_Font* TextFont;
         CustomerManager customerManager;
+        DessertManager dessertManager;
 
         MusicPlayer gamemusic;
         std::vector<MenuButton> Btns;
@@ -40,6 +43,8 @@ class RUI_GameScene: public RUI_Scene
 
         Clock TestClock;
         const int HourTime = 10000;
+
+        int TotalMoney = 0;
 
         GameEvent TestEvent;
 
@@ -56,8 +61,10 @@ class RUI_GameScene: public RUI_Scene
                 gamemusic.play(-1);
             }
             customerManager.InitCustomerManager();
+            dessertManager.InitDessertManager();
             Background = ResourceManager::instance()->FindTexture("hall");
             BackgroundWall = ResourceManager::instance()->FindTexture("hallwall");
+            TextFont = nullptr;
 
             for(int i = 0; i < 16; i++)
             {
@@ -91,7 +98,7 @@ class RUI_GameScene: public RUI_Scene
             {  
                 TimeChange();
                 TestEvent.SetClock(TestClock);
-                TestEvent.onUpdate(Chairs,Cabinets,customerManager);
+                TestEvent.onUpdate(Chairs,Cabinets,customerManager,dessertManager,TotalMoney);
             }
             else
             {
@@ -124,11 +131,22 @@ class RUI_GameScene: public RUI_Scene
 
         void onRender(SDL_Renderer* Renderer)
         {
+
+            if(!TextFont)
+                TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
+            SDL_Color color = { 10, 10, 10, 255};
+            std::string Title = "总金额" + std::to_string(TotalMoney);
+            SDL_Surface* image = TTF_RenderUTF8_Blended(TextFont, Title.c_str(),color);
+            SDL_Rect TextRect = {150,10,image->w,image->h};
+            SDL_Texture* MoneyTexture = SDL_CreateTextureFromSurface(Renderer,image);
+            SDL_FreeSurface(image);
+
             //SDL_SetRenderDrawColor(Renderer,80,80,235,255);
             SDL_RenderClear(Renderer);
 
             SDL_Rect BackGroundRect = {0,0,800,600};
             SDL_RenderCopy(Renderer,Background,nullptr,&BackGroundRect);
+            SDL_RenderCopy(Renderer,MoneyTexture,nullptr,&TextRect);
 
             for(int i = 0; i < Btns.size(); i++)
             {
@@ -154,8 +172,8 @@ class RUI_GameScene: public RUI_Scene
             {
                 Cabinets[i].onRender(Renderer);
             }
-            SDL_Rect BackGroundWallRect = {0,6,800,600};
-            SDL_RenderCopy(Renderer,BackgroundWall,nullptr,&BackGroundWallRect);
+            // SDL_Rect BackGroundWallRect = {0,6,800,600};
+            // SDL_RenderCopy(Renderer,BackgroundWall,nullptr,&BackGroundWallRect);
 
             SDL_RenderPresent(Renderer);
         }

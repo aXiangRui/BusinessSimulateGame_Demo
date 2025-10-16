@@ -15,6 +15,7 @@ class Cabinet
         CabinetID = id;
         x = (CabinetID / 12) * 200 + 100 * (CabinetID % 2) + 20;
         y = (CabinetID / 2 % 6) * 40 + 200; 
+        DessertID = 0;
     }
 
     int GetX()
@@ -25,6 +26,16 @@ class Cabinet
     int GetY()
     {
         return y;
+    }
+
+    int GetDessertID()
+    {
+        return DessertID;
+    }
+
+    void SetDessertID(int id)
+    {
+        DessertID = id;
     }
 
     void onRender(SDL_Renderer* Renderer)

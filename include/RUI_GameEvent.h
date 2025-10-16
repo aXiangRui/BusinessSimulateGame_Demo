@@ -4,6 +4,7 @@
 #include"RUI_Clock.h"
 #include"RUI_Cabinet.h"
 #include"RUI_CustomerManager.h"
+#include"RUI_DessertManager.h"
 #include<vector>
 #include<string>
 #include<fstream>
@@ -50,7 +51,12 @@ class GameEvent
         timeClock = c;
     }
 
-    void onUpdate(std::vector<Chair>& Chairs,std::vector<Cabinet>& Cabinets, CustomerManager customerManager)
+    void onUpdate(std::vector<Chair>& Chairs,
+        std::vector<Cabinet>& Cabinets,
+        CustomerManager customerManager,
+        DessertManager dessertManager,
+        int& TotalMoney
+        )
     {
         if(test >= 10000000)
         {
@@ -83,7 +89,7 @@ class GameEvent
         }
         for(int i = (int)Customers.size() - 1; i >= 0; --i)
         {    
-            Customers[i].Update(Chairs, CurrentTime, Cabinets);
+            Customers[i].Update(Chairs, CurrentTime, Cabinets, dessertManager ,TotalMoney);
             //差点找不到顾客类刷新了哈哈哈哈
             if(Customers[i].GetQuit() && Customers[i].getX() > 800 && Customers[i].getY() > 350) {
                 SDL_Log("顾客准备离开，此时id:%d,x:%d,y:%d",Customers[i].GetCustomerID(),Customers[i].getX(),Customers[i].getY());
