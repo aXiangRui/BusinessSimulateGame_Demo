@@ -91,7 +91,7 @@ class GameEvent
         }
         if(timeClock.ReturnHour() >= 7 && timeClock.ReturnHour() < 22)
         {
-            if(CurrentTime - LastTime >= 1500 + (rand()%2000) - 1000)
+            if(CurrentTime - LastTime >= 7000 + (rand()%2000) - 1000)
             {
                 // int j = rand() % 4;
                 // if(j <= 3)

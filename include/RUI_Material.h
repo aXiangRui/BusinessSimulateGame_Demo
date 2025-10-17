@@ -11,13 +11,7 @@ class Material
 
         SDL_Texture* MaterialTexture;
 
-        void InitLevel(int materialid, int SweetNumber, int FullNumber, int TasteNumber)
-        {
-            MaterialID = materialid;
-            SweetLevel = SweetNumber;
-            FullLevel = FullNumber;
-            TasteLevel = TasteNumber;
-        }
+        virtual void InitLevel(int materialid, int SweetNumber, int FullNumber, int TasteNumber, std::string name, std::string path){};
 
         void SetLoadPath(std::string path)
         {
@@ -92,6 +86,7 @@ class Material
         int FullLevel;
         int TasteLevel;
         int MaterialID;
+        int Kind;
         int x,y;
         std::string LoadPath;
         std::string Name;

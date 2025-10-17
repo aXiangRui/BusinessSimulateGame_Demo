@@ -55,7 +55,7 @@ class Customer
             ChooseNumber = 0;
             payPrice = 0;
             hasJoined = 0;
-            RandomDelay = 1000 + rand() % 3000;
+            RandomDelay = rand() % 10000;
         }
 
         int GetCustomerID()
@@ -328,7 +328,7 @@ class Customer
                         toward = 0;
                     }
                     
-                    if(CurrentTime - SitTime >= 1000 + rand()% 5000)
+                    if(CurrentTime - SitTime >= 10000 + rand()% 5000)
                     {    
                         Chairs[isEating].SetUsing(0);
                         preference = preference + 5;
@@ -455,7 +455,6 @@ class Customer
             }
             else
             {
-            
                 if(rand() % 2 == 1)
                 {
                     return true;
