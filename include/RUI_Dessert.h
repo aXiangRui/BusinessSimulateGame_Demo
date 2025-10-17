@@ -22,8 +22,8 @@ class Dessert
         DessertTexture = ResourceManager::instance()->FindTexture(path.c_str());
         price = SweetLevel/10 * 3 + FullLevel/10 * 1 + TasteLevel/10 * 2;
 
-        x = 0;
-        y = 0;
+        x = 200;
+        y = 200;
         w = 64;
         h = 64;
     }

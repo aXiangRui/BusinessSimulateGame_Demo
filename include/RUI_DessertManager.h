@@ -66,6 +66,11 @@ class DessertManager
         return Desserts[i].GetDessertPath();
     }
 
+    void onRender(SDL_Renderer* Renderer,int i)
+    {
+        Desserts[i].onRender(Renderer);
+    }
+
     int GetDessertsSize()
     {
         return Desserts.size();

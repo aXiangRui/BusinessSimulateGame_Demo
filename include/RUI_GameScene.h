@@ -39,6 +39,7 @@ class RUI_GameScene: public RUI_Scene
         std::vector<Chair> Chairs;
         std::vector<Desk> Desks;
         std::vector<Cabinet> Cabinets;
+        CabinetFrame cabinetFrame;
         std::queue<ChatFrame> ChatFrames;
         std::vector<RUI_Icon> Icons;
         Register reg;
@@ -73,6 +74,7 @@ class RUI_GameScene: public RUI_Scene
             Background = ResourceManager::instance()->FindTexture("hall");
             BackgroundWall = ResourceManager::instance()->FindTexture("hallwall");
             TextFont = nullptr;
+            cabinetFrame.InitFrame();
 
             for(int i = 0; i < 16; i++)
             {
@@ -216,6 +218,12 @@ class RUI_GameScene: public RUI_Scene
                 Icons[i].onRender(Renderer);
             }
 
+            if(cabinetFrame.GetCabinetID() != -1)
+            {
+                //SDL_Log("当前面包柜id%d",cabinetFrame.GetCabinetID());
+                cabinetFrame.onRender(Renderer, Cabinets[cabinetFrame.GetCabinetID()],dessertManager);
+            }
+
             if(isChatFrameShowing)
             {
 
@@ -276,6 +284,24 @@ class RUI_GameScene: public RUI_Scene
                             }
                         }
                     }
+                    for(int i = 0; i < Cabinets.size(); i++)
+                    {
+                        if(Cabinets[i].isClicked(mx, my))
+                        {
+                            cabinetFrame.SetCabinetID(i);
+                        }
+                    }
+                    if(cabinetFrame.GetCabinetID() != -1)
+                    {
+                        if(mx >= 580 && mx <= 612)
+                        {
+                            if(my >= 100 && my <= 132)
+                            {
+                                cabinetFrame.SetCabinetID(-1);
+                                cabinetFrame.quit();
+                            }
+                        }
+                    }
                     break;
                 }
                 case SDL_MOUSEMOTION:
@@ -297,29 +323,46 @@ class RUI_GameScene: public RUI_Scene
                             Btns[i].setHovered(false);
                             Btns[i].setClicked(false);
                         }
-                        if(!j)
-                        {
-                            SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
-                        }
                     }
-                    int k = 0;
                     for(int i = 0; i < Icons.size(); i++)
                     {
                         if(Icons[i].isHovered(mx,my))
                         {
                             SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
-                            k = 1;
+                            j = 1;
                         }
-                        if(!k)
+                    }
+                    for(int i = 0; i < Cabinets.size(); i++)
+                    {
+                        if(Cabinets[i].isClicked(mx,my))
                         {
-                            SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
+                            SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                            j = 1;
                         }
+                    } 
+
+                    if(cabinetFrame.GetCabinetID() != -1)
+                    {
+                        if(mx >= 580 && mx <= 612)
+                        {
+                            if(my >= 100 && my <= 132)
+                            {
+                                SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                                j = 1;
+                            }
+                        }
+                    } 
+                    
+                    if(!j)
+                    {
+                        SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
                     }
                     break;
                 }
                 default:
                     break;
             }
+            TestEvent.input(event);
         }
         void onExit()
         {

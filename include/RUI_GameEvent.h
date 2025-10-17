@@ -65,6 +65,17 @@ class GameEvent
         timeClock = c;
     }
 
+    void input(const SDL_Event& event)
+    {
+        switch(event.type)
+        {
+            case SDL_MOUSEBUTTONDOWN:
+            {
+                break;
+            }
+        }
+    }
+
     void onUpdate(std::vector<Chair>& Chairs,
         std::vector<Cabinet>& Cabinets,
         CustomerManager& customerManager,
@@ -301,4 +312,5 @@ class GameEvent
         Clock timeClock;
         Uint32 CurrentTime;
         Uint32 LastTime;
+
 };
