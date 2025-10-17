@@ -4,6 +4,7 @@
 #include"RUI_SceneManager.h"
 #include"RUI_MenuButton.h"
 #include"RUI_Button.h"
+#include"RUI_BaseMaterial.h"
 #include"RUI_ResourceManager.h"
 #include"RUI_MusicManager.h"
 #include"RUI_ChooseFrame.h"
@@ -21,12 +22,19 @@ class CreateRUIEvent
     std::vector<ChooseFrame> SizeFrames;
     std::vector<ChooseFrame> BaseFrames;
     std::vector<ChooseFrame> DecorationFrames;
+    std::vector<Plate> plates;
 
     void load()
     {
         CStage = Stage::size;
         TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
         ChooseFrameTexture = ResourceManager::instance()->FindTexture("chooseframe");
+        for(int i = 0; i < 3; i++)
+        {
+            Plate a;
+            a.InitPlate(140,-60,i);
+            plates.push_back(a);
+        }
     }
 
     void ChooseSize(std::vector<int>& Size)
@@ -48,6 +56,11 @@ class CreateRUIEvent
         }
     }
 
+    void update()
+    {
+        CurrentTime = SDL_GetTicks();
+    }
+
     void onRender(SDL_Renderer* Renderer)
     {
     switch(CStage)
@@ -56,7 +69,15 @@ class CreateRUIEvent
         {
             for(int i = 0; i < SizeFrames.size(); i++)
             {
-                SizeFrames[i].onRender(Renderer);
+                if(SizeFrames[i].GetIsHovered())
+                {
+                    SizeFrames[i].onHoverRender(Renderer);
+                    plates[i].AnimationRender(Renderer,CurrentTime);
+                }
+                else
+                {
+                    SizeFrames[i].onRender(Renderer);
+                }              
             }
             break;
         }
@@ -72,24 +93,41 @@ class CreateRUIEvent
                 int mx = event.motion.x; int my = event.motion.y;
                 switch (CStage)
                 {
-                    case Stage::size:{SizeChoose(mx,my);break;}
+                    case Stage::size:
+                    {
+                        for(int i = 0; i < SizeFrames.size(); i++)
+                        {
+                            SizeFrames[i].isHovered(mx,my);
+                        }
+                        break;
+                    }
                     default:break;
                 }
             }
-        }
-    }
-
-    void SizeChoose(int mx, int my)
-    {
-        for(int i = 0; i < SizeFrames.size(); i++)
-        {
-            if(SizeFrames[i].isHovered(mx,my))
-            {}
+            case SDL_MOUSEBUTTONDOWN:
+            {
+                int mx = event.button.x; int my = event.button.y;
+                switch(CStage)
+                {
+                    case Stage::size:
+                    {
+                        for(int i = 0; i < SizeFrames.size(); i++)
+                        {
+                            if(SizeFrames[i].GetIsHovered())
+                            {
+                                
+                            }
+                        }
+                    }
+                }
+                break;
+            }
         }
     }
 
     void quit()
     {
+        plates.clear();
         DessertSize.clear();
         SizeFrames.clear();
     }
@@ -118,4 +156,5 @@ class CreateRUIEvent
     std::vector<int> DessertSize;
     TTF_Font* TextFont;
     SDL_Texture* ChooseFrameTexture;
+    int CurrentTime;
 };

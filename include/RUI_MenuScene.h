@@ -88,22 +88,10 @@ class RUI_MenuScene: public RUI_Scene
                             Btns[i].setClicked(true);
                             switch(i)
                             {
-                                case 0:
-                                {
-                                    SceneManager.ChooseScene(RUI_SceneManager::SceneType::Saving);
-                                    break;
-                                }
-                                case 1:
-                                {
-                                    SceneManager.ChooseScene(RUI_SceneManager::SceneType::Setting);
-                                    break;
-                                }
-                                case 2:
-                                {
-                                    running = false;
-                                    onExit();
-                                    break;
-                                }
+                                case 0:{SceneManager.ChooseScene(RUI_SceneManager::SceneType::Saving);break;}
+                                case 1:{SceneManager.ChooseScene(RUI_SceneManager::SceneType::Setting);break;}
+                                case 2:{running = false;onExit();break;}
+                                default:break;
                             }
                         }
                         else

@@ -58,14 +58,16 @@ class RUI_CreateScene : public RUI_Scene
                 Size.push_back( 16* (i+1) );
             }
             Event.load();
+            Event.ChooseSize(Size);
         }
         void onUpdate()
         {
             Event.SetStage(StageInt());
+            Event.update();
             //SDL_Log("更新设置场景");
             switch(CurrentStage)
             {
-                case CreateStage::ChooseSize:{Event.ChooseSize(Size);break;}
+                case CreateStage::ChooseSize:{break;}
                 case CreateStage::ChooseBasicMaterial:
                 {
                     break;

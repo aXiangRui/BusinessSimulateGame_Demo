@@ -69,3 +69,59 @@ class BaseMaterial : public Material
     SDL_Rect Rect;
     SDL_Texture* MaterialTexture;
 };
+
+class Plate
+{
+    public:
+    Plate() = default;
+    ~Plate() = default;
+
+    void InitPlate(int mx,int my, int id)
+    {
+        x = mx;
+        y = my;
+        switch(id)
+        {
+            case 0:PlateTexture = ResourceManager::instance()->FindTexture("smallplate");break;
+            case 1:PlateTexture = ResourceManager::instance()->FindTexture("mediumplate");break;
+            case 2:PlateTexture = ResourceManager::instance()->FindTexture("largeplate");break;
+            default:break;
+        }   
+        Rect = {x,y,256,256};
+        LastTime = 0;
+        WhetherAppear = 0;
+    }
+
+    void onRender(SDL_Renderer* Renderer)
+    {
+        SDL_RenderCopy(Renderer, PlateTexture, nullptr, &Rect);
+    }
+
+    void AnimationRender(SDL_Renderer* Renderer, int CurrentTime)
+    {
+        if(CurrentTime - LastTime >= 500)
+        {
+            if(WhetherAppear == 0)
+            {
+                WhetherAppear = 1;
+            }
+            else
+            {
+                WhetherAppear = 0;
+            }
+            LastTime = CurrentTime;
+        }
+        if(WhetherAppear)
+        {
+            SDL_RenderCopy(Renderer, PlateTexture, nullptr, &Rect);  
+        }
+    }
+
+    private:
+    int x,y;
+    int LastTime;
+    bool WhetherAppear;
+    SDL_Texture* PlateTexture;
+    SDL_Rect Rect;
+
+};

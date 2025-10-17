@@ -76,18 +76,9 @@ class RUI_SavingScene : public RUI_Scene
                             Btns[i].setClicked(true);
                             switch(i)
                             {
-                                case 0:
-                                {
-                                    SceneManager.ChooseScene(RUI_SceneManager::SceneType::Menu);
-                                    break;
-                                }
-                                case 1:
-                                {
-                                    SceneManager.ChooseScene(RUI_SceneManager::SceneType::Game);
-                                    break;
-                                }
-                                default:
-                                break;
+                                case 0:{SceneManager.ChooseScene(RUI_SceneManager::SceneType::Menu); break;}
+                                case 1:{SceneManager.ChooseScene(RUI_SceneManager::SceneType::Game);break;}
+                                default:break;
                             }
                         }
                         else

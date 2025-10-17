@@ -22,42 +22,52 @@ class ChooseFrame
         ChooseHoveredFrameTexture = ResourceManager::instance()->FindTexture("chooseframe_hovered");
         Rect = {x,y,320,64};
         TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",24);
+        
+        SDL_Color color = {10,10,10,255};
+        image = TTF_RenderUTF8_Blended(TextFont, Text.c_str(), color);
+        //SDL_Log("%s",Text.c_str());
+
     }
 
     bool isHovered(int mx, int my)
     {
-        if(mx >= x && mx <= x + 320)
-        {
-            if(my >= y && my <= y + 64)
-            {
-                ishovered = 1;
-                return true;
-            }
-        }
-        return false;
+        bool hovered = (mx >= x && mx <= x + 320 && my >= y && my <= y + 64);
+        ishovered = hovered ? 1 : 0;
+        return hovered;
     }
 
     void onRender(SDL_Renderer* Renderer)
+    {   
+        
+        SDL_RenderCopy(Renderer, ChooseFrameTexture, nullptr, &Rect);
+        // if(image)
+        // {
+        int mw = image->w; int mh = image->h;  
+        TextRect = { x + 20, y + 20, mw, mh};
+        if(TextTexture == nullptr)
+            TextTexture = SDL_CreateTextureFromSurface(Renderer,image); 
+        //}  
+        SDL_RenderCopy(Renderer, TextTexture, nullptr, &TextRect);
+        // SDL_DestroyTexture(TextTexture);
+        // TextTexture = nullptr;
+    }
+
+    void onHoverRender(SDL_Renderer* Renderer)
     {
-        if(ishovered == 0)
-        {
-            SDL_RenderCopy(Renderer, ChooseFrameTexture, nullptr, &Rect);
-        }
-        else
-        {
-            SDL_RenderCopy(Renderer, ChooseHoveredFrameTexture, nullptr, &Rect);
-        }
-        SDL_Color color = {10,10,10,255};
-        SDL_Surface* image = TTF_RenderUTF8_Blended(TextFont, Text.c_str(), color);
-        TextTexture = SDL_CreateTextureFromSurface(Renderer,image);
+        SDL_RenderCopy(Renderer, ChooseHoveredFrameTexture, nullptr, &Rect);
         if(image)
         {
             int mw = image->w; int mh = image->h;  
             TextRect = { x + 20, y + 20, mw, mh};
-            SDL_RenderCopy(Renderer, TextTexture, nullptr, &TextRect);
-            SDL_FreeSurface(image);
-        }   
-        // SDL_DestroyTexture(TextTexture);
+            if(TextTexture == nullptr)
+                TextTexture = SDL_CreateTextureFromSurface(Renderer,image); 
+        }  
+        SDL_RenderCopy(Renderer, TextTexture, nullptr, &TextRect);
+    }
+
+    bool GetIsHovered()
+    {
+        return ishovered;
     }
 
     private:
@@ -65,10 +75,11 @@ class ChooseFrame
     int x,y;
     SDL_Texture* ChooseFrameTexture;
     SDL_Texture* ChooseHoveredFrameTexture;
-    SDL_Texture* TextTexture;
+    SDL_Texture* TextTexture = nullptr;
+    SDL_Surface* image = nullptr;
     SDL_Rect Rect;
     SDL_Rect TextRect;
-    TTF_Font* TextFont;
+    TTF_Font* TextFont = nullptr;
     std::string Text;
     bool ishovered;
 };
