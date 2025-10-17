@@ -17,25 +17,29 @@ class CustomerManager
 
     void InitCustomerManager()
     {
-        std::ifstream File("./save/Customers.txt");
-        std::string string;
-        int line = 0;
-        while(std::getline(File,string))
+        if(hasloaded == 0)
         {
-            line++;
-            std::istringstream iss(string);
-            int cID;
-            int pID;
-            std::string cName;
-            std::string cPath;
-            int pre;
-            iss>>cID>>pID>>cName>>cPath>>pre;
-            SDL_Log("%d %d %s %s %d",cID,pID,cName.c_str(),cPath.c_str(),pre);
-            Customer a;
-            a.InitCustomer(cID,pID,cName,cPath,pre);
-            SDL_Log("%d",a.GetHasJoined());
-            Customers.push_back(a);
+            std::ifstream File("./save/Customers.txt");
+            std::string string;
+            int line = 0;
+            while(std::getline(File,string))
+            {
+                line++;
+                std::istringstream iss(string);
+                int cID;
+                int pID;
+                std::string cName;
+                std::string cPath;
+                int pre;
+                iss>>cID>>pID>>cName>>cPath>>pre;
+                SDL_Log("%d %d %s %s %d",cID,pID,cName.c_str(),cPath.c_str(),pre);
+                Customer a;
+                a.InitCustomer(cID,pID,cName,cPath,pre);
+                SDL_Log("%d",a.GetHasJoined());
+                Customers.push_back(a);
+            }
         }
+        hasloaded = 1;
     }
 
     int GetCustomerID(int i)
@@ -67,4 +71,7 @@ class CustomerManager
     {
         return Customers.size();
     }
+
+    private:
+    bool hasloaded;
 };

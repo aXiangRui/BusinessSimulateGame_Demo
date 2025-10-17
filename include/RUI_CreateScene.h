@@ -53,7 +53,7 @@ class RUI_CreateScene : public RUI_Scene
             exiticon.InitIcon(10,500,50,50,0,"exiticon");
             Icons.push_back(exiticon);
 
-            for(int i = 0; i < 4; i++)
+            for(int i = 0; i < 3; i++)
             {
                 Size.push_back( 16* (i+1) );
             }
@@ -126,6 +126,7 @@ class RUI_CreateScene : public RUI_Scene
             default:
             break;
         }
+        Event.input(event);
             // if(event.type == SDL_MOUSEBUTTONDOWN)
             // {
             //     SceneManager.ChooseScene(RUI_SceneManager::SceneType::Game);
@@ -133,6 +134,8 @@ class RUI_CreateScene : public RUI_Scene
         }
         void onExit()
         {
+            Size.clear();
+            Event.quit();
             CreateMusic.quit();
             SDL_Log("退出创造场景");
         }

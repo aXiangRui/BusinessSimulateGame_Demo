@@ -73,6 +73,14 @@ class GameEvent
         int& TotalCustomers
         )
     {
+        if(customerManager.GetCustomersSize() > 4)
+        {
+        for(int i = 0; i < customerManager.GetCustomersSize(); i++)
+                {
+                    SDL_Log("第%d人，%s",i,customerManager.Customers[i].GetCustomerName().c_str());
+                }
+        }
+        
         if(TotalCustomers >= 10000000)
         {
             TotalCustomers = 0;
@@ -89,26 +97,10 @@ class GameEvent
                 AddCustomers.pop_back();
             }
         }
-        if(timeClock.ReturnHour() >= 7 && timeClock.ReturnHour() < 22)
+        if(timeClock.ReturnHour() >= 7 && timeClock.ReturnHour() < 21)
         {
             if(CurrentTime - LastTime >= 7000 + (rand()%2000) - 1000)
             {
-                // int j = rand() % 4;
-                // if(j <= 3)
-                // {
-                //     int randIndex = rand()%customerManager.GetCustomersSize();
-                //     Customer a;
-                //     a.InitCustomer(
-                //         TotalCustomers,
-                //         customerManager.GetPreferDessertID(randIndex),
-                //         customerManager.GetCustomerName(randIndex),
-                //         customerManager.GetCustomerPath(randIndex),
-                //         customerManager.GetCustomerPreference(randIndex)
-                //     );
-                //     AddCustomer(a);
-                //     SDL_Log("增加顾客，当前%d人",Customers.size());
-                //     TotalCustomers++;
-                // }
                 for(int i = 0; i < customerManager.GetCustomersSize(); i++)
                 {
                     if(customerManager.Customers[i].WhetherAdd(Customers.size(),timeClock))

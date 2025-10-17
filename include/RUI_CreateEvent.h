@@ -6,6 +6,7 @@
 #include"RUI_Button.h"
 #include"RUI_ResourceManager.h"
 #include"RUI_MusicManager.h"
+#include"RUI_ChooseFrame.h"
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_image.h>
 #include<SDL2/SDL_ttf.h>
@@ -17,10 +18,9 @@ class CreateRUIEvent
     CreateRUIEvent() = default;
     ~CreateRUIEvent() = default;
 
-    // void onUpdate(std::vector<int>& Size)
-    // {
-
-    // }
+    std::vector<ChooseFrame> SizeFrames;
+    std::vector<ChooseFrame> BaseFrames;
+    std::vector<ChooseFrame> DecorationFrames;
 
     void load()
     {
@@ -32,6 +32,20 @@ class CreateRUIEvent
     void ChooseSize(std::vector<int>& Size)
     {
         DessertSize = Size;
+        for(int i = 0; i < DessertSize.size(); i++)
+        {
+            ChooseFrame AddFrame;
+            std::string a;
+            switch(i)
+            {
+                case 0: a = "小";break;
+                case 1: a = "中";break;
+                case 2: a = "大";break;
+                default:break;
+            }
+            AddFrame.InitChooseFrame(500, 10 + i * 50, i, a.c_str());
+            SizeFrames.push_back(AddFrame);
+        }
     }
 
     void onRender(SDL_Renderer* Renderer)
@@ -40,42 +54,55 @@ class CreateRUIEvent
     {
         case Stage::size:
         {
-            for(int i = 0; i < DessertSize.size(); i++)
+            for(int i = 0; i < SizeFrames.size(); i++)
             {
-                SDL_Rect Rect = {400, 50 + i * 30 , 320, 64};
-                SDL_RenderCopy(Renderer, ChooseFrameTexture, nullptr, &Rect);
+                SizeFrames[i].onRender(Renderer);
             }
             break;
         }
     }
     }
 
+    void input(const SDL_Event& event)
+    {
+        switch(event.type)
+        {
+            case SDL_MOUSEMOTION:
+            {
+                int mx = event.motion.x; int my = event.motion.y;
+                switch (CStage)
+                {
+                    case Stage::size:{SizeChoose(mx,my);break;}
+                    default:break;
+                }
+            }
+        }
+    }
+
+    void SizeChoose(int mx, int my)
+    {
+        for(int i = 0; i < SizeFrames.size(); i++)
+        {
+            if(SizeFrames[i].isHovered(mx,my))
+            {}
+        }
+    }
+
+    void quit()
+    {
+        DessertSize.clear();
+        SizeFrames.clear();
+    }
+
     void SetStage(int i)
     {
         switch(i)
         {
-            case 1:
-            {
-                CStage = Stage::size;
-                break;
-            }
-            case 2:
-            {
-                CStage = Stage::base;
-                break;
-            }
-            case 3:
-            {
-                CStage = Stage::create;
-                break;
-            }
-            case 4:
-            {
-                CStage = Stage::decorate;
-                break;
-            }
-            default:
-            break;
+            case 1:{CStage = Stage::size;     break;}
+            case 2:{CStage = Stage::base;     break;}
+            case 3:{CStage = Stage::create;   break;}
+            case 4:{CStage = Stage::decorate; break;}
+            default:break;
         }
     }
 
