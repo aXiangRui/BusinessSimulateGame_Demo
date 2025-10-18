@@ -23,10 +23,11 @@ class ProductManager
     {
         dManager.InitDessertManager();
         mManager.InitMaterialManager();
-        plates.resize(3);
         for(int i = 0; i < 3; i++)
         {
-            plates[i].InitPlate(200,200,i);
+            Plate a;
+            a.InitPlate(200,200,i);
+            plates.push_back(a);
         }
         std::ifstream File("./save/Product.txt");
         std::string string;
@@ -52,6 +53,24 @@ class ProductManager
         }
     }
 
+    void Save()
+    {
+        std::ofstream file("./save/Product.txt");
+        for(int i = 0; i < products.size(); i++)
+        {
+            file << products[i].GetProductID() << " " << products[i].GetDessertID() << " ";
+            std::vector<int> a;
+            a = products[i].GetDecorationID();
+            for(int i = 0; i < 3; i++)
+            {
+                file << a[i] <<" ";
+            }
+            file << products[i].GetPlateSize();
+            file << std::endl;
+        }
+        file.close();
+    }
+
     std::string GetProductName(int i)
     {
         return products[i].GetProductName(dManager);
@@ -72,6 +91,16 @@ class ProductManager
     void quit()
     {
         products.clear();
+    }
+
+    void AddProduct(ProducedProduct a)
+    {
+        products.push_back(a);
+    }
+
+    int GetProductSize()
+    {
+        return products.size();
     }
 
     private:

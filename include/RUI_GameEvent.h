@@ -1,5 +1,6 @@
 #pragma once
 
+#include"RUI_MenuButton.h"
 #include"RUI_Customer.h"
 #include"RUI_Clock.h"
 #include"RUI_Cabinet.h"
@@ -8,6 +9,7 @@
 #include"RUI_ProductManager.h"
 #include"RUI_BaseMaterial.h"
 #include"RUI_MaterialManager.h"
+#include"RUI_ChatFrame.h"
 #include<vector>
 #include<string>
 #include<fstream>
@@ -24,8 +26,10 @@ class GameEvent
     std::vector<Customer> AddCustomers;
     ProductManager productManager;
     std::vector<Plate> plates;
+    std::vector<MenuButton>Btns;
     DessertManager dessertManager;
     MaterialManager materialManager;
+    ChatFrame Chat;
 
     void AddCustomer(Customer cus)
     {
@@ -57,14 +61,18 @@ class GameEvent
 
     void onEnter()
     {
-        productManager.InitProductManager();
         dessertManager.InitDessertManager();
-        materialManager.InitMaterialManager();
-        plates.resize(3);
+        materialManager.InitMaterialManager();    
+        productManager.InitProductManager();
+        
         for(int i = 0; i < 3; i++)
         {
-            plates[i].InitPlate(200,200,i);
+            Plate a;
+            a.InitPlate(200,200,i);
+            plates.push_back(a);
         }
+        MenuButton Btn0((WindowWidth-320)/2,450,320,64,"设置新甜点",0);
+        Btns.push_back(Btn0);
     }
 
     void quit()
@@ -73,6 +81,7 @@ class GameEvent
         dessertManager.quit();
         dessertManager.quit();
         plates.clear();
+        Btns.clear();
     }
 
     void RemoveIdFromQueue(int id)
@@ -270,7 +279,25 @@ class GameEvent
     {
         int cid = cabinetFrame.GetCabinetID();
         if( cid >= 0 && cid < Cabinets.size())
+        {
             cabinetFrame.onRender(Renderer, Cabinets[cid],productManager);
+            Btns[0].ButtonRender(Renderer);
+        }    
+    }
+
+    void onProductRender(SDL_Renderer* Renderer)
+    {
+        Chat.RenderFrame(Renderer);
+        for(int i = 0; i < productManager.GetProductSize(); i++)
+        {
+            if(i / 6 == 0)
+            {
+                productManager.products[i].onRender(
+                    Renderer, dessertManager, materialManager, plates,
+                    200 + i/3 * 200, i % 3 * 200, 200, 200
+                );
+            }
+        }
     }
 
     int ReturnClockTime()

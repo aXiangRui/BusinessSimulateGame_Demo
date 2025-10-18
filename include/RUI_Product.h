@@ -92,6 +92,15 @@ class ProducingProduct
         SDL_RenderCopy(Renderer, DNumberTexture, nullptr, &CRect);
     }
 
+    std::vector<int> GetDecorationID()
+    {
+        std::vector<int> a;
+        for(int i = 0; i < 3; i++)
+        {
+            a.push_back(DecorationID[i]);
+        }
+        return a;
+    }
 
     void moveUpdate(int CurrentTime)
     {
@@ -146,7 +155,6 @@ class ProducingProduct
         CreateNumber--;
     }
 
-    
     void SetDEcorationCase(int i, int j)
     {
         DecorationID[i] = j;
@@ -169,11 +177,20 @@ class ProducingProduct
             }
             for(int i = 0; i < 10; i++)
             {
-                if(Type[0] == 2 && Type[1] == 1)
+                if(Type[0] == 2 && Type[1] == 1 && BaseMaterialID == 0)
                 {
                     if(CurrentTime - DelayTime >= 1000)
                     {
                         BaseMaterialID = dManager.GetDessertID(1);  
+                        hasCalculated = 0;
+                        WhetherRenderCreate = 0;
+                    }
+                }
+                if(Type[2] >= 2 && Type[1] == 0 && BaseMaterialID == 0)
+                {
+                    if(CurrentTime - DelayTime >= 1000)
+                    {
+                        BaseMaterialID = dManager.GetDessertID(2);  
                         hasCalculated = 0;
                         WhetherRenderCreate = 0;
                     }
@@ -283,6 +300,11 @@ class ProducedProduct
         return dManager.GetDessertName(BaseDessertID);
     }
 
+    int GetProductID(){return ProductID;}
+    int GetDessertID(){return BaseDessertID;}
+    std::vector<int> GetDecorationID(){return DecorationID;}
+    int GetPlateSize(){return PlateSize;}
+
     private:
     int ProductID;
     int BaseDessertID;
@@ -311,12 +333,17 @@ class Cloth
         DelayTime = 0;
         x = 0; y = -600;
         Rect = {x,y,600,600};
-        a = 1;
+        a = 0;
     }
 
     void SetWhetherRender(bool a)
     {
         whetherRender = 1;
+    }
+
+    void SetWhetherAppear(bool b)
+    {
+        a = b;
     }
 
     void Appear(int CurrentTime)

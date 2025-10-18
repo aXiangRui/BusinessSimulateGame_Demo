@@ -62,6 +62,10 @@ class RUI_CreateScene : public RUI_Scene
         {
             //Event.SetStage(StageInt());
             Event.update();
+            if(Event.GetWhetherBack())
+            {
+                SceneManager.ChooseScene(RUI_SceneManager::SceneType::Game);
+            }
             //SDL_Log("更新设置场景");
             switch(CurrentStage)
             {

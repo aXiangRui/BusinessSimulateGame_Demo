@@ -10,6 +10,7 @@
 #include"RUI_ChooseFrame.h"
 #include"RUI_Product.h"
 #include"RUI_MaterialManager.h"
+#include"RUI_ProductManager.h"
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_image.h>
 #include<SDL2/SDL_ttf.h>
@@ -21,6 +22,7 @@ class CreateRUIEvent
     CreateRUIEvent() = default;
     ~CreateRUIEvent() = default;
 
+    std::vector<MenuButton> buttons;
     std::vector<RUI_Icon> Icons;
     std::vector<ChooseFrame> SizeFrames;
     std::vector<ChooseFrame> BaseFrames;
@@ -29,6 +31,7 @@ class CreateRUIEvent
     std::vector<Material> DecorationMaterials;
     std::vector<Plate> plates;
     ProducingProduct PProduct;
+    ProductManager productManager;
     MaterialManager materialManager;  
     Cloth RedCloth; 
 
@@ -39,6 +42,7 @@ class CreateRUIEvent
         ChooseFrameTexture = ResourceManager::instance()->FindTexture("chooseframe");     
         dessertManager.InitDessertManager();
         materialManager.InitMaterialManager();
+        productManager.InitProductManager();
 
         for(int i = 0; i < 3; i++)
         {
@@ -50,8 +54,11 @@ class CreateRUIEvent
         RUI_Icon exiticon;
         exiticon.InitIcon(10,500,50,50,0,"exiticon");
         Icons.push_back(exiticon);
+        MenuButton Btn0((WindowWidth-320)/2 + 200,500,320,64,"完成",0);
+        buttons.push_back(Btn0);
         PProduct.Init(materialManager,dessertManager);
         RedCloth.init();
+        WhetherBack = 0;
     }
 
     void ChooseSize(std::vector<int>& Size)
@@ -202,6 +209,10 @@ class CreateRUIEvent
                     DecorationFrames[i].onRender(Renderer);
                 }
             }
+            for(int i = 0; i < buttons.size(); i++)
+            {
+                buttons[i].ButtonRender(Renderer);
+            }
             break;    
         }
         default:break;
@@ -267,6 +278,14 @@ class CreateRUIEvent
                         for(int i = 0; i < DecorationFrames.size(); i++)
                         {
                             if(DecorationFrames[i].isHovered(mx,my))
+                            {
+                                j = 1;
+                                SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                            }
+                        }
+                        for(int i = 0; i < buttons.size(); i++)
+                        {
+                            if(buttons[i].RUI_isHovered(mx,my))
                             {
                                 j = 1;
                                 SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
@@ -348,6 +367,7 @@ class CreateRUIEvent
                                 if(n == 2)
                                 {
                                     CStage = Stage::decorate;
+                                    RedCloth.SetWhetherAppear(1);
                                     RedCloth.SetWhetherRender(1);
                                     PProduct.SetDelayTime(CurrentTime);
                                 } 
@@ -369,6 +389,31 @@ class CreateRUIEvent
                                 if(n == 2)
                                 {
                                     SDL_Log("制作完成");
+                                }
+                            }
+                        }
+                        for(int i = 0; i < buttons.size(); i++)
+                        {
+                            if(buttons[i].RUI_isClicked(mx,my))
+                            {
+                                switch(i)
+                                {
+                                    case 0:
+                                    {
+                                        ProducedProduct a;
+                                        a.LoadInit
+                                        (
+                                        productManager.GetProductSize(),
+                                        PProduct.GetBaseID(),
+                                        PProduct.GetDecorationID(),
+                                        PProduct.GetPlateSize()
+                                        );
+                                    productManager.AddProduct(a);
+                                    productManager.Save();
+                                    SDL_Log("添加新产品:%d",productManager.GetProductSize());
+                                    WhetherBack = 1;
+                                    break;
+                                    }
                                 }
                             }
                         }
@@ -406,6 +451,8 @@ class CreateRUIEvent
         }
     }
 
+    bool GetWhetherBack(){return WhetherBack;}
+
     enum class Stage
     {
         size,
@@ -420,4 +467,5 @@ class CreateRUIEvent
     SDL_Texture* ChooseFrameTexture;
     int CurrentTime;
     DessertManager dessertManager;
+    bool WhetherBack;
 };

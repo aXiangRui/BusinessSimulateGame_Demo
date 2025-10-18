@@ -43,8 +43,8 @@ class ChatFrame
 
     void RenderFrame(SDL_Renderer* Renderer)
     {
-        FrameTexture = ResourceManager::instance()->FindTexture("ChatFrame");
-        SDL_Rect rect = {150,50,500,500};
+        FrameTexture = ResourceManager::instance()->FindTexture("saving");
+        SDL_Rect rect = {100,0,600,600};
         SDL_RenderCopy(Renderer,FrameTexture,nullptr,&rect);
     }
 

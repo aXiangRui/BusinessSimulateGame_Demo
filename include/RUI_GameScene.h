@@ -52,6 +52,7 @@ class RUI_GameScene: public RUI_Scene
 
         int TotalMoney = 0;
         int isChatFrameShowing = 0;
+        bool WhetherReadingProduct;
 
         int TotalCustomers;
 
@@ -115,8 +116,14 @@ class RUI_GameScene: public RUI_Scene
             exiticon.InitIcon(10,500,50,50,2,"exiticon");
             Icons.push_back(exiticon);
 
+            RUI_Icon readicon;
+            readicon.InitIcon(10,360,50,50,3,"readicon");
+            Icons.push_back(readicon);
+
             LastTime = SDL_GetTicks();
             TestClock.SetStartTime(TestEvent.ReturnClockTime());
+
+            WhetherReadingProduct = 0;
             SDL_Log("进入游戏场景");
         }
         void onUpdate()
@@ -226,6 +233,11 @@ class RUI_GameScene: public RUI_Scene
                 TestEvent.onFrameRender(Renderer,cabinetFrame, Cabinets);
             }
 
+            if(WhetherReadingProduct)
+            {
+                TestEvent.onProductRender(Renderer);
+            }
+
             if(isChatFrameShowing)
             {
 
@@ -279,6 +291,14 @@ class RUI_GameScene: public RUI_Scene
                                 case 2:
                                 {
                                     SceneManager.ChooseScene(RUI_SceneManager::SceneType::Menu);
+                                    break;
+                                }
+                                case 3:
+                                {
+                                    if(WhetherReadingProduct == 0)
+                                        WhetherReadingProduct = 1;
+                                    else
+                                        WhetherReadingProduct = 0;
                                     break;
                                 }
                                 default:
