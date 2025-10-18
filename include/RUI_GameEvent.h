@@ -5,6 +5,9 @@
 #include"RUI_Cabinet.h"
 #include"RUI_CustomerManager.h"
 #include"RUI_DessertManager.h"
+#include"RUI_ProductManager.h"
+#include"RUI_BaseMaterial.h"
+#include"RUI_MaterialManager.h"
 #include<vector>
 #include<string>
 #include<fstream>
@@ -19,6 +22,10 @@ class GameEvent
 
     std::queue<int> payQueue;
     std::vector<Customer> AddCustomers;
+    ProductManager productManager;
+    std::vector<Plate> plates;
+    DessertManager dessertManager;
+    MaterialManager materialManager;
 
     void AddCustomer(Customer cus)
     {
@@ -46,6 +53,26 @@ class GameEvent
                 return; // stop after removing to avoid invalid indices
             }
         }
+    }
+
+    void onEnter()
+    {
+        productManager.InitProductManager();
+        dessertManager.InitDessertManager();
+        materialManager.InitMaterialManager();
+        plates.resize(3);
+        for(int i = 0; i < 3; i++)
+        {
+            plates[i].InitPlate(200,200,i);
+        }
+    }
+
+    void quit()
+    {
+        productManager.quit();
+        dessertManager.quit();
+        dessertManager.quit();
+        plates.clear();
     }
 
     void RemoveIdFromQueue(int id)
@@ -137,7 +164,7 @@ class GameEvent
         }
         for(int i = (int)Customers.size() - 1; i >= 0; --i)
         {    
-            Customers[i].Update(Chairs, CurrentTime, Cabinets, dessertManager ,TotalMoney);
+            Customers[i].Update(Chairs, CurrentTime, Cabinets, dessertManager, productManager, TotalMoney);
             //差点找不到顾客类刷新了哈哈哈哈
             if(Customers[i].GetQuit() && Customers[i].getX() > 800 && Customers[i].getY() > 350) 
             {
@@ -235,6 +262,15 @@ class GameEvent
         {
             Customers[i].OnRender(Renderer);
         }
+        //productManager.products[0].onRender(Renderer,dessertManager,materialManager,plates,
+        //200,200,200,200);
+    }
+
+    void onFrameRender(SDL_Renderer* Renderer, CabinetFrame cabinetFrame, std::vector<Cabinet> Cabinets)
+    {
+        int cid = cabinetFrame.GetCabinetID();
+        if( cid >= 0 && cid < Cabinets.size())
+            cabinetFrame.onRender(Renderer, Cabinets[cid],productManager);
     }
 
     int ReturnClockTime()

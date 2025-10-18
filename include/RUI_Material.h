@@ -107,6 +107,12 @@ class Material
         {
             SDL_RenderCopy(Renderer, MaterialTexture, nullptr, &Rect);
         };
+
+        void onRender(SDL_Renderer* Renderer,SDL_Rect newRect, int i)
+        {
+            newRect.y = newRect.y - i * 20;
+            SDL_RenderCopy(Renderer, MaterialTexture, nullptr, &newRect);
+        };
         
     private:
         int SweetLevel;

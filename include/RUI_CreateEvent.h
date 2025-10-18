@@ -29,7 +29,7 @@ class CreateRUIEvent
     std::vector<Material> DecorationMaterials;
     std::vector<Plate> plates;
     ProducingProduct PProduct;
-    MaterialManager materialManager;   
+    MaterialManager materialManager;  
     Cloth RedCloth; 
 
     void load()
@@ -50,7 +50,7 @@ class CreateRUIEvent
         RUI_Icon exiticon;
         exiticon.InitIcon(10,500,50,50,0,"exiticon");
         Icons.push_back(exiticon);
-        PProduct.Init(materialManager);
+        PProduct.Init(materialManager,dessertManager);
         RedCloth.init();
     }
 
@@ -68,7 +68,7 @@ class CreateRUIEvent
                 case 2: a = "大";break;
                 default:break;
             }
-            AddFrame.InitChooseFrame(500, 10 + i * 50, i, a.c_str());
+            AddFrame.InitChooseFrame(500, 10 + i * 64, i, a.c_str());
             SizeFrames.push_back(AddFrame);
         }
     }
@@ -79,7 +79,7 @@ class CreateRUIEvent
         {
             ChooseFrame AddFrames;
             std::string name = dessertManager.GetDessertName(i);
-            AddFrames.InitChooseFrame(500, 10 + i * 50, i, name.c_str());
+            AddFrames.InitChooseFrame(500, 10 + i * 64, i, name.c_str());
             BaseFrames.push_back(AddFrames);
             BaseDessert.push_back(dessertManager.Desserts[i]);
             BaseDessert[i].SetPosition(140,-100);
@@ -92,7 +92,7 @@ class CreateRUIEvent
         {
             ChooseFrame AddFrames;
             std::string name = materialManager.GetDecorationName(i);
-            AddFrames.InitChooseFrame(500,10 + i * 50, i, name);
+            AddFrames.InitChooseFrame(500,10 + i * 64, i, name);
             DecorationFrames.push_back(AddFrames);
             DecorationMaterials.push_back(materialManager.DecorationMaterial[i]);
         }
@@ -107,11 +107,20 @@ class CreateRUIEvent
         }
         if(PProduct.GetBaseID() != -1)
         {
-            BaseDessert[PProduct.GetBaseID()].moveUpdate(CurrentTime);
+            for(int i = 0; i < BaseDessert.size(); i++)
+            {
+                BaseDessert[i].moveUpdate(CurrentTime);
+            }
+            // BaseDessert[PProduct.GetBaseID()].moveUpdate(CurrentTime);
         }
         PProduct.moveUpdate(CurrentTime);
+        PProduct.DmoveUpdate(CurrentTime);
         RedCloth.Appear(CurrentTime);
         RedCloth.Quit(CurrentTime);   
+        if(PProduct.GetDelayTime() != 0)
+        {
+            PProduct.Calculate(CurrentTime);
+        }
     }
 
     void onRender(SDL_Renderer* Renderer)
@@ -119,8 +128,12 @@ class CreateRUIEvent
         if(PProduct.GetPlateSize() != -1)
             plates[PProduct.GetPlateSize()].onRender(Renderer);
         if(PProduct.GetBaseID() != -1)
+        {
             BaseDessert[PProduct.GetBaseID()].onRender(Renderer);
+        }
         PProduct.RenderCreateMaterial(Renderer);
+        PProduct.RenderDecorationMaterial(Renderer);
+
     switch(CStage)
     {
         case Stage::size:
@@ -172,6 +185,24 @@ class CreateRUIEvent
                 }
                 
             }
+            break;
+        }
+        case Stage::decorate:
+        {
+            PProduct.RenderDecorationNumbers(Renderer);
+            for(int i = 0; i < DecorationFrames.size(); i++)
+            {
+                if(DecorationFrames[i].GetIsHovered())
+                {
+                    DecorationFrames[i].onHoverRender(Renderer);
+                    DecorationMaterials[i].onRender(Renderer);
+                }
+                else
+                {
+                    DecorationFrames[i].onRender(Renderer);
+                }
+            }
+            break;    
         }
         default:break;
     }
@@ -230,6 +261,18 @@ class CreateRUIEvent
                                 SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
                             }
                         }
+                    }
+                    case Stage::decorate:
+                    {
+                        for(int i = 0; i < DecorationFrames.size(); i++)
+                        {
+                            if(DecorationFrames[i].isHovered(mx,my))
+                            {
+                                j = 1;
+                                SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                            }
+                        }
+                        break;
                     }
                     default:break;
                 }
@@ -306,7 +349,27 @@ class CreateRUIEvent
                                 {
                                     CStage = Stage::decorate;
                                     RedCloth.SetWhetherRender(1);
+                                    PProduct.SetDelayTime(CurrentTime);
                                 } 
+                            }
+                        }
+                        break;
+                    }
+                    case Stage::decorate:
+                    {
+                        for(int i = 0; i < DecorationFrames.size(); i++)
+                        {
+                            int n = PProduct.GetLastDecorationNumbers();
+                            if(DecorationFrames[i].isHovered(mx,my))
+                            {
+                                if(n <= 2)
+                                {
+                                    PProduct.SetDEcorationCase(n,DecorationMaterials[i].GetID());
+                                }
+                                if(n == 2)
+                                {
+                                    SDL_Log("制作完成");
+                                }
                             }
                         }
                     }

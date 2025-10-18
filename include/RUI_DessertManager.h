@@ -71,6 +71,11 @@ class DessertManager
         Desserts[i].onRender(Renderer);
     }
 
+    void onRender(SDL_Renderer* Renderer,int i, SDL_Rect newRect)
+    {
+        Desserts[i].onRender(Renderer,newRect);
+    }
+
     void onRender(SDL_Renderer* Renderer,int i,int mx,int my)
     {
         Desserts[i].onRender(Renderer,mx,my);

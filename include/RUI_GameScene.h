@@ -60,6 +60,7 @@ class RUI_GameScene: public RUI_Scene
         void onEnter()
         {
             TestEvent.Load(TotalMoney,TotalCustomers);
+            TestEvent.onEnter();
             // MenuButton Btn0((WindowWidth-320)/2,520,320,64,"返回首页",0);
             // Btns.push_back(Btn0);
             BackgroundMusic.quit();
@@ -221,7 +222,8 @@ class RUI_GameScene: public RUI_Scene
             if(cabinetFrame.GetCabinetID() != -1)
             {
                 //SDL_Log("当前面包柜id%d",cabinetFrame.GetCabinetID());
-                cabinetFrame.onRender(Renderer, Cabinets[cabinetFrame.GetCabinetID()],dessertManager);
+                //cabinetFrame.onRender(Renderer, Cabinets[cabinetFrame.GetCabinetID()],produtManager);
+                TestEvent.onFrameRender(Renderer,cabinetFrame, Cabinets);
             }
 
             if(isChatFrameShowing)
@@ -373,6 +375,7 @@ class RUI_GameScene: public RUI_Scene
             Cabinets.clear();
             Icons.clear();
             TestEvent.Save(TotalMoney,TotalCustomers);
+            TestEvent.quit();
             dessertManager.quit();
             gamemusic.quit();
         }

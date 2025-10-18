@@ -97,6 +97,11 @@ class Plate
         SDL_RenderCopy(Renderer, PlateTexture, nullptr, &Rect);
     }
 
+    void onRender(SDL_Renderer* Renderer, SDL_Rect newRect)
+    {
+        SDL_RenderCopy(Renderer, PlateTexture, nullptr, &newRect);
+    }
+
     void AnimationRender(SDL_Renderer* Renderer, int CurrentTime)
     {
         if(CurrentTime - LastTime >= 500)

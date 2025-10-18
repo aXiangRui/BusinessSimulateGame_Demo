@@ -4,6 +4,7 @@
 #include<SDL2/SDL_image.h>
 #include"RUI_ResourceManager.h"
 #include"RUI_DessertManager.h"
+#include"RUI_ProductManager.h"
 
 class Cabinet
 {
@@ -16,7 +17,8 @@ class Cabinet
         CabinetID = id;
         x = (CabinetID / 12) * 200 + 100 * (CabinetID % 2) + 20;
         y = (CabinetID / 2 % 6) * 40 + 200; 
-        DessertID = 0;
+        // DessertID = 0;
+        DessertID = rand() % 3;
     }
 
     int GetX()
@@ -105,11 +107,11 @@ class CabinetFrame
         DessertNameTexture = nullptr;
     }
 
-    void onRender(SDL_Renderer* Renderer, Cabinet& cab, DessertManager Manager)
+    void onRender(SDL_Renderer* Renderer, Cabinet& cab, ProductManager Manager)
     {
         SDL_RenderCopy(Renderer, CabinetFrameTexture, nullptr, &Rect);
         SDL_RenderCopy(Renderer, QuitIcon, nullptr, &QuitRect);
-        DessertName = Manager.GetDessertName(cab.GetDessertID()) + " " + std::to_string(Manager.GetDessertPrice(cab.GetDessertID())) + "元";
+        DessertName = Manager.GetProductName(cab.GetDessertID()) + " " + std::to_string(Manager.GetProductPrice(cab.GetDessertID())) + "元";
         CabinetID = "第" + std::to_string(IntCabinetID + 1) + "个面包柜";
         //SDL_Log("%d",IntCabinetID);
 
@@ -131,7 +133,7 @@ class CabinetFrame
 
         SDL_RenderCopy(Renderer, TitleTexture, nullptr, &TitleRect);
         SDL_RenderCopy(Renderer, DessertNameTexture, nullptr, &DessertRect);
-        Manager.onRender(Renderer,cab.GetDessertID(),200,100);
+        Manager.onRender(Renderer,cab.GetDessertID());
     }
 
     private:

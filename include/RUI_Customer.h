@@ -10,6 +10,7 @@
 #include"RUI_Chair.h"
 #include"RUI_Cabinet.h"
 #include"RUI_Clock.h"
+#include"RUI_ProductManager.h"
 
 enum class CustomerStage
 {
@@ -140,6 +141,7 @@ class Customer
             int currentTime, 
             std::vector<Cabinet>& Cabtines,
             DessertManager dessertManager,
+            ProductManager pManager,
             int&  TotalMoney
         )
         {
@@ -152,7 +154,7 @@ class Customer
                 }
                 case CustomerStage::Choose:
                 {
-                    ChooseDessert(Cabtines,currentTime,dessertManager);
+                    ChooseDessert(Cabtines,currentTime,pManager);
                     break;
                 }
                 case CustomerStage::Buy:
@@ -201,7 +203,7 @@ class Customer
             }
         }
 
-        void ChooseDessert(std::vector<Cabinet>&Cabinets, int currentTime, DessertManager dessertManager)
+        void ChooseDessert(std::vector<Cabinet>&Cabinets, int currentTime, ProductManager pManager)
         {
             if(x < Cabinets[chooseID].GetX() + 32)
             {
@@ -229,7 +231,7 @@ class Customer
                 if(currentTime - ChooseTime >= 5000 + rand() % 500 - 250)
                 {
                     int dID = Cabinets[chooseID].GetDessertID();
-                    int price = dessertManager.GetDessertPrice(dID);
+                    int price = pManager.GetProductPrice(dID);
                     ChooseNumber = rand() % 4 + 1;
                     payPrice = price * ChooseNumber;
                     CurrentStage = CustomerStage::Buy;

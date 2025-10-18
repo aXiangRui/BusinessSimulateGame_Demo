@@ -109,6 +109,12 @@ class Dessert
         SDL_RenderCopy(Renderer,DessertTexture,nullptr,&Rect);
     }
 
+    void onRender(SDL_Renderer* Renderer,SDL_Rect newRect)
+    {
+        DessertTexture = ResourceManager::instance()->FindTexture(FilePath.c_str());
+        SDL_RenderCopy(Renderer,DessertTexture,nullptr,&newRect);
+    }
+
     void onRender(SDL_Renderer* Renderer,int mx,int my)
     {
         DessertTexture = ResourceManager::instance()->FindTexture(FilePath.c_str());
@@ -123,7 +129,7 @@ class Dessert
 
     void moveUpdate(int CurrentTime)
     {
-        if(isClicked)
+        if(true)
         {
             if(CurrentTime - lastTime >= 16 && y <= 160)
             {
