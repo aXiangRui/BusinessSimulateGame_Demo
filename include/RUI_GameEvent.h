@@ -116,7 +116,7 @@ class GameEvent
                 {
                     if(customerManager.Customers[i].WhetherAdd(Customers.size(),timeClock))
                     {
-                        SDL_Log("可以生成%d",i);
+                        // SDL_Log("可以生成%d",i);
                         Customer a;
                         a.InitCustomer(
                             TotalCustomers,

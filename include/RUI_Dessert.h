@@ -21,11 +21,13 @@ class Dessert
         Name = name;
         DessertTexture = ResourceManager::instance()->FindTexture(path.c_str());
         price = SweetLevel/10 * 3 + FullLevel/10 * 1 + TasteLevel/10 * 2;
+        lastTime = 0;
+        isClicked = 0;
 
         x = 200;
         y = 200;
-        w = 64;
-        h = 64;
+        w = 256;
+        h = 256;
     }
 
     int GetDessertID()
@@ -103,8 +105,33 @@ class Dessert
     void onRender(SDL_Renderer* Renderer)
     {
         DessertTexture = ResourceManager::instance()->FindTexture(FilePath.c_str());
-        SDL_Rect Rect = {x,y,w,h};
+        Rect = {x,y,w,h};
         SDL_RenderCopy(Renderer,DessertTexture,nullptr,&Rect);
+    }
+
+    void onRender(SDL_Renderer* Renderer,int mx,int my)
+    {
+        DessertTexture = ResourceManager::instance()->FindTexture(FilePath.c_str());
+        Rect = {mx,my,w,h};
+        SDL_RenderCopy(Renderer,DessertTexture,nullptr,&Rect);
+    }
+
+    void SetIsClicked(bool x)
+    {
+        isClicked = x;
+    }
+
+    void moveUpdate(int CurrentTime)
+    {
+        if(isClicked)
+        {
+            if(CurrentTime - lastTime >= 16 && y <= 160)
+            {
+                y = y + 5;
+                Rect = {x,y,w,h};
+                lastTime = CurrentTime;
+            }
+        }
     }
 
     private:
@@ -117,4 +144,7 @@ class Dessert
     std::string FilePath;
     int x,y;
     int w,h;
+    int lastTime;
+    bool isClicked;
+    SDL_Rect Rect;
 };

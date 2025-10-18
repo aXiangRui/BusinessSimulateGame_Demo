@@ -56,6 +56,8 @@ class Customer
             payPrice = 0;
             hasJoined = 0;
             RandomDelay = rand() % 10000;
+
+            payCharm.Init();
         }
 
         int GetCustomerID()
@@ -130,7 +132,8 @@ class Customer
             {
                 SDL_RenderCopyEx(Renderer,NormalTexture,nullptr,&Rect,0,0,SDL_FLIP_HORIZONTAL);
             }
-            
+            if(payCharm.GetMoney() != 0)
+                payCharm.onRender(Renderer);
         }
 
         void Update(std::vector<Chair>& Chairs,
@@ -260,7 +263,10 @@ class Customer
                 if(CurrentTime - PayTime >= 1000 && isGoingPay == 1)
                 {
                     TotalMoney = TotalMoney + payPrice;
-                    SDL_Log("已付款，当前总金额:%d",TotalMoney);
+                    payCharm.SetPrice(payPrice);
+                    payCharm.SetStartTime(CurrentTime);
+                    payCharm.SetStopTime(CurrentTime);
+                    // SDL_Log("已付款，当前总金额:%d",TotalMoney);
                     SitTime = CurrentTime;
                     CurrentStage = CustomerStage::Eat;
                 }
@@ -336,7 +342,7 @@ class Customer
                     }
                 }
             }
-            //CurrentStage = CustomerStage::Leave;
+            payCharm.SetStopTime(CurrentTime);
         }
 
         void SetChooseID(int i)
@@ -510,4 +516,5 @@ class Customer
         int RandomDelay;
 
         bool hasJoined;
+        PayCharm payCharm;
 };

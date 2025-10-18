@@ -71,8 +71,18 @@ class DessertManager
         Desserts[i].onRender(Renderer);
     }
 
+    void onRender(SDL_Renderer* Renderer,int i,int mx,int my)
+    {
+        Desserts[i].onRender(Renderer,mx,my);
+    }
+
     int GetDessertsSize()
     {
         return Desserts.size();
+    }
+
+    void quit()
+    {
+        Desserts.clear();
     }
 };

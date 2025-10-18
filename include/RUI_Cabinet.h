@@ -131,7 +131,7 @@ class CabinetFrame
 
         SDL_RenderCopy(Renderer, TitleTexture, nullptr, &TitleRect);
         SDL_RenderCopy(Renderer, DessertNameTexture, nullptr, &DessertRect);
-        Manager.onRender(Renderer,cab.GetDessertID());
+        Manager.onRender(Renderer,cab.GetDessertID(),200,100);
     }
 
     private:
@@ -150,4 +150,72 @@ class CabinetFrame
     std::string CabinetID;
     SDL_Color color;
     int IntCabinetID;
+};
+
+
+class PayCharm
+{
+    public:
+    PayCharm() = default;
+    ~PayCharm() = default;
+
+    void Init()
+    {
+        TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",24);
+        Money = 0;
+    }
+
+    void SetPrice(int i)
+    {
+        Money = i;
+        std::string price = std::to_string(Money) + "元";
+        color = {10,10,10,255};
+        PriceSurface = TTF_RenderUTF8_Blended(TextFont, price.c_str(), color);
+        w = PriceSurface->w; h = PriceSurface->h;
+        x = 350; y = 120;
+        Rect = {x,y,w,h};
+        StartTime = 0;
+        StopTime = 0;
+    }
+
+    int GetMoney()
+    {
+        return Money;
+    }
+
+    void SetStartTime(int CurrentTime)
+    {
+        StartTime = CurrentTime;
+    }
+
+    void SetStopTime(int CurrentTime)
+    {
+        StopTime = CurrentTime;
+    }
+
+    void onRender(SDL_Renderer* Renderer)
+    {
+        if( StopTime - StartTime < 1000)
+        {
+            if(PriceTexture == nullptr)
+            {
+                if(PriceSurface == nullptr)
+                    SDL_Log("nullptr");
+                PriceTexture = SDL_CreateTextureFromSurface(Renderer,PriceSurface);
+            }
+            SDL_RenderCopy(Renderer, PriceTexture, nullptr, &Rect);
+        }
+    }
+
+    private:
+    int Money;
+    int StartTime;
+    int StopTime;
+    int x,y;
+    int w,h;
+    TTF_Font* TextFont;
+    SDL_Rect Rect;
+    SDL_Surface* PriceSurface;
+    SDL_Texture* PriceTexture = nullptr;
+    SDL_Color color;
 };

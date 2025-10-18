@@ -373,6 +373,7 @@ class RUI_GameScene: public RUI_Scene
             Cabinets.clear();
             Icons.clear();
             TestEvent.Save(TotalMoney,TotalCustomers);
+            dessertManager.quit();
             gamemusic.quit();
         }
         private:
