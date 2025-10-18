@@ -1,0 +1,2 @@
+1 0 0 奶油 cream 10 5 5
+1 1 1 小草莓 strawberry 2 2 5

@@ -9,6 +9,7 @@
 #include"RUI_MusicManager.h"
 #include"RUI_ChooseFrame.h"
 #include"RUI_Product.h"
+#include"RUI_MaterialManager.h"
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_image.h>
 #include<SDL2/SDL_ttf.h>
@@ -20,12 +21,16 @@ class CreateRUIEvent
     CreateRUIEvent() = default;
     ~CreateRUIEvent() = default;
 
+    std::vector<RUI_Icon> Icons;
     std::vector<ChooseFrame> SizeFrames;
     std::vector<ChooseFrame> BaseFrames;
     std::vector<Dessert> BaseDessert;
     std::vector<ChooseFrame> DecorationFrames;
+    std::vector<Material> DecorationMaterials;
     std::vector<Plate> plates;
     ProducingProduct PProduct;
+    MaterialManager materialManager;   
+    Cloth RedCloth; 
 
     void load()
     {
@@ -33,6 +38,7 @@ class CreateRUIEvent
         TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
         ChooseFrameTexture = ResourceManager::instance()->FindTexture("chooseframe");     
         dessertManager.InitDessertManager();
+        materialManager.InitMaterialManager();
 
         for(int i = 0; i < 3; i++)
         {
@@ -40,7 +46,12 @@ class CreateRUIEvent
             a.InitPlate(140,-60,i);
             plates.push_back(a);
         }
-        PProduct.Init();
+        
+        RUI_Icon exiticon;
+        exiticon.InitIcon(10,500,50,50,0,"exiticon");
+        Icons.push_back(exiticon);
+        PProduct.Init(materialManager);
+        RedCloth.init();
     }
 
     void ChooseSize(std::vector<int>& Size)
@@ -75,6 +86,18 @@ class CreateRUIEvent
         }
     }
 
+    void ChooseDecoration()
+    {
+        for(int i = 0; i < materialManager.GetDecorationSize(); i++)
+        {
+            ChooseFrame AddFrames;
+            std::string name = materialManager.GetDecorationName(i);
+            AddFrames.InitChooseFrame(500,10 + i * 50, i, name);
+            DecorationFrames.push_back(AddFrames);
+            DecorationMaterials.push_back(materialManager.DecorationMaterial[i]);
+        }
+    }
+
     void update()
     {
         CurrentTime = SDL_GetTicks();
@@ -86,6 +109,9 @@ class CreateRUIEvent
         {
             BaseDessert[PProduct.GetBaseID()].moveUpdate(CurrentTime);
         }
+        PProduct.moveUpdate(CurrentTime);
+        RedCloth.Appear(CurrentTime);
+        RedCloth.Quit(CurrentTime);   
     }
 
     void onRender(SDL_Renderer* Renderer)
@@ -94,6 +120,7 @@ class CreateRUIEvent
             plates[PProduct.GetPlateSize()].onRender(Renderer);
         if(PProduct.GetBaseID() != -1)
             BaseDessert[PProduct.GetBaseID()].onRender(Renderer);
+        PProduct.RenderCreateMaterial(Renderer);
     switch(CStage)
     {
         case Stage::size:
@@ -132,9 +159,27 @@ class CreateRUIEvent
         case Stage::create:
         {
             PProduct.RenderCreateNumbers(Renderer);
+            for(int i = 0; i < DecorationFrames.size(); i++)
+            {
+                if(DecorationFrames[i].GetIsHovered())
+                {
+                    DecorationFrames[i].onHoverRender(Renderer);
+                    DecorationMaterials[i].onRender(Renderer);
+                }
+                else
+                {
+                    DecorationFrames[i].onRender(Renderer);
+                }
+                
+            }
         }
         default:break;
     }
+        for(int i = 0; i < Icons.size(); i++)
+            {
+                Icons[i].onRender(Renderer);
+            }
+        RedCloth.onRender(Renderer);
     }
 
     void input(const SDL_Event& event)
@@ -144,11 +189,11 @@ class CreateRUIEvent
             case SDL_MOUSEMOTION:
             {
                 int mx = event.motion.x; int my = event.motion.y;
+                int j = 0;
                 switch (CStage)
                 {
                     case Stage::size:
                     {
-                        int j = 0;
                         for(int i = 0; i < SizeFrames.size(); i++)
                         {
                             if(SizeFrames[i].isHovered(mx,my))
@@ -157,13 +202,12 @@ class CreateRUIEvent
                                 SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
                             }                        
                         }
-                        if(!j)
-                            SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
+                        // if(!j)
+                        //     SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
                         break;
                     }
                     case Stage::base:
                     {
-                        int j = 0;
                         for(int i = 0; i < BaseFrames.size(); i++)
                         {
                             if(BaseFrames[i].isHovered(mx,my))
@@ -172,17 +216,54 @@ class CreateRUIEvent
                                 SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
                             }
                         }
-                        if(!j)
-                            SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
+                        // if(!j)
+                        //     SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
                         break;
+                    }
+                    case Stage::create:
+                    {
+                        for(int i = 0; i < DecorationFrames.size(); i++)
+                        {
+                            if(DecorationFrames[i].isHovered(mx,my))
+                            {
+                                j = 1;
+                                SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                            }
+                        }
                     }
                     default:break;
                 }
+                for(int i = 0; i < Icons.size(); i++)
+                {
+                    if(Icons[i].isHovered(mx,my))
+                    {
+                        j = 1;
+                        SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                    }
+                }
+                if(!j)
+                    SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
                 break;
             }
             case SDL_MOUSEBUTTONDOWN:
             {
                 int mx = event.button.x; int my = event.button.y;
+                for(int i = 0; i <= Icons.size(); i++)
+                {
+                    if(Icons[i].isClicked(mx,my))
+                    {
+                        switch(i)
+                        {
+                            case 0:
+                            {
+                                SceneManager.ChooseScene(RUI_SceneManager::SceneType::Game);
+                                break;
+                            }
+                            default:
+                                break;
+                        }
+                    }
+                }
                 switch(CStage)
                 {
                     case Stage::size:
@@ -210,6 +291,24 @@ class CreateRUIEvent
                                 CStage = Stage::create;
                             }
                         }
+                        break;
+                    }
+                    case Stage::create:
+                    {
+                        int n = PProduct.GetLastCreateNumbers();
+                        for(int i = 0; i < DecorationFrames.size(); i++)
+                        {
+                            if(DecorationFrames[i].isHovered(mx,my))
+                            {
+                                if(n <= 2)
+                                    PProduct.SetCreateCase(n,DecorationMaterials[i].GetID());
+                                if(n == 2)
+                                {
+                                    CStage = Stage::decorate;
+                                    RedCloth.SetWhetherRender(1);
+                                } 
+                            }
+                        }
                     }
                     default:break;
                 }
@@ -226,6 +325,10 @@ class CreateRUIEvent
         BaseFrames.clear();
         BaseDessert.clear();
         dessertManager.quit();
+        materialManager.quit();
+        DecorationFrames.clear();
+        DecorationMaterials.clear();
+        RedCloth.SetWhetherRender(0);
     }
 
     void SetStage(int i)

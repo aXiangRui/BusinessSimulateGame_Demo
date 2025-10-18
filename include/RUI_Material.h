@@ -2,6 +2,7 @@
 
 #include<string>
 #include<SDL2/SDL.h>
+#include"RUI_ResourceManager.h"
 
 class Material
 {
@@ -9,13 +10,21 @@ class Material
         Material() = default;
         ~Material() = default;
 
-        SDL_Texture* MaterialTexture;
-
-        virtual void InitLevel(int materialid, int SweetNumber, int FullNumber, int TasteNumber, std::string name, std::string path){};
-
-        void SetLoadPath(std::string path)
+        // virtual void InitLevel(int materialid, int SweetNumber, int FullNumber, int TasteNumber, std::string name, std::string path){};
+        void InitMaterial(int id, int type, std::string name, std::string Path,int sweet, int full, int taste)
         {
-            LoadPath = path;
+            MaterialID = id;
+            MaterialType = type;
+            Name = name;
+            LoadPath = Path;
+            SweetLevel = sweet;
+            FullLevel = full;
+            TasteLevel = taste;
+            MaterialTexture = ResourceManager::instance()->FindTexture(LoadPath.c_str());
+            x = 150; y = -100;
+            w = 256; h = 256;
+            Rect = {x,y,w,h};
+            LastTime = 0;
         }
 
         void AddSweetNumber(int SweetNumber)
@@ -79,7 +88,25 @@ class Material
             return y;
         }
 
-        virtual void RenderMaterial(SDL_Renderer* Renderer){};
+        int GetID()
+        {
+            return MaterialID;
+        }
+
+        void moveUpdate(int CurrentTime, int i)
+        {
+            if(CurrentTime - LastTime >= 16 && y <= 120 - i * 20)
+            {
+                y = y + 5;
+                Rect = {x,y,w,h};
+                LastTime = CurrentTime;
+            }
+        }
+
+        void onRender(SDL_Renderer* Renderer)
+        {
+            SDL_RenderCopy(Renderer, MaterialTexture, nullptr, &Rect);
+        };
         
     private:
         int SweetLevel;
@@ -88,6 +115,11 @@ class Material
         int MaterialID;
         int Kind;
         int x,y;
+        int w,h;
+        int MaterialType;
         std::string LoadPath;
         std::string Name;
+        SDL_Texture* MaterialTexture;
+        SDL_Rect Rect;
+        int LastTime;
 };

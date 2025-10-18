@@ -31,7 +31,7 @@ class RUI_CreateScene : public RUI_Scene
     };
 
     std::vector<Button> MenuButtons;
-    std::vector<RUI_Icon> Icons;
+
     std::vector<int> Size;
 
     CreateRUIEvent Event;
@@ -49,10 +49,6 @@ class RUI_CreateScene : public RUI_Scene
             MenuButtons.push_back(Btn0);
             CurrentStage = CreateStage::ChooseSize;
 
-            RUI_Icon exiticon;
-            exiticon.InitIcon(10,500,50,50,0,"exiticon");
-            Icons.push_back(exiticon);
-
             for(int i = 0; i < 3; i++)
             {
                 Size.push_back( 16* (i+1) );
@@ -60,6 +56,7 @@ class RUI_CreateScene : public RUI_Scene
             Event.load();
             Event.ChooseSize(Size);
             Event.ChooseBase();
+            Event.ChooseDecoration();
         }
         void onUpdate()
         {
@@ -81,64 +78,13 @@ class RUI_CreateScene : public RUI_Scene
             SDL_RenderClear(Renderer);
             SDL_RenderCopy(Renderer, BackgroundTexture, nullptr, &BackgroundRect);
 
-            for(int i = 0; i < Icons.size(); i++)
-            {
-                Icons[i].onRender(Renderer);
-            }
-
             Event.onRender(Renderer);
 
             SDL_RenderPresent(Renderer);
         }
         void onInput(const SDL_Event& event,SDL_Renderer* Renderer, bool& running)
         {
-        switch(event.type)
-        {
-            case SDL_MOUSEBUTTONDOWN:
-            {
-                int mx = event.button.x;
-                int my = event.button.y;
-                for(int i = 0; i <= Icons.size(); i++)
-                {
-                    if(Icons[i].isClicked(mx,my))
-                    {
-                        switch(i)
-                        {
-                            case 0:
-                            {
-                                SceneManager.ChooseScene(RUI_SceneManager::SceneType::Game);
-                                break;
-                            }
-                            default:
-                                break;
-                        }
-                    }
-                }
-                break;
-            }
-            case SDL_MOUSEMOTION:
-            {
-                int mx = event.motion.x; int my = event.motion.y;
-                int j = 0;
-                for(int i = 0; i < Icons.size(); i++)
-                {
-                    if(Icons[i].isHovered(mx,my))
-                    {
-                        j = 1;
-                        SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
-                    }
-                }
-                if(!j)
-                    SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
-            }
-            default:
-            break;
-        }
-        Event.input(event);
-            // if(event.type == SDL_MOUSEBUTTONDOWN)
-            // {
-            //     SceneManager.ChooseScene(RUI_SceneManager::SceneType::Game);
-            // }    
+            Event.input(event);
         }
         void onExit()
         {

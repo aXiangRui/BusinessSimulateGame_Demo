@@ -21,7 +21,7 @@ class ChooseFrame
         ChooseFrameTexture = ResourceManager::instance()->FindTexture("chooseframe");
         ChooseHoveredFrameTexture = ResourceManager::instance()->FindTexture("chooseframe_hovered");
         Rect = {x,y,320,64};
-        TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",24);
+        TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",32);
         
         SDL_Color color = {10,10,10,255};
         image = TTF_RenderUTF8_Blended(TextFont, Text.c_str(), color);
@@ -43,7 +43,7 @@ class ChooseFrame
         // if(image)
         // {
         int mw = image->w; int mh = image->h;  
-        TextRect = { x + 20, y + 20, mw, mh};
+        TextRect = { x + 20, y + 15, mw, mh};
         if(TextTexture == nullptr)
             TextTexture = SDL_CreateTextureFromSurface(Renderer,image); 
         //}  
@@ -58,7 +58,7 @@ class ChooseFrame
         if(image)
         {
             int mw = image->w; int mh = image->h;  
-            TextRect = { x + 20, y + 20, mw, mh};
+            TextRect = { x + 20, y + 15, mw, mh};
             if(TextTexture == nullptr)
                 TextTexture = SDL_CreateTextureFromSurface(Renderer,image); 
         }  
