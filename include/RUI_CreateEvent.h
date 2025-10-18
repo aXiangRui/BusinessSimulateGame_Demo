@@ -8,6 +8,7 @@
 #include"RUI_ResourceManager.h"
 #include"RUI_MusicManager.h"
 #include"RUI_ChooseFrame.h"
+#include"RUI_Product.h"
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_image.h>
 #include<SDL2/SDL_ttf.h>
@@ -21,20 +22,25 @@ class CreateRUIEvent
 
     std::vector<ChooseFrame> SizeFrames;
     std::vector<ChooseFrame> BaseFrames;
+    std::vector<Dessert> BaseDessert;
     std::vector<ChooseFrame> DecorationFrames;
     std::vector<Plate> plates;
+    ProducingProduct PProduct;
 
     void load()
     {
         CStage = Stage::size;
         TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
-        ChooseFrameTexture = ResourceManager::instance()->FindTexture("chooseframe");
+        ChooseFrameTexture = ResourceManager::instance()->FindTexture("chooseframe");     
+        dessertManager.InitDessertManager();
+
         for(int i = 0; i < 3; i++)
         {
             Plate a;
             a.InitPlate(140,-60,i);
             plates.push_back(a);
         }
+        PProduct.Init();
     }
 
     void ChooseSize(std::vector<int>& Size)
@@ -56,13 +62,31 @@ class CreateRUIEvent
         }
     }
 
+    void ChooseBase()
+    {
+        for(int i = 0; i < dessertManager.GetDessertsSize(); i++)
+        {
+            ChooseFrame AddFrames;
+            std::string name = dessertManager.GetDessertName(i);
+            AddFrames.InitChooseFrame(500, 10 + i * 50, i, name.c_str());
+            BaseFrames.push_back(AddFrames);
+            BaseDessert.push_back(dessertManager.Desserts[i]);
+        }
+    }
+
     void update()
     {
         CurrentTime = SDL_GetTicks();
+        if(PProduct.GetPlateSize() != -1)
+        {
+            plates[PProduct.GetPlateSize()].MovitionUpdate(CurrentTime,5);
+        }
     }
 
     void onRender(SDL_Renderer* Renderer)
-    {
+    {    
+        if(PProduct.GetPlateSize() != -1)
+            plates[PProduct.GetPlateSize()].onRender(Renderer);
     switch(CStage)
     {
         case Stage::size:
@@ -81,6 +105,24 @@ class CreateRUIEvent
             }
             break;
         }
+        case Stage::base:
+        {
+            for(int i = 0; i < BaseFrames.size(); i++)
+            {
+                if(BaseFrames[i].GetIsHovered())
+                {
+                    BaseFrames[i].onHoverRender(Renderer);
+                    BaseDessert[i].onRender(Renderer);
+                }
+                else
+                {
+                    BaseFrames[i].onRender(Renderer);
+                }
+                
+            }
+            break;
+        }
+        default:break;
     }
     }
 
@@ -95,14 +137,37 @@ class CreateRUIEvent
                 {
                     case Stage::size:
                     {
+                        int j = 0;
                         for(int i = 0; i < SizeFrames.size(); i++)
                         {
-                            SizeFrames[i].isHovered(mx,my);
+                            if(SizeFrames[i].isHovered(mx,my))
+                            {
+                                j = 1;
+                                SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                            }                        
                         }
+                        if(!j)
+                            SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
+                        break;
+                    }
+                    case Stage::base:
+                    {
+                        int j = 0;
+                        for(int i = 0; i < BaseFrames.size(); i++)
+                        {
+                            if(BaseFrames[i].GetIsHovered())
+                            {
+                                j = 1;
+                                SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                            }
+                        }
+                        if(!j)
+                            SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
                         break;
                     }
                     default:break;
                 }
+                break;
             }
             case SDL_MOUSEBUTTONDOWN:
             {
@@ -114,10 +179,15 @@ class CreateRUIEvent
                         for(int i = 0; i < SizeFrames.size(); i++)
                         {
                             if(SizeFrames[i].GetIsHovered())
-                            {
-                                
+                            {     
+                                SDL_Log("当前按下的坐标:%d,%d,%d",mx,my,i);
+                                plates[i].SetMoveCheck(1);
+                                PProduct.SetPlateSize(i);
+                                CStage = Stage::base;
                             }
                         }
+                        break;
+                        default:break;
                     }
                 }
                 break;
@@ -130,6 +200,8 @@ class CreateRUIEvent
         plates.clear();
         DessertSize.clear();
         SizeFrames.clear();
+        BaseFrames.clear();
+        BaseDessert.clear();
     }
 
     void SetStage(int i)
@@ -157,4 +229,5 @@ class CreateRUIEvent
     TTF_Font* TextFont;
     SDL_Texture* ChooseFrameTexture;
     int CurrentTime;
+    DessertManager dessertManager;
 };

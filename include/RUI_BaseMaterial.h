@@ -117,10 +117,28 @@ class Plate
         }
     }
 
+    void MovitionUpdate(int CurrentTime,int speedy)
+    {
+        if(MoveCheck)
+        {
+            if(CurrentTime - LastTime >= 500 && y <= 200)
+            {
+                y = y + speedy;
+                Rect = {x, y, 256, 256};
+            }
+        }
+    }
+
+    void SetMoveCheck(bool x)
+    {
+        MoveCheck = x;
+    }
+
     private:
     int x,y;
     int LastTime;
     bool WhetherAppear;
+    bool MoveCheck;
     SDL_Texture* PlateTexture;
     SDL_Rect Rect;
 

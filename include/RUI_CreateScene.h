@@ -59,29 +59,20 @@ class RUI_CreateScene : public RUI_Scene
             }
             Event.load();
             Event.ChooseSize(Size);
+            Event.ChooseBase();
         }
         void onUpdate()
         {
-            Event.SetStage(StageInt());
+            //Event.SetStage(StageInt());
             Event.update();
             //SDL_Log("更新设置场景");
             switch(CurrentStage)
             {
                 case CreateStage::ChooseSize:{break;}
-                case CreateStage::ChooseBasicMaterial:
-                {
-                    break;
-                }
-                case CreateStage::Create:
-                {
-                    break;
-                }
-                case CreateStage::ChooseDecorationMaterial:
-                {
-                    break;
-                }
-                default:
-                break;
+                case CreateStage::ChooseBasicMaterial:{break;}
+                case CreateStage::Create:{break;}
+                case CreateStage::ChooseDecorationMaterial:{break; }
+                default:break;
             }
         }
         void onRender(SDL_Renderer* Renderer)
@@ -124,6 +115,21 @@ class RUI_CreateScene : public RUI_Scene
                     }
                 }
                 break;
+            }
+            case SDL_MOUSEMOTION:
+            {
+                int mx = event.motion.x; int my = event.motion.y;
+                int j = 0;
+                for(int i = 0; i < Icons.size(); i++)
+                {
+                    if(Icons[i].isHovered(mx,my))
+                    {
+                        j = 1;
+                        SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                    }
+                }
+                if(!j)
+                    SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
             }
             default:
             break;
