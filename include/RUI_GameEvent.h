@@ -73,6 +73,7 @@ class GameEvent
         }
         MenuButton Btn0((WindowWidth-320)/2,450,320,64,"设置新甜点",0);
         Btns.push_back(Btn0);
+        isReadingPage = -1;
     }
 
     void quit()
@@ -285,16 +286,16 @@ class GameEvent
         }    
     }
 
-    void onProductRender(SDL_Renderer* Renderer)
+    void onProductRender(SDL_Renderer* Renderer, int j)
     {
         Chat.RenderFrame(Renderer);
         for(int i = 0; i < productManager.GetProductSize(); i++)
         {
-            if(i / 6 == 0)
+            if(i / 6 == j)
             {
                 productManager.products[i].onRender(
                     Renderer, dessertManager, materialManager, plates,
-                    200 + i/3 * 200, i % 3 * 200, 200, 200
+                    200 + i/3 * 200 - j * 400 , i % 3 * 200, 200, 200
                 );
             }
         }
@@ -308,6 +309,21 @@ class GameEvent
     int GetCustomerNumber()
     {
         return Customers.size();
+    }
+
+    int GetIsReadingPage()
+    {
+        return isReadingPage;
+    }
+
+    int GetProductNumber()
+    {
+        return productManager.GetProductSize();
+    }
+
+    void SetIsReadingPage(int i)
+    {
+        isReadingPage = i;
     }
 
     void Load(int& TotalMoney, int& TotalCustomers)
@@ -375,5 +391,6 @@ class GameEvent
         Clock timeClock;
         Uint32 CurrentTime;
         Uint32 LastTime;
+        int isReadingPage;
 
 };

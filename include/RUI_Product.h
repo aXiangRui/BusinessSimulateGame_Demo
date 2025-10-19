@@ -234,7 +234,7 @@ class ProducedProduct
     ProducedProduct() = default;
     ~ProducedProduct() = default;
 
-    void LoadInit(int id, int bid, std::vector<int> did, int size)
+    void LoadInit(int id, int bid, std::vector<int> did, int size, MaterialManager mManager, DessertManager dManager)
     {
         ProductID = id;
         BaseDessertID = bid;
@@ -245,7 +245,21 @@ class ProducedProduct
         PlateSize = size;
         x = 200; y = 200;
         w = 200; h = 200;
-        sweetlevel = 0; fulllevel = 0; tastelevel = 0;
+        
+        sweetlevel = dManager.Desserts[BaseDessertID].GetSweetNumber();
+        fulllevel = dManager.Desserts[BaseDessertID].GetFullNumber();
+        tastelevel = dManager.Desserts[BaseDessertID].GetTasteNumber();
+        for(int i = 0; i < 3; i++)
+        {
+            if(DecorationID[i] >= 0)
+            {
+                //SDL_Log("当前：%d",DecorationID[i]);
+                sweetlevel = sweetlevel + mManager.DecorationMaterial[DecorationID[i]].GetSweetNumber();
+                fulllevel = fulllevel + mManager.DecorationMaterial[DecorationID[i]].GetFullNumber();
+                tastelevel = tastelevel + mManager.DecorationMaterial[DecorationID[i]].GetTasteNumber();
+            }    
+        }
+
     }
 
     void SetRect(int mx,int my, int mw, int mh)
@@ -274,23 +288,9 @@ class ProducedProduct
         }
     }
 
-    int GetProductPrice(DessertManager dManager, MaterialManager mManager)
+    int GetProductPrice()
     {
-        sweetlevel = dManager.Desserts[BaseDessertID].GetSweetNumber()
-        + mManager.DecorationMaterial[DecorationID[0]].GetSweetNumber()
-        + mManager.DecorationMaterial[DecorationID[1]].GetSweetNumber()
-        + mManager.DecorationMaterial[DecorationID[2]].GetSweetNumber();
-
-        fulllevel = dManager.Desserts[BaseDessertID].GetFullNumber()
-        + mManager.DecorationMaterial[DecorationID[0]].GetFullNumber()
-        + mManager.DecorationMaterial[DecorationID[1]].GetFullNumber()
-        + mManager.DecorationMaterial[DecorationID[2]].GetFullNumber();
-
-        tastelevel = dManager.Desserts[BaseDessertID].GetTasteNumber()
-        + mManager.DecorationMaterial[DecorationID[0]].GetTasteNumber()
-        + mManager.DecorationMaterial[DecorationID[1]].GetTasteNumber()
-        + mManager.DecorationMaterial[DecorationID[2]].GetTasteNumber();
-        // SDL_Log("%d %d %d",sweetlevel,fulllevel,tastelevel);
+        // SDL_Log("当前三围如下：%d %d %d",sweetlevel,fulllevel,tastelevel);
         price = sweetlevel/10*3 + fulllevel/10 + tastelevel/10*2;
         return price;
     }

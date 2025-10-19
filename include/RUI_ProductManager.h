@@ -48,7 +48,7 @@ class ProductManager
 
             SDL_Log("读取到%d号产品",ID);
             ProducedProduct a;
-            a.LoadInit(ID,BID,did,size);
+            a.LoadInit(ID,BID,did,size,mManager,dManager);
             products.push_back(a);
         }
     }
@@ -79,7 +79,7 @@ class ProductManager
     int GetProductPrice(int i)
     {
     //     return dManager.GetDessertPrice(i);
-        return products[i].GetProductPrice(dManager,mManager);
+        return products[i].GetProductPrice();
     }
 
     void onRender(SDL_Renderer* Renderer, int i)

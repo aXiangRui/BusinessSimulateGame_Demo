@@ -406,7 +406,9 @@ class CreateRUIEvent
                                         productManager.GetProductSize(),
                                         PProduct.GetBaseID(),
                                         PProduct.GetDecorationID(),
-                                        PProduct.GetPlateSize()
+                                        PProduct.GetPlateSize(),
+                                        materialManager,
+                                        dessertManager
                                         );
                                     productManager.AddProduct(a);
                                     productManager.Save();
@@ -435,7 +437,8 @@ class CreateRUIEvent
         dessertManager.quit();
         materialManager.quit();
         DecorationFrames.clear();
-        DecorationMaterials.clear();
+        DecorationMaterials.clear();  
+        productManager.quit();
         RedCloth.SetWhetherRender(0);
     }
 

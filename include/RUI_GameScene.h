@@ -55,6 +55,7 @@ class RUI_GameScene: public RUI_Scene
         bool WhetherReadingProduct;
 
         int TotalCustomers;
+        int ReadingPage;
 
         GameEvent TestEvent;
 
@@ -62,6 +63,7 @@ class RUI_GameScene: public RUI_Scene
         {
             TestEvent.Load(TotalMoney,TotalCustomers);
             TestEvent.onEnter();
+            TestEvent.SetIsReadingPage(0);
             // MenuButton Btn0((WindowWidth-320)/2,520,320,64,"返回首页",0);
             // Btns.push_back(Btn0);
             BackgroundMusic.quit();
@@ -120,10 +122,19 @@ class RUI_GameScene: public RUI_Scene
             readicon.InitIcon(10,360,50,50,3,"readicon");
             Icons.push_back(readicon);
 
+            RUI_Icon nexticon;
+            nexticon.InitIcon(675,250,50,50,4,"nexticon");
+            Icons.push_back(nexticon);
+
+            RUI_Icon lasticon;
+            lasticon.InitIcon(75,250,50,50,5,"nexticon");
+            Icons.push_back(lasticon);
+
             LastTime = SDL_GetTicks();
             TestClock.SetStartTime(TestEvent.ReturnClockTime());
 
             WhetherReadingProduct = 0;
+            ReadingPage = -1;
             SDL_Log("进入游戏场景");
         }
         void onUpdate()
@@ -223,7 +234,17 @@ class RUI_GameScene: public RUI_Scene
 
             for(int i = 0; i < Icons.size(); i++)
             {
-                Icons[i].onRender(Renderer);
+                if(i <= 3)
+                    Icons[i].onRender(Renderer);
+                    else
+                    {
+                        if(TestEvent.GetIsReadingPage())
+                        {
+                            if(i == 4){Icons[i].onRender(Renderer);}
+                            if(i == 5){Icons[i].onRender(Renderer,1);} 
+                        }
+                    }
+                    
             }
 
             if(cabinetFrame.GetCabinetID() != -1)
@@ -235,7 +256,7 @@ class RUI_GameScene: public RUI_Scene
 
             if(WhetherReadingProduct)
             {
-                TestEvent.onProductRender(Renderer);
+                TestEvent.onProductRender(Renderer, ReadingPage);
             }
 
             if(isChatFrameShowing)
@@ -296,10 +317,39 @@ class RUI_GameScene: public RUI_Scene
                                 case 3:
                                 {
                                     if(WhetherReadingProduct == 0)
+                                    {
                                         WhetherReadingProduct = 1;
+                                        TestEvent.SetIsReadingPage(1);
+                                        ReadingPage = 0;
+                                    }
                                     else
+                                    {
                                         WhetherReadingProduct = 0;
+                                        TestEvent.SetIsReadingPage(0);
+                                        ReadingPage = -1;
+                                    }                                       
                                     break;
+                                }
+                                case 4:
+                                {
+                                    if(TestEvent.GetIsReadingPage())
+                                    {
+                                        ReadingPage = ReadingPage + 1;
+                                        if(ReadingPage > TestEvent.GetProductNumber()/6)
+                                        {
+                                            ReadingPage = TestEvent.GetProductNumber() / 6;
+                                        }
+                                    }
+                                    break;
+                                }
+                                case 5:
+                                {
+                                    if(TestEvent.GetIsReadingPage())
+                                    {
+                                        ReadingPage = ReadingPage - 1;
+                                        if(ReadingPage < 0)
+                                            ReadingPage = 0;
+                                    }
                                 }
                                 default:
                                 break;
@@ -350,8 +400,19 @@ class RUI_GameScene: public RUI_Scene
                     {
                         if(Icons[i].isHovered(mx,my))
                         {
-                            SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
-                            j = 1;
+                            if(i <= 3)
+                            {
+                                SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                                j = 1;
+                            }    
+                            else
+                            {
+                                if(TestEvent.GetIsReadingPage())
+                                {
+                                    SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                                    j = 1;
+                                }
+                            }
                         }
                     }
                     for(int i = 0; i < Cabinets.size(); i++)

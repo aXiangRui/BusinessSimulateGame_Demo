@@ -32,6 +32,15 @@ class RUI_Icon
         SDL_RenderCopy(Renderer,IconTexture,nullptr,&Rect);
     }
 
+    void onRender(SDL_Renderer* Renderer, int i)
+    {
+        if(i == 1)
+        {
+            IconTexture = ResourceManager::instance()->FindTexture(address.c_str());
+            SDL_RenderCopyEx(Renderer,IconTexture,nullptr,&Rect,0,0,SDL_FLIP_HORIZONTAL);
+        }
+    }
+
     bool isHovered(int mx, int my)
     {
         if(mx>=x && mx<=x+w)
