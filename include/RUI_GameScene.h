@@ -53,19 +53,22 @@ class RUI_GameScene: public RUI_Scene
         int TotalMoney = 0;
         int isChatFrameShowing = 0;
         bool WhetherReadingProduct;
+        bool isSettingNewProduct;
+        bool CheckSetting;
 
         int TotalCustomers;
         int ReadingPage;
+        int CurrentCabnet;
 
         GameEvent TestEvent;
 
         void onEnter()
         {
-            TestEvent.Load(TotalMoney,TotalCustomers);
+            TestEvent.Load(TotalMoney,TotalCustomers,Cabinets);
             TestEvent.onEnter();
             TestEvent.SetIsReadingPage(0);
-            // MenuButton Btn0((WindowWidth-320)/2,520,320,64,"返回首页",0);
-            // Btns.push_back(Btn0);
+            MenuButton Btn0((WindowWidth-320)/2,450,320,64,"设置新甜点",0);
+            Btns.push_back(Btn0);
             BackgroundMusic.quit();
             reg.InitRegister();
             if(!Mix_PlayingMusic())
@@ -87,12 +90,12 @@ class RUI_GameScene: public RUI_Scene
                 Chairs.push_back(chair);
             }
 
-            for(int i = 0; i < 24; i++)
-            {
-                Cabinet cabinet;
-                cabinet.InitCabinet(i);
-                Cabinets.push_back(cabinet);
-            }
+            // for(int i = 0; i < 24; i++)
+            // {
+            //     Cabinet cabinet;
+            //     cabinet.InitCabinet(i);
+            //     Cabinets.push_back(cabinet);
+            // }
 
             for(int i = 0; i < 8; i++)
             {
@@ -134,7 +137,10 @@ class RUI_GameScene: public RUI_Scene
             TestClock.SetStartTime(TestEvent.ReturnClockTime());
 
             WhetherReadingProduct = 0;
+            isSettingNewProduct = 0;
+            CheckSetting = 0;
             ReadingPage = -1;
+            CurrentCabnet = -1;
             SDL_Log("进入游戏场景");
         }
         void onUpdate()
@@ -207,11 +213,6 @@ class RUI_GameScene: public RUI_Scene
             SDL_RenderCopy(Renderer,Background,nullptr,&BackGroundRect);
             SDL_RenderCopy(Renderer,MoneyTexture,nullptr,&TextRect);
 
-            for(int i = 0; i < Btns.size(); i++)
-            {
-                Btns[i].ButtonRender(Renderer);
-            }
-
             for(int i = 0; i < Chairs.size(); i++)
             {
                 Chairs[i].onRender(Renderer);
@@ -243,10 +244,8 @@ class RUI_GameScene: public RUI_Scene
                             if(i == 4){Icons[i].onRender(Renderer);}
                             if(i == 5){Icons[i].onRender(Renderer,1);} 
                         }
-                    }
-                    
+                    }        
             }
-
             if(cabinetFrame.GetCabinetID() != -1)
             {
                 //SDL_Log("当前面包柜id%d",cabinetFrame.GetCabinetID());
@@ -257,6 +256,19 @@ class RUI_GameScene: public RUI_Scene
             if(WhetherReadingProduct)
             {
                 TestEvent.onProductRender(Renderer, ReadingPage);
+            }
+      
+            for(int i = 0; i < Btns.size(); i++)
+            {
+                if(isSettingNewProduct)
+                    Btns[i].ButtonRender(Renderer);
+            }
+
+            if(CheckSetting == 1)
+            {
+                TestEvent.SettingProductRender(Renderer,ReadingPage);
+                Icons[4].onRender(Renderer);
+                Icons[5].onRender(Renderer,1);
             }
 
             if(isChatFrameShowing)
@@ -276,25 +288,69 @@ class RUI_GameScene: public RUI_Scene
                 {            
                     int mx = event.motion.x;
                     int my = event.motion.y;
+                    if(CheckSetting)
+                    {
+                        if(CheckRect(200,400,0,200,mx,my))
+                        {
+                            Cabinets[CurrentCabnet].SetDessertID(ReadingPage*6);
+                            CheckSetting = 0;
+                            isSettingNewProduct = 1;
+                        }
+                        if(CheckRect(200,400,200,400,mx,my))
+                        {
+                            Cabinets[CurrentCabnet].SetDessertID(ReadingPage*6+1);
+                            CheckSetting = 0;
+                            isSettingNewProduct = 1;
+                        }
+                        if(CheckRect(200,400,400,600,mx,my))
+                        {
+                            Cabinets[CurrentCabnet].SetDessertID(ReadingPage*6+2);
+                            CheckSetting = 0;
+                            isSettingNewProduct = 1;
+                        }
+                        if(CheckRect(400,600,0,200,mx,my))
+                        {
+                            Cabinets[CurrentCabnet].SetDessertID(ReadingPage*6+3);
+                            CheckSetting = 0;
+                            isSettingNewProduct = 1;
+                        }
+                        if(CheckRect(400,600,200,400,mx,my))
+                        {
+                            Cabinets[CurrentCabnet].SetDessertID(ReadingPage*6+4);
+                            CheckSetting = 0;
+                            isSettingNewProduct = 1;
+                        }
+                        if(CheckRect(400,600,400,600,mx,my))
+                        {
+                            Cabinets[CurrentCabnet].SetDessertID(ReadingPage*6+5);
+                            CheckSetting = 0;
+                            isSettingNewProduct = 1;
+                        }
+                    }
                     for(int i = 0; i < Btns.size(); i++)
                     {
-                        if(Btns[i].RUI_isClicked(mx,my))
+                        if(isSettingNewProduct)
                         {
-                            Btns[i].setClicked(true);
-                            switch(i)
+                            if(Btns[i].RUI_isClicked(mx,my))
                             {
-                                case 0:
+                                Btns[i].setClicked(true);
+                                switch(i)
                                 {
-                                    SceneManager.ChooseScene(RUI_SceneManager::SceneType::Menu);
+                                    case 0:
+                                    {
+                                        CheckSetting = 1;
+                                        ReadingPage = 0;
+                                        isSettingNewProduct = 0;
+                                        break;
+                                    }
+                                    default:
                                     break;
                                 }
-                                default:
-                                break;
                             }
-                        }
-                        else
-                        {
-                            Btns[i].setClicked(false);
+                            else
+                            {
+                                Btns[i].setClicked(false);
+                            }
                         }
                         
                     }
@@ -340,12 +396,26 @@ class RUI_GameScene: public RUI_Scene
                                             ReadingPage = TestEvent.GetProductNumber() / 6;
                                         }
                                     }
+                                    if(CheckSetting)
+                                    {                        
+                                        ReadingPage = ReadingPage + 1;
+                                        if(ReadingPage > TestEvent.GetProductNumber()/6)
+                                        {
+                                            ReadingPage = TestEvent.GetProductNumber() / 6;
+                                        }
+                                    }
                                     break;
                                 }
                                 case 5:
                                 {
                                     if(TestEvent.GetIsReadingPage())
                                     {
+                                        ReadingPage = ReadingPage - 1;
+                                        if(ReadingPage < 0)
+                                            ReadingPage = 0;
+                                    }
+                                    if(CheckSetting)
+                                    { 
                                         ReadingPage = ReadingPage - 1;
                                         if(ReadingPage < 0)
                                             ReadingPage = 0;
@@ -358,9 +428,14 @@ class RUI_GameScene: public RUI_Scene
                     }
                     for(int i = 0; i < Cabinets.size(); i++)
                     {
-                        if(Cabinets[i].isClicked(mx, my))
+                        if(isSettingNewProduct == 0)
                         {
-                            cabinetFrame.SetCabinetID(i);
+                            if(Cabinets[i].isClicked(mx, my))
+                            {
+                                CurrentCabnet = i;
+                                cabinetFrame.SetCabinetID(i);
+                                isSettingNewProduct = 1;
+                            }
                         }
                     }
                     if(cabinetFrame.GetCabinetID() != -1)
@@ -370,6 +445,7 @@ class RUI_GameScene: public RUI_Scene
                             if(my >= 100 && my <= 132)
                             {
                                 cabinetFrame.SetCabinetID(-1);
+                                isSettingNewProduct = 0;
                                 cabinetFrame.quit();
                             }
                         }
@@ -378,22 +454,35 @@ class RUI_GameScene: public RUI_Scene
                 }
                 case SDL_MOUSEMOTION:
                 {
-                    
                     int mx = event.motion.x;
                     int my = event.motion.y;
                     int j = 0;
+                    if(CheckSetting)
+                    {
+                        if(mx >= 200 && mx <= 600)
+                        {
+                            if(my >= 0 & my <= 600)
+                            {
+                                SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                                j = 1;
+                            }
+                        }
+                    }
                     for(int i = 0; i < Btns.size(); i++)
                     {
-                        if(Btns[i].RUI_isHovered(mx,my))
+                        if(isSettingNewProduct)
                         {
-                            Btns[i].setHovered(true);
-                            SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
-                            j = 1;
-                        }
-                        else
-                        {
-                            Btns[i].setHovered(false);
-                            Btns[i].setClicked(false);
+                            if(Btns[i].RUI_isHovered(mx,my))
+                            {
+                                Btns[i].setHovered(true);
+                                SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                                j = 1;
+                            }
+                            else
+                            {
+                                Btns[i].setHovered(false);
+                                Btns[i].setClicked(false);
+                            }
                         }
                     }
                     for(int i = 0; i < Icons.size(); i++)
@@ -417,10 +506,13 @@ class RUI_GameScene: public RUI_Scene
                     }
                     for(int i = 0; i < Cabinets.size(); i++)
                     {
-                        if(Cabinets[i].isClicked(mx,my))
+                        if(CheckSetting == 0)
                         {
-                            SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
-                            j = 1;
+                            if(Cabinets[i].isClicked(mx,my))
+                            {
+                                SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                                j = 1;
+                            }
                         }
                     } 
 
@@ -449,16 +541,25 @@ class RUI_GameScene: public RUI_Scene
         }
         void onExit()
         {
-            SDL_Log("退出游戏场景");
+            SDL_Log("退出游戏场景");          
+            TestEvent.Save(TotalMoney,TotalCustomers, Cabinets);
             Btns.clear();
             Chairs.clear();
             Desks.clear();
             Cabinets.clear();
             Icons.clear();
-            TestEvent.Save(TotalMoney,TotalCustomers);
             TestEvent.quit();
             dessertManager.quit();
             gamemusic.quit();
+        }
+
+        bool CheckRect(int sx, int ex, int sy, int ey, int mx, int my)
+        {
+            if(mx >= sx && mx <= ex && my >= sy && my <= ey)
+            {
+                return true;
+            }
+            return false;
         }
         private:
 

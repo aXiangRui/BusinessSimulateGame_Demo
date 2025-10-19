@@ -12,13 +12,13 @@ class Cabinet
     Cabinet() = default;
     ~Cabinet() = default;
 
-    void InitCabinet(int id)
+    void InitCabinet(int id,int did)
     {
         CabinetID = id;
         x = (CabinetID / 12) * 200 + 100 * (CabinetID % 2) + 20;
         y = (CabinetID / 2 % 6) * 40 + 200; 
-        // DessertID = 0;
-        DessertID = rand() % 4;
+        DessertID = did;
+        // DessertID = rand() % 4;
     }
 
     int GetX()

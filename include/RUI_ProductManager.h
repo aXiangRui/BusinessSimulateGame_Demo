@@ -36,6 +36,10 @@ class ProductManager
         {
             line++;
             std::istringstream iss(string);
+
+            if(string[0] == '#')
+                continue;
+
             int ID;
             int BID;
             int d1,d2,d3;

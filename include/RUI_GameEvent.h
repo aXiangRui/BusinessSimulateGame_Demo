@@ -71,8 +71,6 @@ class GameEvent
             a.InitPlate(200,200,i);
             plates.push_back(a);
         }
-        MenuButton Btn0((WindowWidth-320)/2,450,320,64,"设置新甜点",0);
-        Btns.push_back(Btn0);
         isReadingPage = -1;
     }
 
@@ -282,11 +280,25 @@ class GameEvent
         if( cid >= 0 && cid < Cabinets.size())
         {
             cabinetFrame.onRender(Renderer, Cabinets[cid],productManager);
-            Btns[0].ButtonRender(Renderer);
         }    
     }
 
     void onProductRender(SDL_Renderer* Renderer, int j)
+    {
+        Chat.RenderFrame(Renderer);
+        for(int i = 0; i < productManager.GetProductSize(); i++)
+        {
+            if(i / 6 == j)
+            {
+                productManager.products[i].onRender(
+                    Renderer, dessertManager, materialManager, plates,
+                    200 + i/3 * 200 - j * 400 , i % 3 * 200, 200, 200
+                );
+            }
+        }
+    }
+
+    void SettingProductRender(SDL_Renderer* Renderer, int j)
     {
         Chat.RenderFrame(Renderer);
         for(int i = 0; i < productManager.GetProductSize(); i++)
@@ -326,7 +338,7 @@ class GameEvent
         isReadingPage = i;
     }
 
-    void Load(int& TotalMoney, int& TotalCustomers)
+    void Load(int& TotalMoney, int& TotalCustomers,std::vector<Cabinet>& Cabinets)
     {
         std::ifstream file("./save/Time.txt");
         std::string string;
@@ -362,9 +374,20 @@ class GameEvent
         file01 >> TotalMoney;
         SDL_Log("读取到总人数为%d",TotalCustomers);
         file01.close();
+
+        std::ifstream file02("./save/Cabinet.txt");
+        for(int i = 0; i < 24; i++)
+        {
+            int a,b;
+            file02 >> a >> b;
+            Cabinet c;
+            c.InitCabinet(a,b);
+            Cabinets.push_back(c);
+        }
+        file02.close();
     }
 
-    void Save(int& TotalMoney, int& TotalCustomers)
+    void Save(int& TotalMoney, int& TotalCustomers, std::vector<Cabinet>& Cabinets)
     {
         std::ofstream file("./save/Time.txt");
         if(!file)
@@ -384,6 +407,14 @@ class GameEvent
         file01 << TotalCustomers <<std::endl;
         file01 << TotalMoney << std::endl;
         file01.close();
+
+        std::ofstream file02("./save/Cabinet.txt");
+        for(int i = 0; i < Cabinets.size(); i++)
+        {
+            file02 << i <<" "<< Cabinets[i].GetDessertID();
+            file02 << std::endl;
+        }
+        file02.close();
     }
 
     private:

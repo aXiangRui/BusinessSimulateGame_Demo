@@ -26,6 +26,10 @@ class CustomerManager
             {
                 line++;
                 std::istringstream iss(string);
+
+                if(string[0] == '#')
+                    continue;
+
                 int cID;
                 int pID;
                 std::string cName;

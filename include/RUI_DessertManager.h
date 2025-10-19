@@ -24,6 +24,10 @@ class DessertManager
         {
             line++;
             std::istringstream iss(string);
+            
+            if(string[0] == '#')
+                continue;
+
             int cID;
             int SweetNumber;
             int FullNumber;

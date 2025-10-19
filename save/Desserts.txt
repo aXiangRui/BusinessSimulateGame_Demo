@@ -1,3 +1,4 @@
+#以下数据依次为ID,甜度,饱腹感,口感,名字,储存地址
 0 20 20 20 戚风蛋糕 chiffon
 1 30 30 30 草莓蛋糕 strawberrycake
 2 35 40 35 巧克力蛋糕 chocolatecake

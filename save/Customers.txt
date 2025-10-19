@@ -1,3 +1,4 @@
+#以下数据依次为ID，喜欢的甜点ID,顾客名字,顾客地址,喜好度
 1 0 唐堂 TangTang 0
 2 0 秋天 QiuTian 0
 3 0 陈青野 ChenQingye 0

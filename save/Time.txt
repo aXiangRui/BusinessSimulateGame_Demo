@@ -1,16 +1,11 @@
-16
-0 QiuTian
-3 LinHang
-4 TangTang
-6 QiuTian
-5 TangTang
-10 LinHang
-11 TangTang
-8 QiuTian
-9 ChenQingye
-13 QiuTian
-14 ChenQingye
-15 TangTang
-16 ChenQingye
-17 LinHang
-18 QiuTian
+45
+51 LinHang
+49 QiuTian
+37 TangTang
+50 ChenQingye
+40 LinHang
+48 TangTang
+45 TangTang
+52 QiuTian
+53 TangTang
+54 ChenQingye

@@ -29,6 +29,10 @@ class MaterialManager
             {
                 line++;
                 std::istringstream iss(string);
+
+                if(string[0] == '#')
+                    continue;
+
                 int Kind;
                 int MID;
                 int type;
