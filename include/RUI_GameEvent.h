@@ -116,16 +116,17 @@ class GameEvent
         CustomerManager& customerManager,
         DessertManager dessertManager,
         int& TotalMoney,
-        int& TotalCustomers
+        int& TotalCustomers,
+        int& TotalDessert
         )
     {
-        if(customerManager.GetCustomersSize() > 4)
-        {
-        for(int i = 0; i < customerManager.GetCustomersSize(); i++)
-                {
-                    SDL_Log("第%d人，%s",i,customerManager.Customers[i].GetCustomerName().c_str());
-                }
-        }
+        // if(customerManager.GetCustomersSize() > 4)
+        // {
+        // for(int i = 0; i < customerManager.GetCustomersSize(); i++)
+        //         {
+        //             SDL_Log("第%d人，%s",i,customerManager.Customers[i].GetCustomerName().c_str());
+        //         }
+        // }
         
         if(TotalCustomers >= 10000000)
         {
@@ -163,7 +164,7 @@ class GameEvent
                         AddCustomers.push_back(a);
                         customerManager.Customers[i].SetHasJoined(1);
                         TotalCustomers++;
-                        
+                        TotalDessert += a.GetChooseNumber();
                         LastTime = CurrentTime;
                     }
 
@@ -354,10 +355,11 @@ class GameEvent
             { 
                 std::istringstream iss(string);
                 int cID;
+                std::string cName;
                 std::string cPath;
-                iss >> cID >> cPath;
+                iss >> cID >> cName >>cPath;
                 Customer a;
-                a.InitCustomer((int)cID, 0, "cName", cPath.c_str(), 0);
+                a.InitCustomer((int)cID, 0, cName, cPath.c_str(), 0);
                 bool overload = 0;
                 for(int i = 0; i < Customers.size(); i++)
                 {
@@ -400,7 +402,8 @@ class GameEvent
 
         for(size_t i = 0; i < Customers.size(); ++i)
         {
-            file << Customers[i].GetCustomerID() << " " << Customers[i].GetCustomerPath() << std::endl;
+            file << Customers[i].GetCustomerID() << " " << Customers[i].GetCustomerName(); 
+            file << " " << Customers[i].GetCustomerPath() << std::endl;
         }
         file.close();
 
@@ -424,5 +427,5 @@ class GameEvent
         Uint32 CurrentTime;
         Uint32 LastTime;
         int isReadingPage;
-
+        int DailyTotalPerson;
 };

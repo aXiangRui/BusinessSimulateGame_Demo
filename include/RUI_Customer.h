@@ -28,6 +28,12 @@ class Customer
         ~Customer() = default;
         std::vector<SDL_Texture*>CustomerTexture;
         SDL_Texture* NormalTexture = nullptr;
+        SDL_Texture* NameTexture = nullptr;
+        SDL_Surface* NameSurface;
+        SDL_Rect NameRect;
+        TTF_Font* NameFont = nullptr;
+        SDL_Color color;
+        int NameW,NameH;
 
         void InitCustomer(int id, int preferid, std::string name, std::string path, int prefer)
         {
@@ -53,10 +59,17 @@ class Customer
             PayTime = 0;
             isFront = 0;
             Queue = 0;
-            ChooseNumber = 0;
+            ChooseNumber = rand() % 4 + 1;
             payPrice = 0;
             hasJoined = 0;
             RandomDelay = rand() % 10000;
+
+            NameFont = TTF_OpenFont("./resources/font/namidiansong.ttf",16);
+            color = {10,10,10,255};
+            NameSurface = TTF_RenderUTF8_Blended(NameFont, CustomerName.c_str(), color);
+            if(!NameSurface)
+                SDL_Log("%s",CustomerName.c_str());
+            NameW = NameSurface->w; NameH = NameSurface->h;
 
             payCharm.Init();
         }
@@ -84,6 +97,11 @@ class Customer
         int GetCustomerPreference()
         {
             return preference;
+        }
+
+        int GetChooseNumber()
+        {
+            return ChooseNumber;
         }
 
         void SetSitTime(int time)
@@ -133,6 +151,13 @@ class Customer
             {
                 SDL_RenderCopyEx(Renderer,NormalTexture,nullptr,&Rect,0,0,SDL_FLIP_HORIZONTAL);
             }
+
+            NameTexture = SDL_CreateTextureFromSurface(Renderer, NameSurface);
+            NameRect = {x+15,y,NameW,NameH};
+            SDL_RenderCopy(Renderer, NameTexture, nullptr, &NameRect);
+            // SDL_FreeSurface(NameSurface);
+            SDL_DestroyTexture(NameTexture);
+
             if(payCharm.GetMoney() != 0)
                 payCharm.onRender(Renderer);
         }
@@ -232,7 +257,6 @@ class Customer
                 {
                     int dID = Cabinets[chooseID].GetDessertID();
                     int price = pManager.GetProductPrice(dID);
-                    ChooseNumber = rand() % 4 + 1;
                     payPrice = price * ChooseNumber;
                     CurrentStage = CustomerStage::Buy;
                 }

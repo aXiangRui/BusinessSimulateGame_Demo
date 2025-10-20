@@ -52,6 +52,7 @@ class RUI_GameScene: public RUI_Scene
 
         int TotalMoney = 0;
         int isChatFrameShowing = 0;
+        int TotalDessert = 0;
         bool WhetherReadingProduct;
         bool isSettingNewProduct;
         bool CheckSetting;
@@ -61,6 +62,7 @@ class RUI_GameScene: public RUI_Scene
         int CurrentCabnet;
 
         GameEvent TestEvent;
+        SummaryFrame summaryFrame;
 
         void onEnter()
         {
@@ -72,9 +74,17 @@ class RUI_GameScene: public RUI_Scene
             BackgroundMusic.quit();
             reg.InitRegister();
             if(!Mix_PlayingMusic())
-            {           
-                gamemusic.setMusic(ResourceManager::instance()->FindMusic("gamemusic"));
-                gamemusic.play(-1);
+            {
+                if(rand() % 2 == 1) 
+                {
+                    gamemusic.setMusic(ResourceManager::instance()->FindMusic("gamemusic"));
+                    gamemusic.play(-1);
+                }        
+                else
+                {
+                    gamemusic.setMusic(ResourceManager::instance()->FindMusic("gamemusic02"));
+                    gamemusic.play(-1);
+                }             
             }
             customerManager.InitCustomerManager();
             dessertManager.InitDessertManager();
@@ -82,6 +92,7 @@ class RUI_GameScene: public RUI_Scene
             BackgroundWall = ResourceManager::instance()->FindTexture("hallwall");
             TextFont = nullptr;
             cabinetFrame.InitFrame();
+            summaryFrame.Init();
 
             for(int i = 0; i < 16; i++)
             {
@@ -151,7 +162,10 @@ class RUI_GameScene: public RUI_Scene
             {  
                 TimeChange();
                 TestEvent.SetClock(TestClock);
-                TestEvent.onUpdate(Chairs,Cabinets,customerManager,dessertManager,TotalMoney,TotalCustomers);
+                TestEvent.onUpdate(Chairs,
+                    Cabinets,customerManager,
+                    dessertManager,TotalMoney,
+                    TotalCustomers,TotalDessert);
             }
             else
             {
@@ -182,9 +196,18 @@ class RUI_GameScene: public RUI_Scene
                         LastTime = CurrentTime;
                         TestClock.UpdateTime();
                         if(TestClock.ReturnHour() == 0)
-                        {
+                        {     
+                            summaryFrame.update(TotalCustomers,TotalDessert);
                             TotalMoney = TotalMoney - 1000;
+                            SDL_Log("今日卖出甜品%d份",TotalDessert);
+                            SDL_Log("今日顾客共有%d人",TotalCustomers);                           
+                            TotalDessert = 0;
+                            TotalCustomers = 0;
+                            
                         }
+                        // if(TestClock.ReturnHour() == 6)
+                        // {
+                        // } 
                     }
                 }
                 else
@@ -274,6 +297,11 @@ class RUI_GameScene: public RUI_Scene
                 TestEvent.SettingProductRender(Renderer,ReadingPage);
                 Icons[4].onRender(Renderer);
                 Icons[5].onRender(Renderer,1);
+            }
+
+            if(TestClock.ReturnHour() >= 0 && TestClock.ReturnHour() <= 6)
+            {
+                summaryFrame.onRender(Renderer);
             }
 
             if(isChatFrameShowing)
