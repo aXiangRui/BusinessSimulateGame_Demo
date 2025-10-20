@@ -62,6 +62,7 @@ class Customer
             ChooseNumber = rand() % 4 + 1;
             payPrice = 0;
             hasJoined = 0;
+            isHovered = 0;
             RandomDelay = rand() % 10000;
 
             NameFont = TTF_OpenFont("./resources/font/namidiansong.ttf",16);
@@ -131,6 +132,33 @@ class Customer
 
         void OnRender(SDL_Renderer* Renderer)
         {
+            if(!Renderer)
+            {
+                SDL_Log("OnRender: Renderer is null for customer id=%d name=%s", CustomerID, CustomerName.c_str());
+                return;
+            }
+            NormalTexture = ResourceManager::instance()->FindTexture(PathName.c_str());
+            if(!NormalTexture)
+            {
+                SDL_Log("OnRender: texture not found for customer id=%d name=%s", CustomerID, CustomerName.c_str());
+                return;
+            }
+            SDL_Rect Rect = {x,y,64,64};
+            if(toward == 0)
+            {
+                SDL_RenderCopy(Renderer,NormalTexture,nullptr,&Rect);
+            }
+            else
+            {
+                SDL_RenderCopyEx(Renderer,NormalTexture,nullptr,&Rect,0,0,SDL_FLIP_HORIZONTAL);
+            }
+
+            if(payCharm.GetMoney() != 0)
+                payCharm.onRender(Renderer);
+        }
+
+        void onRenderWithName(SDL_Renderer* Renderer)
+        {      
             if(!Renderer)
             {
                 SDL_Log("OnRender: Renderer is null for customer id=%d name=%s", CustomerID, CustomerName.c_str());
@@ -511,6 +539,16 @@ class Customer
             return hasJoined;
         }
 
+        void SetIsHovered(bool i)
+        {
+            isHovered = i;
+        }
+
+        bool GetIsHoverd()
+        {
+            return isHovered;
+        }
+
     private:
         std::string CustomerName;
         std::string PathName;
@@ -542,5 +580,6 @@ class Customer
         int RandomDelay;
 
         bool hasJoined;
+        bool isHovered;
         PayCharm payCharm;
 };

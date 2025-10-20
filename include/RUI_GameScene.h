@@ -315,6 +315,7 @@ class RUI_GameScene: public RUI_Scene
         }
         void onInput(const SDL_Event& event,SDL_Renderer* Renderer, bool& running)
         {  
+            TestEvent.input(event);
             switch(event.type)
             {               
                 case SDL_MOUSEBUTTONDOWN:
@@ -570,7 +571,6 @@ class RUI_GameScene: public RUI_Scene
                 default:
                     break;
             }
-            TestEvent.input(event);
         }
         void onExit()
         {

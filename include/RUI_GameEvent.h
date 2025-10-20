@@ -108,6 +108,23 @@ class GameEvent
             {
                 break;
             }
+            case SDL_MOUSEMOTION:
+            {
+                int mx = event.motion.x; int my = event.motion.y;
+                for(int i = 0; i < Customers.size(); i++)
+                {
+                    bool ishover = 0;
+                    int cx = Customers[i].getX();int cy = Customers[i].getY();
+                    if(mx >= cx && mx <= cx + 64)
+                    {
+                        if( my >= cy && my <= cy + 64)
+                        {
+                            ishover = 1;
+                        }
+                    }
+                    Customers[i].SetIsHovered(ishover);
+                }
+            }
         }
     }
 
@@ -267,12 +284,18 @@ class GameEvent
 
     void onRender(SDL_Renderer* Renderer)
     {
-        for(int i = 0;i < Customers.size(); i++)
+        for(int i = 0; i < Customers.size(); i++)
         {
-            Customers[i].OnRender(Renderer);
+            if(Customers[i].GetIsHoverd() == 1)
+            {
+                SDL_Log("%s",Customers[i].GetCustomerName().c_str());
+                Customers[i].onRenderWithName(Renderer);
+            }
+            else
+            {
+                Customers[i].OnRender(Renderer);
+            }        
         }
-        //productManager.products[0].onRender(Renderer,dessertManager,materialManager,plates,
-        //200,200,200,200);
     }
 
     void onFrameRender(SDL_Renderer* Renderer, CabinetFrame cabinetFrame, std::vector<Cabinet> Cabinets)
