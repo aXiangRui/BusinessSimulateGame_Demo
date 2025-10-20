@@ -6,6 +6,9 @@
 #include"RUI_BaseMaterial.h"
 #include"RUI_MaterialManager.h"
 #include"RUI_DessertManager.h"
+#include"RUI_ResourceManager.h"
+
+int CreateDessertID(int baseid, int* type);
 
 class ProducingProduct
 {
@@ -148,9 +151,10 @@ class ProducingProduct
             }
     }
 
-    void SetCreateCase(int i, int j)
+    void SetCreateCase(int i, int j,MaterialManager mManager)
     {
         CreateMaterialID[i] = j;
+        CreateMaterialType[i] = mManager.GetDecorationType(j);
         create[i] = manager.DecorationMaterial[j];
         CreateNumber--;
     }
@@ -173,28 +177,13 @@ class ProducingProduct
         {
             for(int i = 0; i < 3; i++)
             {
-                Type[CreateMaterialID[i]]++;
+                Type[CreateMaterialType[i]]++;
             }
-            for(int i = 0; i < 10; i++)
+            if(CurrentTime - DelayTime >= 1000)
             {
-                if(Type[0] == 2 && Type[1] == 1 && BaseMaterialID == 0)
-                {
-                    if(CurrentTime - DelayTime >= 1000)
-                    {
-                        BaseMaterialID = dManager.GetDessertID(1);  
-                        hasCalculated = 0;
-                        WhetherRenderCreate = 0;
-                    }
-                }
-                if(Type[2] >= 2 && Type[1] == 0 && BaseMaterialID == 0)
-                {
-                    if(CurrentTime - DelayTime >= 1000)
-                    {
-                        BaseMaterialID = dManager.GetDessertID(2);  
-                        hasCalculated = 0;
-                        WhetherRenderCreate = 0;
-                    }
-                }
+                BaseMaterialID = CreateDessertID(BaseMaterialID,Type);
+                hasCalculated = 0;
+                WhetherRenderCreate = 0;
             }
             for(int i = 0; i < 10; i++)
             {
@@ -207,6 +196,7 @@ class ProducingProduct
     int PlateSize;
     int BaseMaterialID;
     int CreateMaterialID[3];
+    int CreateMaterialType[3];
     int DecorationID[3];
     int CreateNumber;
     int DecorateNumber;
@@ -227,6 +217,34 @@ class ProducingProduct
     bool hasCalculated;
     bool WhetherRenderCreate;
 };
+
+int CreateDessertID(int baseid, int* type)
+{
+    switch(baseid)
+    {
+        case 0:
+        {
+            if(type[0] == 2 && type[1] == 1)
+                return 1;
+            if(type[0] == 1 && type[2] == 2)
+                return 2;
+            if(type[0] == 1 && type[4] == 1 && type[5] == 1)
+                return 7;
+            break;
+        }
+        case 3:
+        {
+            if(type[0] == 3)
+                return 4;
+            if(type[0] == 1 && type[1] == 2)
+                return 5;
+            if(type[0] == 1 && type[2] == 2)
+                return 6;
+        }
+        default:break;
+    }
+    return baseid;
+}
 
 class ProducedProduct
 {
@@ -259,7 +277,7 @@ class ProducedProduct
                 tastelevel = tastelevel + mManager.DecorationMaterial[DecorationID[i]].GetTasteNumber();
             }    
         }
-
+        RoundTexture = ResourceManager::instance()->FindTexture("round");
     }
 
     void SetRect(int mx,int my, int mw, int mh)
@@ -278,13 +296,17 @@ class ProducedProduct
         int mx, int my, int mw, int mh)
     {
         Rect = {mx, my, mw, mh};
+        RoundRect = {mx + 30, my + 30, mw -60, mh-60};
+        SDL_RenderCopy(Renderer, RoundTexture, nullptr, &RoundRect);
         plates[PlateSize].onRender(Renderer, Rect);
-        Rect.y = Rect.y - 30;
+        Rect.y = Rect.y - 25;
         dManager.onRender(Renderer,BaseDessertID, Rect);
-        Rect.y = Rect.y - 20;
+        Rect.y = Rect.y - 30;
         for(int i = 0; i < 3; i++)
         {
+            if(DecorationID[i] != -1)
             mManager.DecorationMaterial[DecorationID[i]].onRender(Renderer,Rect,i);
+            // SDL_Log("%d",DecorationID[i]);
         }
     }
 
@@ -315,9 +337,11 @@ class ProducedProduct
     int price;
     int PlateSize;
     SDL_Rect Rect;
+    SDL_Rect RoundRect;
     int x,y;
     int w,h;
     SDL_Texture* BaseTexture;
+    SDL_Texture* RoundTexture;
 };
 
 class Cloth

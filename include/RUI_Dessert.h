@@ -11,7 +11,7 @@ class Dessert
        ~Dessert() = default;
     SDL_Texture* DessertTexture;
 
-    void InitLevel(int dessertid, int SweetNumber, int FullNumber, int TasteNumber, std::string name,std::string path)
+    void InitLevel(int dessertid, int SweetNumber, int FullNumber, int TasteNumber, std::string name,std::string path, bool w)
     {
         DessertID = dessertid;
         SweetLevel = SweetNumber;
@@ -19,6 +19,7 @@ class Dessert
         TasteLevel = TasteNumber;
         FilePath = path;
         Name = name;
+        WhetherBase = w;
         DessertTexture = ResourceManager::instance()->FindTexture(path.c_str());
         price = SweetLevel/10 * 3 + FullLevel/10 * 1 + TasteLevel/10 * 2;
         lastTime = 0;
@@ -104,6 +105,8 @@ class Dessert
 
     void onRender(SDL_Renderer* Renderer)
     {
+        // SDL_Log("正在渲染甜品%s",FilePath.c_str());
+        // SDL_Log("%d,%d,%d,%d",x,y,w,h);
         DessertTexture = ResourceManager::instance()->FindTexture(FilePath.c_str());
         Rect = {x,y,w,h};
         SDL_RenderCopy(Renderer,DessertTexture,nullptr,&Rect);
@@ -140,6 +143,11 @@ class Dessert
         }
     }
 
+    bool GetWhetherBase()
+    {
+        return WhetherBase;
+    }
+
     private:
     int SweetLevel;
     int FullLevel;
@@ -152,5 +160,6 @@ class Dessert
     int w,h;
     int lastTime;
     bool isClicked;
+    bool WhetherBase;
     SDL_Rect Rect;
 };

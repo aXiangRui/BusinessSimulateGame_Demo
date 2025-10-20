@@ -93,6 +93,11 @@ class Material
             return MaterialID;
         }
 
+        int GetMaterialType()
+        {
+            return MaterialType;
+        }
+
         void moveUpdate(int CurrentTime, int i)
         {
             if(CurrentTime - LastTime >= 16 && y <= 120 - i * 20)

@@ -34,8 +34,8 @@ class DessertManager
             int TasteNumber;
             std::string dname;
             std::string dPath;
-            int pre;
-            iss>>cID>>SweetNumber>>FullNumber>>TasteNumber>>dname>>dPath;
+            bool whetherbase;
+            iss>>cID>>SweetNumber>>FullNumber>>TasteNumber>>dname>>dPath>>whetherbase;
             SDL_Log("新甜品id:%d,甜度:%d,饱腹感:%d,味道:%d,名字:%s,路径:%s",
             cID,
             SweetNumber,
@@ -45,7 +45,7 @@ class DessertManager
             dPath.c_str()
         );
             Dessert a;
-            a.InitLevel(cID,SweetNumber,FullNumber,TasteNumber,dname,dPath);
+            a.InitLevel(cID,SweetNumber,FullNumber,TasteNumber,dname,dPath,whetherbase);
             Desserts.push_back(a);
         }
     }
@@ -73,6 +73,11 @@ class DessertManager
     void onRender(SDL_Renderer* Renderer,int i)
     {
         Desserts[i].onRender(Renderer);
+    }
+
+    bool GetWhetherBase(int i)
+    {
+        return Desserts[i].GetWhetherBase();
     }
 
     void onRender(SDL_Renderer* Renderer,int i, SDL_Rect newRect)

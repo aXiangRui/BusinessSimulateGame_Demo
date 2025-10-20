@@ -60,6 +60,7 @@ class ProductManager
     void Save()
     {
         std::ofstream file("./save/Product.txt");
+        file << "#以下数据依次表示内容:产品id,基类甜点id,三种装饰物id,盘子尺寸" << std::endl;
         for(int i = 0; i < products.size(); i++)
         {
             file << products[i].GetProductID() << " " << products[i].GetDessertID() << " ";

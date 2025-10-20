@@ -114,15 +114,15 @@ class RUI_GameScene: public RUI_Scene
             Icons.push_back(testicon);
 
             RUI_Icon CookingIcon;
-            CookingIcon.InitIcon(10,430,50,50,1,"cooking");
+            CookingIcon.InitIcon(740,470,50,50,1,"cooking");
             Icons.push_back(CookingIcon);
 
             RUI_Icon exiticon;
-            exiticon.InitIcon(10,500,50,50,2,"exiticon");
+            exiticon.InitIcon(740,530,50,50,2,"exiticon");
             Icons.push_back(exiticon);
 
             RUI_Icon readicon;
-            readicon.InitIcon(10,360,50,50,3,"readicon");
+            readicon.InitIcon(740,410,50,50,3,"readicon");
             Icons.push_back(readicon);
 
             RUI_Icon nexticon;
@@ -141,6 +141,7 @@ class RUI_GameScene: public RUI_Scene
             CheckSetting = 0;
             ReadingPage = -1;
             CurrentCabnet = -1;
+            
             SDL_Log("进入游戏场景");
         }
         void onUpdate()
@@ -180,6 +181,10 @@ class RUI_GameScene: public RUI_Scene
                     {          
                         LastTime = CurrentTime;
                         TestClock.UpdateTime();
+                        if(TestClock.ReturnHour() == 0)
+                        {
+                            TotalMoney = TotalMoney - 1000;
+                        }
                     }
                 }
                 else
@@ -260,7 +265,7 @@ class RUI_GameScene: public RUI_Scene
       
             for(int i = 0; i < Btns.size(); i++)
             {
-                if(isSettingNewProduct)
+                if(isSettingNewProduct && WhetherReadingProduct == 0)
                     Btns[i].ButtonRender(Renderer);
             }
 

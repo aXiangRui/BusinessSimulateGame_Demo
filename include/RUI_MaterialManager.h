@@ -74,6 +74,11 @@ class MaterialManager
         return DecorationMaterial[i].GetID();
     }
 
+    int GetDecorationType(int i)
+    {
+        return DecorationMaterial[i].GetMaterialType();
+    }
+
     void quit()
     {
         DecorationMaterial.clear();

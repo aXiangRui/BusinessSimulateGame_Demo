@@ -27,6 +27,7 @@ class CreateRUIEvent
     std::vector<ChooseFrame> SizeFrames;
     std::vector<ChooseFrame> BaseFrames;
     std::vector<Dessert> BaseDessert;
+    std::vector<Dessert> AllBaseDessert;
     std::vector<ChooseFrame> DecorationFrames;
     std::vector<Material> DecorationMaterials;
     std::vector<Plate> plates;
@@ -50,15 +51,30 @@ class CreateRUIEvent
             a.InitPlate(140,-60,i);
             plates.push_back(a);
         }
+
+        for(int i = 0; i < 100; i++)
+        {
+            BaseID[i] = -1;
+        }
         
         RUI_Icon exiticon;
         exiticon.InitIcon(10,500,50,50,0,"exiticon");
         Icons.push_back(exiticon);
+
+        RUI_Icon nexticon;
+        nexticon.InitIcon(740, 540, 50, 50, 1, "nexticon");
+        Icons.push_back(nexticon);
+
+        RUI_Icon lasticon;
+        lasticon.InitIcon(680, 540, 50, 50, 2, "nexticon");
+        Icons.push_back(lasticon);
+
         MenuButton Btn0((WindowWidth-320)/2 + 200,500,320,64,"完成",0);
         buttons.push_back(Btn0);
         PProduct.Init(materialManager,dessertManager);
         RedCloth.init();
         WhetherBack = 0;
+        ChoosePage = 0;
     }
 
     void ChooseSize(std::vector<int>& Size)
@@ -82,14 +98,26 @@ class CreateRUIEvent
 
     void ChooseBase()
     {
+        int j = 0;
         for(int i = 0; i < dessertManager.GetDessertsSize(); i++)
-        {
-            ChooseFrame AddFrames;
-            std::string name = dessertManager.GetDessertName(i);
-            AddFrames.InitChooseFrame(500, 10 + i * 64, i, name.c_str());
-            BaseFrames.push_back(AddFrames);
+        {         
+            if(dessertManager.GetWhetherBase(i))
+            { 
+                ChooseFrame AddFrames;
+                std::string name = dessertManager.GetDessertName(i);
+                AddFrames.InitChooseFrame(500, 10 + j * 64 - (j / 8) * 64 * 8 , j, name.c_str());
+                BaseFrames.push_back(AddFrames);
+                AllBaseDessert.push_back(dessertManager.Desserts[i]);
+                // ensure the newly-pushed dessert has its position initialized
+                AllBaseDessert.back().SetPosition(140, -100);
+                AllBaseDessert.back().SetWidth(256,256);
+                BaseID[j] = i;
+                // SDL_Log("基类蛋糕:%s,%d,%d",BaseDessert.back().GetDessertName().c_str(),BaseDessert.back().GetDessertID(),i);
+                j++;
+            }
             BaseDessert.push_back(dessertManager.Desserts[i]);
-            BaseDessert[i].SetPosition(140,-100);
+            BaseDessert.back().SetPosition(140, -100);
+            BaseDessert.back().SetWidth(256,256);
         }
     }
 
@@ -99,7 +127,7 @@ class CreateRUIEvent
         {
             ChooseFrame AddFrames;
             std::string name = materialManager.GetDecorationName(i);
-            AddFrames.InitChooseFrame(500,10 + i * 64, i, name);
+            AddFrames.InitChooseFrame(500,10 + i * 64 - (i / 8) * 64 * 8, i, name);
             DecorationFrames.push_back(AddFrames);
             DecorationMaterials.push_back(materialManager.DecorationMaterial[i]);
         }
@@ -136,7 +164,11 @@ class CreateRUIEvent
             plates[PProduct.GetPlateSize()].onRender(Renderer);
         if(PProduct.GetBaseID() != -1)
         {
+            // if(PProduct.GetBaseID() < BaseDessert.size())
+            // SDL_Log("当前甜点id,%d",PProduct.GetBaseID());
             BaseDessert[PProduct.GetBaseID()].onRender(Renderer);
+            // SDL_Log("当前甜点名字%s",dessertManager.GetDessertName(PProduct.GetBaseID()).c_str());
+            // dessertManager.onRender(Renderer, PProduct.GetBaseID());
         }
         PProduct.RenderCreateMaterial(Renderer);
         PProduct.RenderDecorationMaterial(Renderer);
@@ -147,15 +179,18 @@ class CreateRUIEvent
         {
             for(int i = 0; i < SizeFrames.size(); i++)
             {
-                if(SizeFrames[i].GetIsHovered())
+                if(i / 8 == ChoosePage)
                 {
-                    SizeFrames[i].onHoverRender(Renderer);
-                    plates[i].AnimationRender(Renderer,CurrentTime);
-                }
-                else
-                {
-                    SizeFrames[i].onRender(Renderer);
-                }              
+                    if(SizeFrames[i].GetIsHovered())
+                    {
+                        SizeFrames[i].onHoverRender(Renderer);
+                        plates[i].AnimationRender(Renderer,CurrentTime);
+                    }
+                    else
+                    {
+                        SizeFrames[i].onRender(Renderer);
+                    }       
+                }       
             }
             break;
         }
@@ -163,16 +198,19 @@ class CreateRUIEvent
         {
             for(int i = 0; i < BaseFrames.size(); i++)
             {
-                if(BaseFrames[i].GetIsHovered())
+                if(i / 8 == ChoosePage)
                 {
-                    BaseFrames[i].onHoverRender(Renderer);
-                    BaseDessert[i].onRender(Renderer);
-                }
-                else
-                {
-                    BaseFrames[i].onRender(Renderer);
-                }
-                
+                    if(BaseFrames[i].GetIsHovered())
+                    {
+                        BaseFrames[i].onHoverRender(Renderer);
+                        dessertManager.onRender(Renderer, BaseID[i]);
+                        BaseDessert[BaseID[i]].onRender(Renderer);
+                    }
+                    else
+                    {
+                        BaseFrames[i].onRender(Renderer);
+                    }
+                } 
             }
             break;
         }
@@ -181,16 +219,18 @@ class CreateRUIEvent
             PProduct.RenderCreateNumbers(Renderer);
             for(int i = 0; i < DecorationFrames.size(); i++)
             {
-                if(DecorationFrames[i].GetIsHovered())
+                if( i / 8 == ChoosePage )
                 {
-                    DecorationFrames[i].onHoverRender(Renderer);
-                    DecorationMaterials[i].onRender(Renderer);
-                }
-                else
-                {
-                    DecorationFrames[i].onRender(Renderer);
-                }
-                
+                    if(DecorationFrames[i].GetIsHovered())
+                    {
+                        DecorationFrames[i].onHoverRender(Renderer);
+                        DecorationMaterials[i].onRender(Renderer);
+                    }
+                    else
+                    {
+                        DecorationFrames[i].onRender(Renderer);
+                    }
+                }            
             }
             break;
         }
@@ -199,14 +239,17 @@ class CreateRUIEvent
             PProduct.RenderDecorationNumbers(Renderer);
             for(int i = 0; i < DecorationFrames.size(); i++)
             {
-                if(DecorationFrames[i].GetIsHovered())
+                if(i / 8 == ChoosePage)
                 {
-                    DecorationFrames[i].onHoverRender(Renderer);
-                    DecorationMaterials[i].onRender(Renderer);
-                }
-                else
-                {
-                    DecorationFrames[i].onRender(Renderer);
+                    if(DecorationFrames[i].GetIsHovered())
+                    {
+                        DecorationFrames[i].onHoverRender(Renderer);
+                        DecorationMaterials[i].onRender(Renderer);
+                    }
+                    else
+                    {
+                        DecorationFrames[i].onRender(Renderer);
+                    }
                 }
             }
             for(int i = 0; i < buttons.size(); i++)
@@ -217,11 +260,14 @@ class CreateRUIEvent
         }
         default:break;
     }
-        for(int i = 0; i < Icons.size(); i++)
-            {
+    for(int i = 0; i < Icons.size(); i++)
+        {
+            if(i != 2)
                 Icons[i].onRender(Renderer);
-            }
-        RedCloth.onRender(Renderer);
+            else
+                {Icons[i].onRender(Renderer,1);} 
+        }
+    RedCloth.onRender(Renderer);
     }
 
     void input(const SDL_Event& event)
@@ -252,10 +298,13 @@ class CreateRUIEvent
                     {
                         for(int i = 0; i < BaseFrames.size(); i++)
                         {
-                            if(BaseFrames[i].isHovered(mx,my))
+                            if( i / 8 == ChoosePage)
                             {
-                                j = 1;
-                                SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                                if(BaseFrames[i].isHovered(mx,my))
+                                {
+                                    j = 1;
+                                    SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                                }
                             }
                         }
                         // if(!j)
@@ -321,6 +370,18 @@ class CreateRUIEvent
                                 SceneManager.ChooseScene(RUI_SceneManager::SceneType::Game);
                                 break;
                             }
+                            case 1:
+                            {
+                                ChoosePage = ChoosePage + 1;
+                                break;
+                            }
+                            case 2:
+                            {
+                                ChoosePage = ChoosePage - 1;
+                                if(ChoosePage < 0)
+                                ChoosePage = 0;
+                                break;
+                            }
                             default:
                                 break;
                         }
@@ -337,6 +398,7 @@ class CreateRUIEvent
                                 //SDL_Log("当前按下的坐标:%d,%d,%d",mx,my,i);
                                 plates[i].SetMoveCheck(1);
                                 PProduct.SetPlateSize(i);
+                                ChoosePage = 0;
                                 CStage = Stage::base;
                             }
                         }
@@ -346,11 +408,16 @@ class CreateRUIEvent
                     {
                         for(int i = 0; i < BaseFrames.size(); i++)
                         {
-                            if(BaseFrames[i].GetIsHovered())
+                            if(i / 8 == ChoosePage)
                             {
-                                BaseDessert[i].SetIsClicked(1);
-                                PProduct.SetBaseID(BaseDessert[i].GetDessertID());
-                                CStage = Stage::create;
+                                if(BaseFrames[i].GetIsHovered())
+                                {
+                                    BaseDessert[i].SetIsClicked(1);
+                                    // PProduct.SetBaseID(BaseDessert[i].GetDessertID());
+                                    PProduct.SetBaseID(BaseID[i]);
+                                    ChoosePage = 0;
+                                    CStage = Stage::create;
+                                }
                             }
                         }
                         break;
@@ -360,17 +427,24 @@ class CreateRUIEvent
                         int n = PProduct.GetLastCreateNumbers();
                         for(int i = 0; i < DecorationFrames.size(); i++)
                         {
-                            if(DecorationFrames[i].isHovered(mx,my))
+                            if(i / 8 == ChoosePage)
                             {
-                                if(n <= 2)
-                                    PProduct.SetCreateCase(n,DecorationMaterials[i].GetID());
-                                if(n == 2)
+                                if(DecorationFrames[i].isHovered(mx,my))
                                 {
-                                    CStage = Stage::decorate;
-                                    RedCloth.SetWhetherAppear(1);
-                                    RedCloth.SetWhetherRender(1);
-                                    PProduct.SetDelayTime(CurrentTime);
-                                } 
+                                    if(n <= 2)
+                                    {
+                                        PProduct.SetCreateCase(n,DecorationMaterials[i].GetID(), materialManager);
+                                    }
+                                        
+                                    if(n == 2)
+                                    {
+                                        ChoosePage = 0;
+                                        CStage = Stage::decorate;
+                                        RedCloth.SetWhetherAppear(1);
+                                        RedCloth.SetWhetherRender(1);
+                                        PProduct.SetDelayTime(CurrentTime);
+                                    } 
+                                }
                             }
                         }
                         break;
@@ -379,16 +453,19 @@ class CreateRUIEvent
                     {
                         for(int i = 0; i < DecorationFrames.size(); i++)
                         {
-                            int n = PProduct.GetLastDecorationNumbers();
-                            if(DecorationFrames[i].isHovered(mx,my))
+                            if(i / 8 == ChoosePage)
                             {
-                                if(n <= 2)
+                                int n = PProduct.GetLastDecorationNumbers();
+                                if(DecorationFrames[i].isHovered(mx,my))
                                 {
-                                    PProduct.SetDEcorationCase(n,DecorationMaterials[i].GetID());
-                                }
-                                if(n == 2)
-                                {
-                                    SDL_Log("制作完成");
+                                    if(n <= 2)
+                                    {
+                                        PProduct.SetDEcorationCase(n,DecorationMaterials[i].GetID());
+                                    }
+                                    if(n == 2)
+                                    {
+                                        SDL_Log("制作完成");
+                                    }
                                 }
                             }
                         }
@@ -429,6 +506,7 @@ class CreateRUIEvent
 
     void quit()
     {
+        Icons.clear();
         plates.clear();
         DessertSize.clear();
         SizeFrames.clear();
@@ -471,4 +549,6 @@ class CreateRUIEvent
     int CurrentTime;
     DessertManager dessertManager;
     bool WhetherBack;
+    int ChoosePage;
+    int BaseID[100];
 };

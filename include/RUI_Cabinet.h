@@ -74,8 +74,33 @@ class CabinetFrame
     CabinetFrame() = default;
     ~CabinetFrame() = default;
 
+    void freeResources() {
+        if (TitleSurface) {
+            SDL_FreeSurface(TitleSurface);
+            TitleSurface = nullptr;
+        }
+        if (DessertSurface) {
+            SDL_FreeSurface(DessertSurface);
+            DessertSurface = nullptr;
+        }
+        if (TitleTexture) {
+            SDL_DestroyTexture(TitleTexture);
+            TitleTexture = nullptr;
+        }
+        if (DessertNameTexture) {
+            SDL_DestroyTexture(DessertNameTexture);
+            DessertNameTexture = nullptr;
+        }
+        if (TextFont) {
+        TTF_CloseFont(TextFont);
+        TextFont = nullptr;
+    }
+    }
+
     void SetCabinetID(int x)
     {
+        if(IntCabinetID != x)
+            freeResources();
         IntCabinetID = x;
     }
 
@@ -93,6 +118,7 @@ class CabinetFrame
         TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
         color = {10,10,10,255};
         IntCabinetID = -1;
+        SDL_Log("已初始化");
     }
 
     void quit()
@@ -105,6 +131,11 @@ class CabinetFrame
         SDL_DestroyTexture(DessertNameTexture);
         TitleTexture = nullptr;
         DessertNameTexture = nullptr;
+        if(TextFont)
+        {
+            TTF_CloseFont(TextFont);
+            TextFont = nullptr;
+        }
     }
 
     void onRender(SDL_Renderer* Renderer, Cabinet& cab, ProductManager Manager)
@@ -113,8 +144,17 @@ class CabinetFrame
         SDL_RenderCopy(Renderer, QuitIcon, nullptr, &QuitRect);
         DessertName = Manager.GetProductName(cab.GetDessertID()) + " " + std::to_string(Manager.GetProductPrice(cab.GetDessertID())) + "元";
         CabinetID = "第" + std::to_string(IntCabinetID + 1) + "个面包柜";
-        //SDL_Log("%d",IntCabinetID);
 
+        if(TextFont == nullptr)
+        {
+            TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
+            if (!TextFont) 
+            {
+            SDL_Log("字体加载失败: %s", TTF_GetError());
+            return; 
+            }
+        }
+            
         if(TitleSurface == nullptr)
             TitleSurface = TTF_RenderUTF8_Blended(TextFont, CabinetID.c_str(), color);
         if(DessertSurface == nullptr)

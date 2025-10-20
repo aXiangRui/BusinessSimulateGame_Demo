@@ -344,6 +344,7 @@ class GameEvent
         std::string string;
         int time;
         file >> time;
+        SDL_Log("当前时间%d",time);
         timeClock.SetClockTime(time);
         int line = 0;
         while(std::getline(file,string))

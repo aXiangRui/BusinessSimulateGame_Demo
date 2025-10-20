@@ -21,9 +21,9 @@
                 "-l", "SDL2_image",
                 "-l", "SDL2_mixer",                
                 "-l", "SDL2",
-                "-mwindows",
                 "-l", "ole32",
-                "-l", "winmm"
+                "-l", "winmm",
+                "-mwindows"
             ],
             "options": {
                 "cwd": "${fileDirname}"
