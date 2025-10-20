@@ -35,7 +35,7 @@ class Customer
         SDL_Color color;
         int NameW,NameH;
 
-        void InitCustomer(int id, int preferid, std::string name, std::string path, int prefer)
+        void InitCustomer(int id, int preferid, std::string name, std::string path, int appear, int prefer)
         {
             CustomerID = id;
             PreferDessertID = preferid;
@@ -45,6 +45,7 @@ class Customer
             y = 450;
             SitTime = 0;
             ChooseTime = 0;
+            WhetherAppear = appear;
             preference = prefer;
 
             CurrentStage = CustomerStage::Enter;
@@ -59,7 +60,7 @@ class Customer
             PayTime = 0;
             isFront = 0;
             Queue = 0;
-            ChooseNumber = rand() % 4 + 1;
+            ChooseNumber = 0;
             payPrice = 0;
             hasJoined = 0;
             isHovered = 0;
@@ -73,6 +74,11 @@ class Customer
             NameW = NameSurface->w; NameH = NameSurface->h;
 
             payCharm.Init();
+        }
+
+        void SetChooseNumber()
+        {
+            ChooseNumber = rand() % 4 + 1;
         }
 
         int GetCustomerID()
@@ -195,6 +201,7 @@ class Customer
             std::vector<Cabinet>& Cabtines,
             DessertManager dessertManager,
             ProductManager pManager,
+            Customer& customer,
             int&  TotalMoney
         )
         {
@@ -217,7 +224,7 @@ class Customer
                 }
                 case CustomerStage::Eat:
                 {
-                    Eat(Chairs, currentTime);
+                    Eat(Chairs, currentTime, customer);
                     break;
                 }
                 case CustomerStage::Leave:
@@ -327,7 +334,7 @@ class Customer
             }
         }
 
-        void Eat(std::vector<Chair>& Chairs, int CurrentTime)
+        void Eat(std::vector<Chair>& Chairs, int CurrentTime, Customer& customer)
         {
             if(isEating == -1)
             {
@@ -392,6 +399,8 @@ class Customer
                     {    
                         Chairs[isEating].SetUsing(0);
                         preference = preference + 5;
+                        customer.AddPreference();
+                        SDL_Log("%s好感度增加5",CustomerName.c_str());
                         CurrentStage = CustomerStage::Leave;
                     }
                 }
@@ -549,6 +558,22 @@ class Customer
             return isHovered;
         }
 
+        void SetWhetherAppear(bool a)
+        {
+            WhetherAppear = a;
+        }
+
+        bool GetWhetherAppear()
+        {
+            return WhetherAppear;
+        }
+
+        void AddPreference()
+        {
+            preference = preference + 5;
+            SDL_Log("当前喜好值%d",preference);
+        }
+
     private:
         std::string CustomerName;
         std::string PathName;
@@ -581,5 +606,6 @@ class Customer
 
         bool hasJoined;
         bool isHovered;
+        bool WhetherAppear;
         PayCharm payCharm;
 };

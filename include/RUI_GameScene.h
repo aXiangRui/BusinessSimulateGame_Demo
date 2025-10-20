@@ -18,6 +18,7 @@
 #include"RUI_GameEvent.h"
 #include"RUI_Cabinet.h"
 #include"RUI_ChatFrame.h"
+#include"RUI_TextManager.h"
 
 extern RUI_SceneManager SceneManager;
 extern MusicPlayer BackgroundMusic;
@@ -33,6 +34,7 @@ class RUI_GameScene: public RUI_Scene
         TTF_Font* TextFont;
         CustomerManager customerManager;
         DessertManager dessertManager;
+        TextManager textManager;
 
         MusicPlayer gamemusic;
         std::vector<MenuButton> Btns;
@@ -65,8 +67,9 @@ class RUI_GameScene: public RUI_Scene
         SummaryFrame summaryFrame;
 
         void onEnter()
-        {
-            TestEvent.Load(TotalMoney,TotalCustomers,Cabinets);
+        {               
+            customerManager.InitCustomerManager();   
+            TestEvent.Load(TotalMoney,TotalCustomers,Cabinets, customerManager);
             TestEvent.onEnter();
             TestEvent.SetIsReadingPage(0);
             MenuButton Btn0((WindowWidth-320)/2,450,320,64,"设置新甜点",0);
@@ -84,10 +87,10 @@ class RUI_GameScene: public RUI_Scene
                 {
                     gamemusic.setMusic(ResourceManager::instance()->FindMusic("gamemusic02"));
                     gamemusic.play(-1);
-                }             
-            }
-            customerManager.InitCustomerManager();
-            dessertManager.InitDessertManager();
+                } 
+            }            
+            dessertManager.InitDessertManager(); 
+            textManager.Init();         
             Background = ResourceManager::instance()->FindTexture("hall");
             BackgroundWall = ResourceManager::instance()->FindTexture("hallwall");
             TextFont = nullptr;
@@ -155,6 +158,7 @@ class RUI_GameScene: public RUI_Scene
             
             SDL_Log("进入游戏场景");
         }
+
         void onUpdate()
         {
             //SDL_Log("更新游戏场景");
@@ -170,7 +174,6 @@ class RUI_GameScene: public RUI_Scene
             else
             {
                 isChatFrameShowing = 1;
-
             }
         }
 
@@ -574,7 +577,8 @@ class RUI_GameScene: public RUI_Scene
         }
         void onExit()
         {
-            SDL_Log("退出游戏场景");          
+            SDL_Log("退出游戏场景");        
+            customerManager.Save();  
             TestEvent.Save(TotalMoney,TotalCustomers, Cabinets);
             Btns.clear();
             Chairs.clear();

@@ -151,6 +151,7 @@ class GameEvent
             //防溢出，不过基本上也没人能招待这么多吧...
         }
         CurrentTime = SDL_GetTicks();
+
         for(int i = 0; i < AddCustomers.size(); i++)
         {
             if(CurrentTime - LastTime >= AddCustomers[i].GetDelayTime())
@@ -167,30 +168,41 @@ class GameEvent
             {
                 for(int i = 0; i < customerManager.GetCustomersSize(); i++)
                 {
-                    if(customerManager.Customers[i].WhetherAdd(Customers.size(),timeClock))
+                    if(customerManager.Customers[i].GetWhetherAppear())
                     {
-                        // SDL_Log("可以生成%d",i);
-                        Customer a;
-                        a.InitCustomer(
-                            TotalCustomers,
-                            customerManager.GetPreferDessertID(i),
-                            customerManager.GetCustomerName(i),
-                            customerManager.GetCustomerPath(i),
-                            customerManager.GetCustomerPreference(i)
-                        );
-                        AddCustomers.push_back(a);
-                        customerManager.Customers[i].SetHasJoined(1);
-                        TotalCustomers++;
-                        TotalDessert += a.GetChooseNumber();
-                        LastTime = CurrentTime;
+                        if(customerManager.Customers[i].WhetherAdd(Customers.size(),timeClock))
+                        {
+                            // SDL_Log("可以生成%d",i);
+                            Customer a;
+                            a.InitCustomer(
+                                TotalCustomers,
+                                customerManager.GetPreferDessertID(i),
+                                customerManager.GetCustomerName(i),
+                                customerManager.GetCustomerPath(i),
+                                customerManager.GetWhetherAppear(i),
+                                customerManager.GetCustomerPreference(i)
+                            );
+                            a.SetChooseNumber();
+                            AddCustomers.push_back(a);
+                            customerManager.Customers[i].SetHasJoined(1);
+                            TotalCustomers++;
+                            TotalDessert += a.GetChooseNumber();
+                            LastTime = CurrentTime;
+                            //添加顾客
+                        }
                     }
-
                 }
             }          
         }
+
+  
         for(int i = (int)Customers.size() - 1; i >= 0; --i)
-        {    
-            Customers[i].Update(Chairs, CurrentTime, Cabinets, dessertManager, productManager, TotalMoney);
+        {
+            for(int j = 0; j < customerManager.GetCustomersSize(); j++)
+            {
+                if(Customers[i].GetCustomerName() == customerManager.GetCustomerName(j))           
+                    Customers[i].Update(Chairs, CurrentTime, Cabinets, dessertManager, productManager, customerManager.Customers[j], TotalMoney);
+            }
             //差点找不到顾客类刷新了哈哈哈哈
             if(Customers[i].GetQuit() && Customers[i].getX() > 800 && Customers[i].getY() > 350) 
             {
@@ -200,7 +212,7 @@ class GameEvent
                 {
                     if(name == customerManager.Customers[i].GetCustomerName())
                     {
-                       customerManager.Customers[i].SetHasJoined(0);
+                        customerManager.Customers[i].SetHasJoined(0);
                     }
                 }
                 DeleteCustomer(Customers[i].GetCustomerID());  // 删除特定 id 的元素 (DeleteCustomer 会返回)
@@ -288,7 +300,7 @@ class GameEvent
         {
             if(Customers[i].GetIsHoverd() == 1)
             {
-                SDL_Log("%s",Customers[i].GetCustomerName().c_str());
+                // SDL_Log("%s",Customers[i].GetCustomerName().c_str());
                 Customers[i].onRenderWithName(Renderer);
             }
             else
@@ -362,7 +374,7 @@ class GameEvent
         isReadingPage = i;
     }
 
-    void Load(int& TotalMoney, int& TotalCustomers,std::vector<Cabinet>& Cabinets)
+    void Load(int& TotalMoney, int& TotalCustomers,std::vector<Cabinet>& Cabinets,CustomerManager& customerManager)
     {
         std::ifstream file("./save/Time.txt");
         std::string string;
@@ -382,7 +394,14 @@ class GameEvent
                 std::string cPath;
                 iss >> cID >> cName >>cPath;
                 Customer a;
-                a.InitCustomer((int)cID, 0, cName, cPath.c_str(), 0);
+                for(int i = 0; i < customerManager.GetCustomersSize(); i++)
+                {
+                    if( cName == customerManager.GetCustomerName(i))
+                    {
+                        a = customerManager.Customers[i];
+                        customerManager.Customers[i].SetHasJoined(1);
+                    }
+                }
                 bool overload = 0;
                 for(int i = 0; i < Customers.size(); i++)
                 {

@@ -11,6 +11,12 @@ class ChatFrame
     ChatFrame() = default;
     ~ChatFrame() = default;
 
+    void init()
+    {    
+        FrameTexture = ResourceManager::instance()->FindTexture("saving");
+        rect = {100,0,600,600};
+    }
+
     void setID(int id)
     {
         ChatFrameID = id;
@@ -42,9 +48,9 @@ class ChatFrame
     }
 
     void RenderFrame(SDL_Renderer* Renderer)
-    {
+    {      
         FrameTexture = ResourceManager::instance()->FindTexture("saving");
-        SDL_Rect rect = {100,0,600,600};
+        rect = {100,0,600,600};
         SDL_RenderCopy(Renderer,FrameTexture,nullptr,&rect);
     }
 
@@ -53,6 +59,7 @@ class ChatFrame
     std::string Title;
     std::string Content;
     SDL_Texture* FrameTexture;
+    SDL_Rect rect;
 };
 
 class SummaryFrame

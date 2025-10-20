@@ -35,15 +35,32 @@ class CustomerManager
                 std::string cName;
                 std::string cPath;
                 int pre;
-                iss>>cID>>pID>>cName>>cPath>>pre;
-                SDL_Log("%d %d %s %s %d",cID,pID,cName.c_str(),cPath.c_str(),pre);
+                int app;
+                iss>>cID>>pID>>cName>>cPath>>app>>pre;
+                SDL_Log("%d %d %s %s %d",cID,pID,cName.c_str(),cPath.c_str(),app);
                 Customer a;
-                a.InitCustomer(cID,pID,cName,cPath,pre);
+                a.InitCustomer(cID,pID,cName,cPath,app,pre);
                 SDL_Log("%d",a.GetHasJoined());
                 Customers.push_back(a);
             }
         }
         hasloaded = 1;
+    }
+
+    void Save()
+    {
+        std::ofstream file("./save/Customers.txt");
+        file << "#以下数据依次为ID，喜欢的甜点ID,顾客名字,顾客地址,是否已解锁(1表示已解锁,0表示未解锁),好感度"<<std::endl;
+        for(int i = 0; i < Customers.size(); i++)
+        {
+            file << Customers[i].GetCustomerID() << " ";
+            file << Customers[i].GetPreferDessertID() << " ";
+            file << Customers[i].GetCustomerName() << " ";
+            file << Customers[i].GetCustomerPath() << " ";
+            file << Customers[i].GetWhetherAppear() << " ";
+            file << Customers[i].GetCustomerPreference() << " ";
+            file << std::endl;
+        }
     }
 
     int GetCustomerID(int i)
@@ -74,6 +91,11 @@ class CustomerManager
     int GetCustomersSize()
     {
         return Customers.size();
+    }
+
+    bool GetWhetherAppear(int i)
+    {
+        return Customers[i].GetWhetherAppear();
     }
 
     private:
