@@ -25,6 +25,12 @@ class ChatFrame
     void setTitle(std::string title)
     {
         Title = title;
+        
+        if(TextFont == nullptr)
+            TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",28); 
+        TitleSurface = TTF_RenderUTF8_Blended(TextFont,Title.c_str(), color);
+        int dw = TitleSurface->w; int dh = TitleSurface->h;
+        TitleRect = {(800-dw)/2, 40, dw,dh};
     }
 
     void setContent(std::string content)
@@ -48,18 +54,37 @@ class ChatFrame
     }
 
     void RenderFrame(SDL_Renderer* Renderer)
-    {      
+    {
+       
         FrameTexture = ResourceManager::instance()->FindTexture("saving");
         rect = {100,0,600,600};
         SDL_RenderCopy(Renderer,FrameTexture,nullptr,&rect);
+        
+    }
+
+    void RenderTitle(SDL_Renderer* Renderer)
+    {
+        if(TextFont == nullptr)
+                    TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36); 
+                TitleTexture = SDL_CreateTextureFromSurface(Renderer,TitleSurface);
+        SDL_RenderCopy(Renderer, TitleTexture, nullptr, &TitleRect);
+        SDL_DestroyTexture(TitleTexture);      
     }
 
     private:
     int ChatFrameID;
     std::string Title;
     std::string Content;
+    TTF_Font* TextFont;
+    SDL_Surface* TitleSurface;
+    SDL_Surface* ContentSurface;
+    SDL_Texture* ContentTexture;
+    SDL_Texture* TitleTexture;
     SDL_Texture* FrameTexture;
     SDL_Rect rect;
+    SDL_Rect TitleRect;
+    SDL_Rect ContentRect;
+    SDL_Color color = { 10, 10, 10, 255};
 };
 
 class SummaryFrame

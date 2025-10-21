@@ -76,6 +76,74 @@ class Customer
             payCharm.Init();
         }
 
+        void SetCurrentStage(int i)
+        {
+            switch(i)
+            {
+                case 0:
+                    CurrentStage = CustomerStage::Enter;
+                    break;
+                case 1:
+                    CurrentStage = CustomerStage::Choose;
+                    break;
+                case 2:
+                    CurrentStage = CustomerStage::Buy;
+                    break;
+                case 3:
+                    CurrentStage = CustomerStage::Eat;
+                    break;
+                case 4:
+                    CurrentStage = CustomerStage::Leave;
+                    break;
+                default:break;
+            }
+        }
+
+        int GetCurrentStage()
+        {
+            switch (CurrentStage)
+            {
+            case CustomerStage::Enter:
+                return 0;
+                break;
+            case CustomerStage::Choose:
+                return 1;
+                break;
+            case CustomerStage::Buy:
+                return 2;
+                break;
+            case CustomerStage::Eat:
+                return 3;
+                break;
+            case CustomerStage::Leave:
+                return 4;
+                break;
+            default:
+                break;
+            }
+            return -1;
+        }
+
+        int GetX()
+        {
+            return x;
+        }
+
+        int GetY()
+        {
+            return y;
+        }
+
+        void SetX(int mx)
+        {
+            x = mx;
+        }
+
+        void SetY(int my)
+        {
+            y = my;
+        }
+
         void SetChooseNumber()
         {
             ChooseNumber = rand() % 4 + 1;

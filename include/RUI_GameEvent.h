@@ -71,6 +71,7 @@ class GameEvent
             a.InitPlate(200,200,i);
             plates.push_back(a);
         }
+        Chat.init();
         isReadingPage = -1;
     }
 
@@ -321,6 +322,8 @@ class GameEvent
 
     void onProductRender(SDL_Renderer* Renderer, int j)
     {
+        std::string title = "查看产品中,当前第" + std::to_string(j+1) + "页";
+        Chat.setTitle(title);
         Chat.RenderFrame(Renderer);
         for(int i = 0; i < productManager.GetProductSize(); i++)
         {
@@ -328,14 +331,17 @@ class GameEvent
             {
                 productManager.products[i].onRender(
                     Renderer, dessertManager, materialManager, plates,
-                    200 + i/3 * 200 - j * 400 , i % 3 * 200, 200, 200
+                    200 + i/3 * 200 - j * 400 ,40 + i % 3 * 180, 180, 180
                 );
             }
         }
+        Chat.RenderTitle(Renderer);
     }
 
     void SettingProductRender(SDL_Renderer* Renderer, int j)
     {
+        std::string title = "设置产品中,当前第" + std::to_string(j+1) + "页";
+        Chat.setTitle(title);
         Chat.RenderFrame(Renderer);
         for(int i = 0; i < productManager.GetProductSize(); i++)
         {
@@ -343,10 +349,11 @@ class GameEvent
             {
                 productManager.products[i].onRender(
                     Renderer, dessertManager, materialManager, plates,
-                    200 + i/3 * 200 - j * 400 , i % 3 * 200, 200, 200
+                    200 + i/3 * 200 - j * 400 ,40 + i % 3 * 180, 180, 180
                 );
             }
         }
+        Chat.RenderTitle(Renderer);
     }
 
     int ReturnClockTime()
@@ -374,7 +381,7 @@ class GameEvent
         isReadingPage = i;
     }
 
-    void Load(int& TotalMoney, int& TotalCustomers,std::vector<Cabinet>& Cabinets,CustomerManager& customerManager)
+    void Load(int& TotalMoney, int& TotalCustomers, int& TotalDessert,std::vector<Cabinet>& Cabinets,CustomerManager& customerManager)
     {
         std::ifstream file("./save/Time.txt");
         std::string string;
@@ -392,7 +399,8 @@ class GameEvent
                 int cID;
                 std::string cName;
                 std::string cPath;
-                iss >> cID >> cName >>cPath;
+                int x,y,stage;
+                iss >> cID >> cName >>cPath >> x >> y >> stage;
                 Customer a;
                 for(int i = 0; i < customerManager.GetCustomersSize(); i++)
                 {
@@ -409,7 +417,13 @@ class GameEvent
                     overload = 1;
                 }
                 if(!overload)
+                {
                     Customers.push_back(a);
+                    Customers.back().SetX(x);
+                    Customers.back().SetY(y);
+                    Customers.back().SetCurrentStage(stage);
+                }
+                    
             }
         }
         file.close();
@@ -417,6 +431,7 @@ class GameEvent
         std::ifstream file01("./save/Total.txt");
         file01 >> TotalCustomers;
         file01 >> TotalMoney;
+        file01 >> TotalDessert;
         SDL_Log("读取到总人数为%d",TotalCustomers);
         file01.close();
 
@@ -432,7 +447,7 @@ class GameEvent
         file02.close();
     }
 
-    void Save(int& TotalMoney, int& TotalCustomers, std::vector<Cabinet>& Cabinets)
+    void Save(int& TotalMoney, int& TotalCustomers, int& TotalDessert, std::vector<Cabinet>& Cabinets)
     {
         std::ofstream file("./save/Time.txt");
         if(!file)
@@ -445,13 +460,17 @@ class GameEvent
         for(size_t i = 0; i < Customers.size(); ++i)
         {
             file << Customers[i].GetCustomerID() << " " << Customers[i].GetCustomerName(); 
-            file << " " << Customers[i].GetCustomerPath() << std::endl;
+            file << " " << Customers[i].GetCustomerPath() << " ";
+            file << Customers[i].getX() << " " << Customers[i].getY() << " ";
+            file << Customers[i].GetCurrentStage();
+            file << std::endl;
         }
         file.close();
 
         std::ofstream file01("./save/Total.txt");
         file01 << TotalCustomers <<std::endl;
         file01 << TotalMoney << std::endl;
+        file01 << TotalDessert << std::endl;
         file01.close();
 
         std::ofstream file02("./save/Cabinet.txt");

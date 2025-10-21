@@ -57,16 +57,16 @@ class TextManager
         StoreText.pop_back();
         CustomerText.pop_back();
         //删除数组末尾的end标识  
-        SDL_Log("%d %d",StoreText.size(), CustomerText.size());
-        for(int i = 0; i < StoreText.size(); i++)
-        {
-            SDL_Log("%s",StoreText[i].c_str());
-        }              
-        SDL_Log("--------");
-        for(int i = 0; i < CustomerText.size(); i++)
-        {
-            SDL_Log("%s",CustomerText[i].c_str());
-        }    
+        // SDL_Log("%d %d",StoreText.size(), CustomerText.size());
+        // for(int i = 0; i < StoreText.size(); i++)
+        // {
+        //     SDL_Log("%s",StoreText[i].c_str());
+        // }              
+        // SDL_Log("--------");
+        // for(int i = 0; i < CustomerText.size(); i++)
+        // {
+        //     SDL_Log("%s",CustomerText[i].c_str());
+        // }    
         File.close();
     }
 };

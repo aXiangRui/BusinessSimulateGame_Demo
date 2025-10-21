@@ -69,7 +69,7 @@ class RUI_GameScene: public RUI_Scene
         void onEnter()
         {               
             customerManager.InitCustomerManager();   
-            TestEvent.Load(TotalMoney,TotalCustomers,Cabinets, customerManager);
+            TestEvent.Load(TotalMoney,TotalCustomers, TotalDessert, Cabinets, customerManager);
             TestEvent.onEnter();
             TestEvent.SetIsReadingPage(0);
             MenuButton Btn0((WindowWidth-320)/2,450,320,64,"设置新甜点",0);
@@ -161,7 +161,7 @@ class RUI_GameScene: public RUI_Scene
 
         void onUpdate()
         {
-            //SDL_Log("更新游戏场景");
+            // SDL_Log("更新游戏场景");
             if(ChatFrames.size() == 0)
             {  
                 TimeChange();
@@ -579,7 +579,7 @@ class RUI_GameScene: public RUI_Scene
         {
             SDL_Log("退出游戏场景");        
             customerManager.Save();  
-            TestEvent.Save(TotalMoney,TotalCustomers, Cabinets);
+            TestEvent.Save(TotalMoney,TotalCustomers, TotalDessert, Cabinets);
             Btns.clear();
             Chairs.clear();
             Desks.clear();
