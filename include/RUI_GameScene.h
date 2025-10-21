@@ -29,43 +29,6 @@ class RUI_GameScene: public RUI_Scene
         RUI_GameScene() = default;
         ~RUI_GameScene() = default;
 
-        SDL_Texture* Background;
-        SDL_Texture* BackgroundWall;
-        TTF_Font* TextFont;
-        CustomerManager customerManager;
-        DessertManager dessertManager;
-        TextManager textManager;
-
-        MusicPlayer gamemusic;
-        std::vector<MenuButton> Btns;
-        std::vector<Chair> Chairs;
-        std::vector<Desk> Desks;
-        std::vector<Cabinet> Cabinets;
-        CabinetFrame cabinetFrame;
-        std::queue<ChatFrame> ChatFrames;
-        std::vector<RUI_Icon> Icons;
-        Register reg;
-
-        Uint32 CurrentTime;
-        Uint32 LastTime;
-
-        Clock TestClock;
-        const int HourTime = 10000;
-
-        int TotalMoney = 0;
-        int isChatFrameShowing = 0;
-        int TotalDessert = 0;
-        bool WhetherReadingProduct;
-        bool isSettingNewProduct;
-        bool CheckSetting;
-
-        int TotalCustomers;
-        int ReadingPage;
-        int CurrentCabnet;
-
-        GameEvent TestEvent;
-        SummaryFrame summaryFrame;
-
         void onEnter()
         {               
             customerManager.InitCustomerManager();   
@@ -104,23 +67,11 @@ class RUI_GameScene: public RUI_Scene
                 Chairs.push_back(chair);
             }
 
-            // for(int i = 0; i < 24; i++)
-            // {
-            //     Cabinet cabinet;
-            //     cabinet.InitCabinet(i);
-            //     Cabinets.push_back(cabinet);
-            // }
-
             for(int i = 0; i < 8; i++)
             {
                 Desk desk;
                 desk.initDesk(i);
                 Desks.push_back(desk);
-            }
-
-            while(ChatFrames.size()!=0)
-            {
-                ChatFrames.pop();
             }
 
             RUI_Icon testicon;
@@ -155,15 +106,16 @@ class RUI_GameScene: public RUI_Scene
             CheckSetting = 0;
             ReadingPage = -1;
             CurrentCabnet = -1;
+            ChatDelayTime = 0;
             
             SDL_Log("进入游戏场景");
         }
 
         void onUpdate()
         {
-            
+            CurrentTime = SDL_GetTicks();
             // SDL_Log("更新游戏场景");
-            if(ChatFrames.size() == 0)
+            if(isChatFrameShowing == 0)
             {  
                 TimeChange();
                 TestEvent.SetClock(TestClock);
@@ -174,15 +126,25 @@ class RUI_GameScene: public RUI_Scene
             }
             else
             {
-                isChatFrameShowing = 1;
+                if(ChatDelayTime == 0)
+                {
+                    ChatDelayTime = CurrentTime;
+                }
+                if(CurrentTime - ChatDelayTime >= 5000)
+                {
+                    isChatFrameShowing = 0;
+                    ChatDelayTime = 0;
+                }
             }
-            
             for(int i = 0; i < customerManager.GetCustomersSize(); i++)
             {
                 if(customerManager.Customers[0].GetCustomerPreference() >= 50 && dessertManager.Desserts[3].GetWhetherUnlock() == 0)
                 {
                     dessertManager.Desserts[3].SetWhetherUnlock(1);
                     dessertManager.Save();
+                    chatFrame.setTitle(customerManager.GetCustomerName(0));
+                    chatFrame.setContent(textManager.CustomerText[1]);
+                    isChatFrameShowing = 1;
                     //如果0号顾客好感度达到50且果冻未解锁就解锁果冻
                 }
             } 
@@ -212,16 +174,16 @@ class RUI_GameScene: public RUI_Scene
                         if(TestClock.ReturnHour() == 0)
                         {     
                             summaryFrame.update(TotalCustomers,TotalDessert);
+                            isSummaryShowing = 1;
                             TotalMoney = TotalMoney - 1000;
                             SDL_Log("今日卖出甜品%d份",TotalDessert);
                             SDL_Log("今日顾客共有%d人",TotalCustomers);                           
-
-                            
                         }
                         if(TestClock.ReturnHour() == 6)
                         {
                             TotalDessert = 0;
                             TotalCustomers = 0;
+                            isSummaryShowing = 0;
                         } 
                     }
                 }
@@ -314,14 +276,16 @@ class RUI_GameScene: public RUI_Scene
                 Icons[5].onRender(Renderer,1);
             }
 
-            if(TestClock.ReturnHour() >= 0 && TestClock.ReturnHour() <= 6)
+            if(isSummaryShowing)
             {
                 summaryFrame.onRender(Renderer);
             }
 
             if(isChatFrameShowing)
             {
-
+                chatFrame.RenderFrame(Renderer);
+                chatFrame.RenderTitle(Renderer);
+                chatFrame.RenderContent(Renderer);
             }
             // SDL_Rect BackGroundWallRect = {0,6,800,600};
             // SDL_RenderCopy(Renderer,BackgroundWall,nullptr,&BackGroundWallRect);
@@ -335,8 +299,8 @@ class RUI_GameScene: public RUI_Scene
             {               
                 case SDL_MOUSEBUTTONDOWN:
                 {            
-                    int mx = event.motion.x;
-                    int my = event.motion.y;
+                    int mx = event.button.x;
+                    int my = event.button.y;
                     if(CheckSetting)
                     {
                         if(CheckRect(200,400,0,200,mx,my))
@@ -374,6 +338,20 @@ class RUI_GameScene: public RUI_Scene
                             Cabinets[CurrentCabnet].SetDessertID(ReadingPage*6+5);
                             CheckSetting = 0;
                             isSettingNewProduct = 1;
+                        }
+                    }
+                    if( isChatFrameShowing )
+                    {
+                        if(mx >= 200 && mx <= 600)
+                        {
+                            isChatFrameShowing = 0;
+                        }
+                    }
+                    if( isSummaryShowing )
+                    {
+                        if( mx >= 200 && mx <= 600)
+                        {
+                            isSummaryShowing = 0;
                         }
                     }
                     for(int i = 0; i < Btns.size(); i++)
@@ -611,6 +589,45 @@ class RUI_GameScene: public RUI_Scene
             }
             return false;
         }
+                SDL_Texture* Background;
+        SDL_Texture* BackgroundWall;
+        TTF_Font* TextFont;
+        CustomerManager customerManager;
+        DessertManager dessertManager;
+        TextManager textManager;
+
+        MusicPlayer gamemusic;
+        std::vector<MenuButton> Btns;
+        std::vector<Chair> Chairs;
+        std::vector<Desk> Desks;
+        std::vector<Cabinet> Cabinets;
+        CabinetFrame cabinetFrame;
+        // std::queue<ChatFrame> ChatFrames;
+        ChatFrame chatFrame; 
+        std::vector<RUI_Icon> Icons;
+        Register reg;
+
+        Uint32 CurrentTime;
+        Uint32 LastTime;
+
+        Clock TestClock;
+        const int HourTime = 10000;
+
+        int TotalMoney = 0;
+        int isChatFrameShowing = 0;
+        int TotalDessert = 0;
+        int ChatDelayTime = 0;
+        bool WhetherReadingProduct;
+        bool isSettingNewProduct;
+        bool CheckSetting;
+        bool isSummaryShowing;
+
+        int TotalCustomers;
+        int ReadingPage;
+        int CurrentCabnet;
+
+        GameEvent TestEvent;
+        SummaryFrame summaryFrame;
         private:
 
 };

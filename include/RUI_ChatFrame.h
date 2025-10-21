@@ -35,7 +35,10 @@ class ChatFrame
 
     void setContent(std::string content)
     {
-        Content = content;
+        Content = "  " + content;
+        ContentSurface = TTF_RenderUTF8_Blended_Wrapped(TextFont,Content.c_str(),color,400);
+        int dw = ContentSurface->w; int dh = ContentSurface->h;
+        ContentRect = { 200, 100, dw, dh};
     }
 
     int getID()
@@ -66,9 +69,16 @@ class ChatFrame
     {
         if(TextFont == nullptr)
                     TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36); 
-                TitleTexture = SDL_CreateTextureFromSurface(Renderer,TitleSurface);
+        TitleTexture = SDL_CreateTextureFromSurface(Renderer,TitleSurface);
         SDL_RenderCopy(Renderer, TitleTexture, nullptr, &TitleRect);
         SDL_DestroyTexture(TitleTexture);      
+    }
+
+    void RenderContent(SDL_Renderer* Renderer)
+    {
+        ContentTexture = SDL_CreateTextureFromSurface(Renderer, ContentSurface);
+        SDL_RenderCopy(Renderer, ContentTexture, nullptr, &ContentRect);
+        SDL_DestroyTexture(ContentTexture);
     }
 
     private:

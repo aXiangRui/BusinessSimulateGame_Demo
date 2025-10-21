@@ -378,7 +378,9 @@ class Customer
                 if(currentTime - ChooseTime >= 5000 + rand() % 500 - 250)
                 {
                     int dID = Cabinets[chooseID].GetDessertID();
+                    SDL_Log("%s 选择了%d",CustomerName.c_str(), chooseID);
                     int price = pManager.GetProductPrice(dID);
+                    SDL_Log("价格为%d",price);
                     payPrice = price * ChooseNumber;
                     CurrentStage = CustomerStage::Buy;
                 }
