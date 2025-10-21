@@ -1,13 +1,13 @@
-#以下数据依次为ID,甜度,饱腹感,口感,名字,储存地址,是否为基类蛋糕(即可合成)
-0 20 20 20 戚风蛋糕 chiffon 1
-1 30 30 30 草莓蛋糕 strawberrycake 0
-2 35 40 35 巧克力蛋糕 chocolatecake 0
-3 10 10 10 果冻 jelly 1
-4 30 25 30 奶油冰激凌 icecream 0
-5 25 30 25 草莓冰激凌 strawberrycream 0
-6 25 35 30 巧克力冰激凌 chocolatecream 0
-7 50 50 50 提拉米苏 Tiramisu 0
-8 45 20 50 黑森林蛋糕 defaultcake 0
-9 20 20 20 max戚风蛋糕 chiffon 0
-10 20 20 20 mini戚风蛋糕 chiffon 0
-11 20 20 20 pura戚风蛋糕 chiffon 0
+#以下数据依次为ID,甜度,饱腹感,口感,名字,储存地址,是否为基类蛋糕(即可合成),是否已解锁
+0 20 20 20 戚风蛋糕 chiffon 1 1 
+1 30 30 30 草莓蛋糕 strawberrycake 0 0 
+2 35 40 35 巧克力蛋糕 chocolatecake 0 0 
+3 10 10 10 果冻 jelly 1 1 
+4 30 25 30 奶油冰激凌 icecream 0 0 
+5 25 30 25 草莓冰激凌 strawberrycream 0 0 
+6 25 35 30 巧克力冰激凌 chocolatecream 0 0 
+7 50 50 50 提拉米苏 Tiramisu 0 0 
+8 45 20 50 黑森林蛋糕 defaultcake 0 0 
+9 20 20 20 max戚风蛋糕 chiffon 0 0 
+10 20 20 20 mini戚风蛋糕 chiffon 0 0 
+11 20 20 20 pura戚风蛋糕 chiffon 0 0 

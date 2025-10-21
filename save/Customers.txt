@@ -1,8 +1,8 @@
 #以下数据依次为ID，喜欢的甜点ID,顾客名字,顾客地址,是否已解锁(1表示已解锁,0表示未解锁),好感度
-1 0 唐堂 TangTang 1 200 
-2 0 秋天 QiuTian 1 210 
-3 0 陈青野 ChenQingye 1 180 
-4 0 林航 LinHang 1 190 
+1 0 唐堂 TangTang 1 60 
+2 0 秋天 QiuTian 1 60 
+3 0 陈青野 ChenQingye 1 55 
+4 0 林航 LinHang 1 60 
 5 0 南爵 default 0 0 
 6 0 祁是 default 0 0 
 7 0 林波 default 0 0 

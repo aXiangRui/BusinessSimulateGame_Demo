@@ -161,6 +161,7 @@ class RUI_GameScene: public RUI_Scene
 
         void onUpdate()
         {
+            
             // SDL_Log("更新游戏场景");
             if(ChatFrames.size() == 0)
             {  
@@ -175,6 +176,16 @@ class RUI_GameScene: public RUI_Scene
             {
                 isChatFrameShowing = 1;
             }
+            
+            for(int i = 0; i < customerManager.GetCustomersSize(); i++)
+            {
+                if(customerManager.Customers[0].GetCustomerPreference() >= 50 && dessertManager.Desserts[3].GetWhetherUnlock() == 0)
+                {
+                    dessertManager.Desserts[3].SetWhetherUnlock(1);
+                    dessertManager.Save();
+                    //如果0号顾客好感度达到50且果冻未解锁就解锁果冻
+                }
+            } 
         }
 
         void TimeChange()
@@ -204,13 +215,14 @@ class RUI_GameScene: public RUI_Scene
                             TotalMoney = TotalMoney - 1000;
                             SDL_Log("今日卖出甜品%d份",TotalDessert);
                             SDL_Log("今日顾客共有%d人",TotalCustomers);                           
-                            TotalDessert = 0;
-                            TotalCustomers = 0;
+
                             
                         }
-                        // if(TestClock.ReturnHour() == 6)
-                        // {
-                        // } 
+                        if(TestClock.ReturnHour() == 6)
+                        {
+                            TotalDessert = 0;
+                            TotalCustomers = 0;
+                        } 
                     }
                 }
                 else
@@ -586,6 +598,7 @@ class RUI_GameScene: public RUI_Scene
             Cabinets.clear();
             Icons.clear();
             TestEvent.quit();
+            dessertManager.Save();
             dessertManager.quit();
             gamemusic.quit();
         }

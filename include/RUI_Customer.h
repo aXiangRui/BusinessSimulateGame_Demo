@@ -146,7 +146,21 @@ class Customer
 
         void SetChooseNumber()
         {
-            ChooseNumber = rand() % 4 + 1;
+            if( preference <= Level[1])
+                ChooseNumber = 1;
+            else if( preference <= Level[3])
+                ChooseNumber = rand() % 2 + 1;
+            else if( preference <= Level[5])
+                ChooseNumber = rand() % 3 + 1;
+            else if( preference <= Level[7])
+                ChooseNumber = rand() % 4 + 1;
+            else
+            {
+                ChooseNumber = rand() % 5 + 1;
+                if(ChooseNumber < 2)
+                    ChooseNumber++;
+            }    
+            SDL_Log("%s当前好感度:%d,选择数量%d",CustomerName.c_str(),preference,ChooseNumber);
         }
 
         int GetCustomerID()
@@ -172,6 +186,11 @@ class Customer
         int GetCustomerPreference()
         {
             return preference;
+        }
+
+        void SetChooseNumber(int Number)
+        {
+            ChooseNumber = Number;
         }
 
         int GetChooseNumber()
@@ -481,6 +500,11 @@ class Customer
             chooseID = i;
         }
 
+        int GetChooseID()
+        {
+            return chooseID;
+        }
+
         void LeaveStore()
         {
             if(x <= 580 && y <= 350)
@@ -675,5 +699,6 @@ class Customer
         bool hasJoined;
         bool isHovered;
         bool WhetherAppear;
+        int Level[10] = {5,20,50,100,150,200,250,300,350,400};
         PayCharm payCharm;
 };

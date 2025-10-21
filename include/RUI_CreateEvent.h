@@ -103,17 +103,20 @@ class CreateRUIEvent
         {         
             if(dessertManager.GetWhetherBase(i))
             { 
-                ChooseFrame AddFrames;
-                std::string name = dessertManager.GetDessertName(i);
-                AddFrames.InitChooseFrame(500, 10 + j * 64 - (j / 8) * 64 * 8 , j, name.c_str());
-                BaseFrames.push_back(AddFrames);
-                AllBaseDessert.push_back(dessertManager.Desserts[i]);
-                // ensure the newly-pushed dessert has its position initialized
-                AllBaseDessert.back().SetPosition(140, -100);
-                AllBaseDessert.back().SetWidth(256,256);
-                BaseID[j] = i;
-                // SDL_Log("基类蛋糕:%s,%d,%d",BaseDessert.back().GetDessertName().c_str(),BaseDessert.back().GetDessertID(),i);
-                j++;
+                if(dessertManager.GetWhetherUnlock(i))
+                {
+                    ChooseFrame AddFrames;
+                    std::string name = dessertManager.GetDessertName(i);
+                    AddFrames.InitChooseFrame(500, 10 + j * 64 - (j / 8) * 64 * 8 , j, name.c_str());
+                    BaseFrames.push_back(AddFrames);
+                    AllBaseDessert.push_back(dessertManager.Desserts[i]);
+                    // ensure the newly-pushed dessert has its position initialized
+                    AllBaseDessert.back().SetPosition(140, -100);
+                    AllBaseDessert.back().SetWidth(256,256);
+                    BaseID[j] = i;
+                    SDL_Log("基类蛋糕:%s,%d,%d",AllBaseDessert.back().GetDessertName().c_str(),AllBaseDessert.back().GetDessertID(),i);
+                    j++;
+                }
             }
             BaseDessert.push_back(dessertManager.Desserts[i]);
             BaseDessert.back().SetPosition(140, -100);

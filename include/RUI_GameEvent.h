@@ -137,15 +137,7 @@ class GameEvent
         int& TotalCustomers,
         int& TotalDessert
         )
-    {
-        // if(customerManager.GetCustomersSize() > 4)
-        // {
-        // for(int i = 0; i < customerManager.GetCustomersSize(); i++)
-        //         {
-        //             SDL_Log("第%d人，%s",i,customerManager.Customers[i].GetCustomerName().c_str());
-        //         }
-        // }
-        
+    {       
         if(TotalCustomers >= 10000000)
         {
             TotalCustomers = 0;
@@ -193,7 +185,8 @@ class GameEvent
                         }
                     }
                 }
-            }          
+            }  
+       
         }
 
   
@@ -400,7 +393,8 @@ class GameEvent
                 std::string cName;
                 std::string cPath;
                 int x,y,stage;
-                iss >> cID >> cName >>cPath >> x >> y >> stage;
+                int chooseid,choosenumber;
+                iss >> cID >> cName >>cPath >> x >> y >> stage>> chooseid >> choosenumber;
                 Customer a;
                 for(int i = 0; i < customerManager.GetCustomersSize(); i++)
                 {
@@ -422,6 +416,8 @@ class GameEvent
                     Customers.back().SetX(x);
                     Customers.back().SetY(y);
                     Customers.back().SetCurrentStage(stage);
+                    Customers.back().SetChooseNumber(choosenumber);
+                    Customers.back().SetChooseID(chooseid);
                 }
                     
             }
@@ -462,7 +458,9 @@ class GameEvent
             file << Customers[i].GetCustomerID() << " " << Customers[i].GetCustomerName(); 
             file << " " << Customers[i].GetCustomerPath() << " ";
             file << Customers[i].getX() << " " << Customers[i].getY() << " ";
-            file << Customers[i].GetCurrentStage();
+            file << Customers[i].GetCurrentStage() << " ";
+            file << Customers[i].GetChooseNumber() << " ";
+            file << Customers[i].GetChooseID() << " ";
             file << std::endl;
         }
         file.close();

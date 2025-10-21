@@ -50,7 +50,7 @@ class ProductManager
             did.push_back(d2);
             did.push_back(d3);
 
-            SDL_Log("读取到%d号产品",ID);
+            // SDL_Log("读取到%d号产品",ID);
             ProducedProduct a;
             a.LoadInit(ID,BID,did,size,mManager,dManager);
             products.push_back(a);

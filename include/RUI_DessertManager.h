@@ -35,7 +35,8 @@ class DessertManager
             std::string dname;
             std::string dPath;
             bool whetherbase;
-            iss>>cID>>SweetNumber>>FullNumber>>TasteNumber>>dname>>dPath>>whetherbase;
+            bool whetherunlock;
+            iss>>cID>>SweetNumber>>FullNumber>>TasteNumber>>dname>>dPath>>whetherbase>>whetherunlock;
             SDL_Log("新甜品id:%d,甜度:%d,饱腹感:%d,味道:%d,名字:%s,路径:%s",
             cID,
             SweetNumber,
@@ -45,9 +46,29 @@ class DessertManager
             dPath.c_str()
         );
             Dessert a;
-            a.InitLevel(cID,SweetNumber,FullNumber,TasteNumber,dname,dPath,whetherbase);
+            a.InitLevel(cID,SweetNumber,FullNumber,TasteNumber,dname,dPath,whetherbase,whetherunlock);
             Desserts.push_back(a);
         }
+    }
+
+    void Save()
+    {
+        std::ofstream File("./save/Desserts.txt");
+        File << "#以下数据依次为ID,甜度,饱腹感,口感,名字,储存地址,是否为基类蛋糕(即可合成),是否已解锁";
+        File << std::endl;
+        for(int i = 0; i < Desserts.size(); i++)
+        {
+            File << Desserts[i].GetDessertID() << " ";
+            File << Desserts[i].GetSweetNumber() << " ";
+            File << Desserts[i].GetFullNumber() << " ";
+            File << Desserts[i].GetTasteNumber() << " ";
+            File << Desserts[i].GetDessertName() << " ";
+            File << Desserts[i].GetDessertPath() << " ";
+            File << Desserts[i].GetWhetherBase() << " ";
+            File << Desserts[i].GetWhetherUnlock() << " ";
+            File << std::endl;
+        }
+
     }
 
     int GetDessertPrice(int i)
@@ -93,6 +114,11 @@ class DessertManager
     int GetDessertsSize()
     {
         return Desserts.size();
+    }
+
+    bool GetWhetherUnlock(int i)
+    {
+        return Desserts[i].GetWhetherUnlock();
     }
 
     void quit()
