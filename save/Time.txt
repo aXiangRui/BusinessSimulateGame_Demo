@@ -1,3 +1,4 @@
-89
-17 林航 LinHang 372 148 3 1 21 
-1 唐堂 TangTang 450 0 3 0 17 
+132
+9 陈青野 ChenQingye 450 100 3 2 16 
+7 秋天 QiuTian 582 74 4 1 14 
+8 林航 LinHang 530 0 3 1 0 

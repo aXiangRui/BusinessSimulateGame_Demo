@@ -42,6 +42,7 @@ class RUI_GameScene: public RUI_Scene
             Btns.push_back(Btn0);
             BackgroundMusic.quit();
             reg.InitRegister();
+            unlockFrame.init();
             if(!Mix_PlayingMusic())
             {
                 if(rand() % 2 == 1) 
@@ -139,19 +140,8 @@ class RUI_GameScene: public RUI_Scene
                     ChatDelayTime = 0;
                 }
             }
-            CheckEvent.update(customerManager, dessertManager, materialManager, chatFrame, textManager, isChatFrameShowing);
-            // for(int i = 0; i < customerManager.GetCustomersSize(); i++)
-            // {
-            //     if(customerManager.Customers[0].GetCustomerPreference() >= 50 && dessertManager.Desserts[3].GetWhetherUnlock() == 0)
-            //     {
-            //         dessertManager.Desserts[3].SetWhetherUnlock(1);
-            //         dessertManager.Save();
-            //         chatFrame.setTitle(customerManager.GetCustomerName(0));
-            //         chatFrame.setContent(textManager.CustomerText[1]);
-            //         isChatFrameShowing = 1;
-            //         //如果0号顾客好感度达到50且果冻未解锁就解锁果冻
-            //     }
-            // } 
+            CheckEvent.update(customerManager, dessertManager, materialManager, chatFrame, textManager, unlockFrame, isChatFrameShowing);
+            unlockFrame.SetTime(CurrentTime);
         }
 
         void TimeChange()
@@ -179,7 +169,7 @@ class RUI_GameScene: public RUI_Scene
                         {     
                             summaryFrame.update(TotalCustomers,TotalDessert);
                             isSummaryShowing = 1;
-                            TotalMoney = TotalMoney - 1000;
+                            TotalMoney = TotalMoney - 10 * TotalDessert;
                             SDL_Log("今日卖出甜品%d份",TotalDessert);
                             SDL_Log("今日顾客共有%d人",TotalCustomers);                           
                         }
@@ -284,6 +274,8 @@ class RUI_GameScene: public RUI_Scene
             {
                 summaryFrame.onRender(Renderer);
             }
+
+            unlockFrame.onRender(Renderer);
 
             if(isChatFrameShowing)
             {
@@ -634,6 +626,7 @@ class RUI_GameScene: public RUI_Scene
         GameEvent TestEvent;
         SummaryFrame summaryFrame;
         CheckUpdate CheckEvent;
+        UnlockFrame unlockFrame;
         private:
 
 };

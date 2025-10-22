@@ -40,11 +40,40 @@ class CustomerManager
                 SDL_Log("%d %d %s %s %d",cID,pID,cName.c_str(),cPath.c_str(),app);
                 Customer a;
                 a.InitCustomer(cID,pID,cName,cPath,app,pre);
-                SDL_Log("%d",a.GetHasJoined());
+                // SDL_Log("%d",a.GetHasJoined());
                 Customers.push_back(a);
             }
         }
         hasloaded = 1;
+    }
+
+    void update()
+    {
+        Customers.clear();
+        std::ifstream File("./save/Customers.txt");
+        std::string string;
+        int line = 0;
+        while(std::getline(File,string))
+        {
+            line++;
+            std::istringstream iss(string);
+
+            if(string[0] == '#')
+                continue;
+
+            int cID;
+            int pID;
+            std::string cName;
+            std::string cPath;
+            int pre;
+            int app;
+            iss>>cID>>pID>>cName>>cPath>>app>>pre;
+            SDL_Log("%d %d %s %s %d",cID,pID,cName.c_str(),cPath.c_str(),app);
+            Customer a;
+            a.InitCustomer(cID,pID,cName,cPath,app,pre);
+            SDL_Log("%d",a.GetHasJoined());
+            Customers.push_back(a);
+        }
     }
 
     void Save()

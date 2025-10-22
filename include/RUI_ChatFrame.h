@@ -155,3 +155,66 @@ class SummaryFrame
     int tCusomers;
     int tDessert;
 };
+
+class UnlockFrame
+{
+    public:
+    UnlockFrame() = default;
+    ~UnlockFrame() = default;
+
+    void init()
+    {
+        TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",24);
+        color = {240 , 240, 240, 255};
+        DelayTime = 0;
+        WhetherRender = 0;
+    }
+
+    void SetTime(int CurrentTime)
+    {
+        if(isSet)
+        {
+            if(DelayTime == 0)
+            {
+                DelayTime = CurrentTime;
+                WhetherRender = 1;
+            }
+            if(CurrentTime - DelayTime >= 5000)
+            {
+                DelayTime = 0;
+                WhetherRender = 0;
+                isSet = 0;
+            }
+        }
+        
+    }
+
+    void SetContent(std::string c)
+    {
+        content = "成功解锁" + c;
+        TextSurface = TTF_RenderUTF8_Blended(TextFont, content.c_str(),color);
+        TextRect = {10, 500, TextSurface->w, TextSurface->h};
+        isSet = 1;
+    }
+
+    void onRender(SDL_Renderer* Renderer)
+    {
+        if(WhetherRender && isSet)
+        {
+            TextTexture = SDL_CreateTextureFromSurface(Renderer, TextSurface);
+            SDL_RenderCopy(Renderer, TextTexture, nullptr, &TextRect);
+            SDL_DestroyTexture(TextTexture);
+        }
+    }
+
+    private:
+    TTF_Font* TextFont;
+    std::string content;
+    SDL_Surface* TextSurface;
+    SDL_Texture* TextTexture;
+    SDL_Rect TextRect;
+    SDL_Color color;
+    int DelayTime;
+    bool WhetherRender;
+    bool isSet;
+};
