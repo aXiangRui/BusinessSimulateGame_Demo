@@ -159,6 +159,22 @@ class ProducingProduct
         CreateNumber--;
     }
 
+    void ClearCreate()
+    {
+        for(int i = 0; i < 3; i++)
+        {
+            CreateMaterialType[i] = -1;
+        }
+    }
+
+    void ClearDecoration()
+    {
+        for(int i = 0; i < 3; i++)
+        {
+            DecorationID[i] = -1;
+        }
+    }
+
     void SetDEcorationCase(int i, int j)
     {
         DecorationID[i] = j;

@@ -70,6 +70,10 @@ class CreateRUIEvent
         lasticon.InitIcon(680, 540, 50, 50, 2, "nexticon");
         Icons.push_back(lasticon);
 
+        RUI_Icon reseticon;
+        reseticon.InitIcon(620, 540, 50, 50, 3, "reseticon");
+        Icons.push_back(reseticon);
+
         MenuButton Btn0((WindowWidth-320)/2 + 200,500,320,64,"完成",0);
         buttons.push_back(Btn0);
         PProduct.Init(materialManager,dessertManager);
@@ -431,6 +435,10 @@ class CreateRUIEvent
                                 }
                             }
                         }
+                        if(Icons[3].isClicked(mx, my))
+                        {
+                            CStage = Stage::size;
+                        }
                         break;
                     }
                     case Stage::create:
@@ -456,8 +464,13 @@ class CreateRUIEvent
                                         PProduct.SetDelayTime(CurrentTime);
                                     } 
                                 }
-                            }
+                            }  
                         }
+                        if(Icons[3].isClicked(mx, my))
+                            {
+                                PProduct.ClearCreate();
+                                CStage = Stage::base;
+                            }
                         break;
                     }
                     case Stage::decorate:
@@ -478,6 +491,11 @@ class CreateRUIEvent
                                         SDL_Log("制作完成");
                                     }
                                 }
+                            }
+                        if(Icons[3].isClicked(mx, my))
+                            {
+                                PProduct.ClearDecoration();
+                                CStage = Stage::create;
                             }
                         }
                         for(int i = 0; i < buttons.size(); i++)
