@@ -11,7 +11,7 @@ class Material
         ~Material() = default;
 
         // virtual void InitLevel(int materialid, int SweetNumber, int FullNumber, int TasteNumber, std::string name, std::string path){};
-        void InitMaterial(int id, int type, std::string name, std::string Path,int sweet, int full, int taste)
+        void InitMaterial(int id, int type, std::string name, std::string Path,int sweet, int full, int taste, bool unlock)
         {
             MaterialID = id;
             MaterialType = type;
@@ -20,6 +20,7 @@ class Material
             SweetLevel = sweet;
             FullLevel = full;
             TasteLevel = taste;
+            WhetherUnlock = unlock;
             MaterialTexture = ResourceManager::instance()->FindTexture(LoadPath.c_str());
             x = 150; y = -100;
             w = 256; h = 256;
@@ -60,6 +61,16 @@ class Material
         void SetName(std::string name)
         {
             Name = name;
+        }
+
+        bool GetWhetherUnlock()
+        {
+            return WhetherUnlock;
+        }
+
+        void SetWhetherUnlock(bool unlock)
+        {
+            WhetherUnlock = unlock;
         }
 
         std::string GetName()
@@ -128,6 +139,7 @@ class Material
         int x,y;
         int w,h;
         int MaterialType;
+        bool WhetherUnlock;
         std::string LoadPath;
         std::string Name;
         SDL_Texture* MaterialTexture;

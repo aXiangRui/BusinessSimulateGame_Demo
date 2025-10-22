@@ -29,6 +29,7 @@ class CreateRUIEvent
     std::vector<Dessert> BaseDessert;
     std::vector<Dessert> AllBaseDessert;
     std::vector<ChooseFrame> DecorationFrames;
+    std::vector<Material> AllDecorationMaterials;
     std::vector<Material> DecorationMaterials;
     std::vector<Plate> plates;
     ProducingProduct PProduct;
@@ -126,12 +127,19 @@ class CreateRUIEvent
 
     void ChooseDecoration()
     {
+        int j = 0;
         for(int i = 0; i < materialManager.GetDecorationSize(); i++)
         {
-            ChooseFrame AddFrames;
-            std::string name = materialManager.GetDecorationName(i);
-            AddFrames.InitChooseFrame(500,10 + i * 64 - (i / 8) * 64 * 8, i, name);
-            DecorationFrames.push_back(AddFrames);
+            if(materialManager.DecorationMaterial[i].GetWhetherUnlock())
+            {
+                ChooseFrame AddFrames;
+                std::string name = materialManager.GetDecorationName(i);
+                AddFrames.InitChooseFrame(500,10 + j * 64 - (j / 8) * 64 * 8, j, name);
+                DecorationFrames.push_back(AddFrames);
+                AllDecorationMaterials.push_back(materialManager.DecorationMaterial[i]);
+                DecorationID[j] = i;
+                j++;
+            }
             DecorationMaterials.push_back(materialManager.DecorationMaterial[i]);
         }
     }
@@ -227,7 +235,7 @@ class CreateRUIEvent
                     if(DecorationFrames[i].GetIsHovered())
                     {
                         DecorationFrames[i].onHoverRender(Renderer);
-                        DecorationMaterials[i].onRender(Renderer);
+                        DecorationMaterials[DecorationID[i]].onRender(Renderer);
                     }
                     else
                     {
@@ -247,7 +255,7 @@ class CreateRUIEvent
                     if(DecorationFrames[i].GetIsHovered())
                     {
                         DecorationFrames[i].onHoverRender(Renderer);
-                        DecorationMaterials[i].onRender(Renderer);
+                        DecorationMaterials[DecorationID[i]].onRender(Renderer);
                     }
                     else
                     {
@@ -554,4 +562,5 @@ class CreateRUIEvent
     bool WhetherBack;
     int ChoosePage;
     int BaseID[100];
+    int DecorationID[100];
 };

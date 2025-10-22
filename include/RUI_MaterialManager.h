@@ -41,10 +41,11 @@ class MaterialManager
                 int sweetlevel;
                 int fulllevel;
                 int tastelevel;
-                iss>>Kind>>MID>>type>>Name>>Path>>sweetlevel>>fulllevel>>tastelevel;
+                bool unlock;
+                iss>>Kind>>MID>>type>>Name>>Path>>sweetlevel>>fulllevel>>tastelevel>>unlock;
                 
                 Material a;
-                a.InitMaterial(MID,type,Name,Path,sweetlevel,fulllevel,tastelevel);
+                a.InitMaterial(MID,type,Name,Path,sweetlevel,fulllevel,tastelevel,unlock);
                 SDL_Log("读取到材料%s",Name.c_str());
                 if(Kind == 0)
                 {
@@ -56,6 +57,33 @@ class MaterialManager
                 }
                 
             }
+        }
+    }
+
+    void Save()
+    {
+        std::ofstream File("./save/Material.txt");
+        File << "以下数据依次为种类(1为装饰,0为基类),ID,食材种类,名字,储存地址,甜度,饱腹感,口感，是否解锁" << std::endl;
+        File << "#食材分类如下:" << std::endl;
+        File << "#---0---奶油类" << std::endl;
+        File << "#---1---草莓类" << std::endl;
+        File << "#---2---巧克力类" << std::endl;
+        File << "#---3---樱桃类" << std::endl;
+        File << "#---4---咖啡类" << std::endl;
+        File << "#---5---饼干类" << std::endl;
+        File << "#---6---果汁类" << std::endl;
+        for(int i = 0; i < DecorationMaterial.size(); i++)
+        {
+            File << 1 << " ";
+            File << DecorationMaterial[i].GetID() << " ";
+            File << DecorationMaterial[i].GetMaterialType() << " ";
+            File << DecorationMaterial[i].GetName() << " ";
+            File << DecorationMaterial[i].GetPath() << " ";
+            File << DecorationMaterial[i].GetSweetNumber() << " ";
+            File << DecorationMaterial[i].GetFullNumber() << " ";
+            File << DecorationMaterial[i].GetTasteNumber() << " ";
+            File << DecorationMaterial[i].GetWhetherUnlock() << " ";
+            File << std::endl;
         }
     }
 

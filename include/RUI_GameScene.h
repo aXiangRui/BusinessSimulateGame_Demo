@@ -15,10 +15,12 @@
 #include"RUI_MenuButton.h"
 #include"RUI_Clock.h"
 #include"RUI_ResourceManager.h"
+#include"RUI_MaterialManager.h"
 #include"RUI_GameEvent.h"
 #include"RUI_Cabinet.h"
 #include"RUI_ChatFrame.h"
 #include"RUI_TextManager.h"
+#include"RUI_CheckUpdate.h"
 
 extern RUI_SceneManager SceneManager;
 extern MusicPlayer BackgroundMusic;
@@ -32,6 +34,7 @@ class RUI_GameScene: public RUI_Scene
         void onEnter()
         {               
             customerManager.InitCustomerManager();   
+            materialManager.InitMaterialManager();
             TestEvent.Load(TotalMoney,TotalCustomers, TotalDessert, Cabinets, customerManager);
             TestEvent.onEnter();
             TestEvent.SetIsReadingPage(0);
@@ -136,18 +139,19 @@ class RUI_GameScene: public RUI_Scene
                     ChatDelayTime = 0;
                 }
             }
-            for(int i = 0; i < customerManager.GetCustomersSize(); i++)
-            {
-                if(customerManager.Customers[0].GetCustomerPreference() >= 50 && dessertManager.Desserts[3].GetWhetherUnlock() == 0)
-                {
-                    dessertManager.Desserts[3].SetWhetherUnlock(1);
-                    dessertManager.Save();
-                    chatFrame.setTitle(customerManager.GetCustomerName(0));
-                    chatFrame.setContent(textManager.CustomerText[1]);
-                    isChatFrameShowing = 1;
-                    //如果0号顾客好感度达到50且果冻未解锁就解锁果冻
-                }
-            } 
+            CheckEvent.update(customerManager, dessertManager, materialManager, chatFrame, textManager, isChatFrameShowing);
+            // for(int i = 0; i < customerManager.GetCustomersSize(); i++)
+            // {
+            //     if(customerManager.Customers[0].GetCustomerPreference() >= 50 && dessertManager.Desserts[3].GetWhetherUnlock() == 0)
+            //     {
+            //         dessertManager.Desserts[3].SetWhetherUnlock(1);
+            //         dessertManager.Save();
+            //         chatFrame.setTitle(customerManager.GetCustomerName(0));
+            //         chatFrame.setContent(textManager.CustomerText[1]);
+            //         isChatFrameShowing = 1;
+            //         //如果0号顾客好感度达到50且果冻未解锁就解锁果冻
+            //     }
+            // } 
         }
 
         void TimeChange()
@@ -595,6 +599,7 @@ class RUI_GameScene: public RUI_Scene
         CustomerManager customerManager;
         DessertManager dessertManager;
         TextManager textManager;
+        MaterialManager materialManager;
 
         MusicPlayer gamemusic;
         std::vector<MenuButton> Btns;
@@ -614,7 +619,7 @@ class RUI_GameScene: public RUI_Scene
         const int HourTime = 10000;
 
         int TotalMoney = 0;
-        int isChatFrameShowing = 0;
+        bool isChatFrameShowing = 0;
         int TotalDessert = 0;
         int ChatDelayTime = 0;
         bool WhetherReadingProduct;
@@ -628,6 +633,7 @@ class RUI_GameScene: public RUI_Scene
 
         GameEvent TestEvent;
         SummaryFrame summaryFrame;
+        CheckUpdate CheckEvent;
         private:
 
 };

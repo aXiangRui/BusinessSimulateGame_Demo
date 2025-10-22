@@ -1,4 +1,3 @@
-60
-4 林航 LinHang 582 70 4 1 0 
-3 陈青野 ChenQingye 572 0 4 2 2 
-1 唐堂 TangTang 574 450 0 0 1 
+89
+17 林航 LinHang 372 148 3 1 21 
+1 唐堂 TangTang 450 0 3 0 17 
