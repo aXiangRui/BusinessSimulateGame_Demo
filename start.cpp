@@ -83,6 +83,11 @@ int main(int argc, char* argv[])
         int DeltaTime = EndTime - StartTime;
         if(DeltaTime < 1000/FPS)
             Sleep(1000/FPS - DeltaTime);
+        else
+        {
+            // SDL_Log("当前帧率:%d",1000/DeltaTime);
+        }
+        
     }
 
     SDL_DestroyWindow(window);

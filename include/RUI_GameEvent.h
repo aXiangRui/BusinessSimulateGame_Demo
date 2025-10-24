@@ -10,6 +10,7 @@
 #include"RUI_BaseMaterial.h"
 #include"RUI_MaterialManager.h"
 #include"RUI_ChatFrame.h"
+#include"RUI_Cook.h"
 #include<vector>
 #include<string>
 #include<fstream>
@@ -30,6 +31,7 @@ class GameEvent
     DessertManager dessertManager;
     MaterialManager materialManager;
     ChatFrame Chat;
+    std::vector<Cook> Cooks;
 
     void AddCustomer(Customer cus)
     {
@@ -73,6 +75,9 @@ class GameEvent
         }
         Chat.init();
         isReadingPage = -1;
+        Cook a;
+        a.Init();
+        Cooks.push_back(a);
     }
 
     void quit()
@@ -82,6 +87,7 @@ class GameEvent
         dessertManager.quit();
         plates.clear();
         Btns.clear();
+        Cooks.clear();
     }
 
     void RemoveIdFromQueue(int id)
@@ -286,10 +292,18 @@ class GameEvent
                 }
             }
         }
+        for(int i = 0; i < Cooks.size(); i++)
+        {
+            Cooks[i].onUpdate(CurrentTime);
+        }
     }
 
     void onRender(SDL_Renderer* Renderer)
     {
+        for(int i = 0; i < Cooks.size(); i++)
+        {
+            Cooks[i].onRender(Renderer);
+        }
         for(int i = 0; i < Customers.size(); i++)
         {
             if(Customers[i].GetIsHoverd() == 1)
@@ -418,6 +432,7 @@ class GameEvent
                     Customers.back().SetCurrentStage(stage);
                     Customers.back().SetChooseNumber(choosenumber);
                     Customers.back().SetChooseID(chooseid);
+                    SDL_Log("当前选择食物数量及id%d,%d",Customers.back().GetChooseNumber(),Customers.back().GetChooseID());
                 }
                     
             }

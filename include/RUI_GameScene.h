@@ -199,6 +199,8 @@ class RUI_GameScene: public RUI_Scene
             if(!TextFont)
                 TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
             SDL_Color color = { 10, 10, 10, 255};
+            if(TotalMoney < 0)
+            color = {200, 40, 40, 255};
             std::string Title = "总金额" + std::to_string(TotalMoney);
             SDL_Surface* image = TTF_RenderUTF8_Blended(TextFont, Title.c_str(),color);
             SDL_Rect TextRect = {10,60,image->w,image->h};
@@ -211,6 +213,7 @@ class RUI_GameScene: public RUI_Scene
             SDL_Rect BackGroundRect = {0,0,800,600};
             SDL_RenderCopy(Renderer,Background,nullptr,&BackGroundRect);
             SDL_RenderCopy(Renderer,MoneyTexture,nullptr,&TextRect);
+            SDL_DestroyTexture(MoneyTexture);
 
             for(int i = 0; i < Chairs.size(); i++)
             {

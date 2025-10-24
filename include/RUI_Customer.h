@@ -311,7 +311,7 @@ class Customer
                 }
                 case CustomerStage::Eat:
                 {
-                    Eat(Chairs, currentTime, customer);
+                    Eat(Chairs, currentTime, customer, Cabtines);
                     break;
                 }
                 case CustomerStage::Leave:
@@ -412,6 +412,8 @@ class Customer
                 toward = 1;
                 if(CurrentTime - PayTime >= 1000 && isGoingPay == 1)
                 {
+                    if(payPrice >= 1000)
+                        SDL_Log("warnning!!!!价格超标，数据异常:%d",payPrice);
                     TotalMoney = TotalMoney + payPrice;
                     payCharm.SetPrice(payPrice);
                     payCharm.SetStartTime(CurrentTime);
@@ -423,7 +425,7 @@ class Customer
             }
         }
 
-        void Eat(std::vector<Chair>& Chairs, int CurrentTime, Customer& customer)
+        void Eat(std::vector<Chair>& Chairs, int CurrentTime, Customer& customer, std::vector<Cabinet>& Cabinets)
         {
             if(isEating == -1)
             {
@@ -484,12 +486,11 @@ class Customer
                         toward = 0;
                     }
                     
-                    if(CurrentTime - SitTime >= 10000 + rand()% 5000)
+                    if(CurrentTime - SitTime >= 18000 + rand()% 5000)
                     {    
                         Chairs[isEating].SetUsing(0);
-                        preference = preference + 5;
-                        customer.AddPreference();
-                        SDL_Log("%s好感度增加5",CustomerName.c_str());
+                        // preference = preference + 5;
+                        customer.AddPreference(Cabinets[chooseID].GetDessertID(),ChooseNumber);
                         CurrentStage = CustomerStage::Leave;
                     }
                 }
@@ -662,9 +663,23 @@ class Customer
             return WhetherAppear;
         }
 
-        void AddPreference()
+        void AddPreference(int DessertID,int chooseNumber)
         {
-            preference = preference + 5;
+            if(PreferDessertID == -1)
+            {
+                preference = preference + 6 * chooseNumber;
+            }
+            else if(DessertID == PreferDessertID)
+            {
+                preference = preference + 6 * chooseNumber;
+                // SDL_Log("01增加了%d",6*chooseNumber);
+            }
+            else
+            {
+                preference = preference + chooseNumber;
+                //  SDL_Log("02增加了%d",chooseNumber);
+            }
+            // preference = preference + 5;
             SDL_Log("当前喜好值%d",preference);
         }
 
@@ -701,6 +716,6 @@ class Customer
         bool hasJoined;
         bool isHovered;
         bool WhetherAppear;
-        int Level[10] = {5,20,50,100,150,200,250,300,350,400};
+        int Level[10] = {5,20,50,100,200,350,500,700,1000,1500};
         PayCharm payCharm;
 };
