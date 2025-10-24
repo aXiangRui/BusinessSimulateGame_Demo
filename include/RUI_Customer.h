@@ -306,7 +306,7 @@ class Customer
                 }
                 case CustomerStage::Buy:
                 {
-                    Pay(currentTime,TotalMoney);
+                    Pay(currentTime,TotalMoney,pManager,Cabtines);
                     break;
                 }
                 case CustomerStage::Eat:
@@ -387,7 +387,7 @@ class Customer
             }
         }
 
-        void Pay(int CurrentTime, int& TotalMoney)
+        void Pay(int CurrentTime, int& TotalMoney, ProductManager& pManager, std::vector<Cabinet>& Cabinets)
         {
             if(y >= 150 + Queue * 2)
             {
@@ -414,12 +414,19 @@ class Customer
                 {
                     if(payPrice >= 1000)
                         SDL_Log("warnning!!!!价格超标，数据异常:%d",payPrice);
+                    int dID = Cabinets[chooseID].GetDessertID();
+                    int price = pManager.GetProductPrice(dID);
+                    payPrice = price * ChooseNumber;
                     TotalMoney = TotalMoney + payPrice;
+
+                    SDL_Log("增加价钱%d,%d,%d",payPrice,price,ChooseNumber);
                     payCharm.SetPrice(payPrice);
                     payCharm.SetStartTime(CurrentTime);
                     payCharm.SetStopTime(CurrentTime);
                     // SDL_Log("已付款，当前总金额:%d",TotalMoney);
                     SitTime = CurrentTime;
+                    
+                    SDL_Log("此时%s数据%d,%d",CustomerName.c_str(),ChooseNumber,chooseID);
                     CurrentStage = CustomerStage::Eat;
                 }
             }

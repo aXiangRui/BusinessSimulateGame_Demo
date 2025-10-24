@@ -408,7 +408,7 @@ class GameEvent
                 std::string cPath;
                 int x,y,stage;
                 int chooseid,choosenumber;
-                iss >> cID >> cName >>cPath >> x >> y >> stage>> chooseid >> choosenumber;
+                iss >> cID >> cName >>cPath >> x >> y >> stage>> choosenumber >> chooseid;
                 Customer a;
                 for(int i = 0; i < customerManager.GetCustomersSize(); i++)
                 {
