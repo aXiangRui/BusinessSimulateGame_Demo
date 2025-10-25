@@ -296,7 +296,7 @@ class Customer
             {
                 case CustomerStage::Enter:
                 {
-                    EnterStore(currentTime);
+                    EnterStore(currentTime,Cabtines.size());
                     break;
                 }
                 case CustomerStage::Choose:
@@ -322,7 +322,7 @@ class Customer
             }
         }
 
-        void EnterStore(int currentTime)
+        void EnterStore(int currentTime, int CabinetSize)
         {
             if(x >= 450)
             {
@@ -344,7 +344,7 @@ class Customer
             }
             if(x < 200 && y < 450)
             {
-                SetChooseID(rand()%24);
+                SetChooseID(rand()%CabinetSize);
                 ChooseTime = currentTime;
                 CurrentStage = CustomerStage::Choose;
             }
@@ -675,6 +675,7 @@ class Customer
             if(PreferDessertID == -1)
             {
                 preference = preference + 6 * chooseNumber;
+
             }
             else if(DessertID == PreferDessertID)
             {
@@ -687,6 +688,8 @@ class Customer
                 //  SDL_Log("02增加了%d",chooseNumber);
             }
             // preference = preference + 5;
+            if(preference > 2000)
+                    preference = 2000;
             SDL_Log("当前喜好值%d",preference);
         }
 

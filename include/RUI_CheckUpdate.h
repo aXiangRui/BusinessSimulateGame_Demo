@@ -16,13 +16,10 @@ class CheckUpdate
         ~CheckUpdate() = default;
 
         void update(CustomerManager& customerManager, DessertManager& dessertManager, MaterialManager& materialManager, ChatFrame& chatFrame, TextManager& textManager, UnlockFrame& unlockFrame,bool& isShowing)
-        {
-            for(int i = 0; i < customerManager.GetCustomersSize(); i++)
-            {               
-                UnlockDessert(customerManager, 0, dessertManager, 3, chatFrame, textManager, unlockFrame,isShowing,1,50);               
-                UnlockCustomer(customerManager, 3, 10, chatFrame, textManager,unlockFrame, isShowing,2, 100);
-                UnlockMaterial(customerManager, 1, materialManager, 4, chatFrame, textManager,unlockFrame, isShowing,1,100);
-            }
+        {            
+            UnlockDessert(customerManager, 0, dessertManager, 3, chatFrame, textManager, unlockFrame,isShowing,1,50);               
+            UnlockCustomer(customerManager, 3, 10, chatFrame, textManager,unlockFrame, isShowing,2, 100);
+            UnlockMaterial(customerManager, 1, materialManager, 4, chatFrame, textManager,unlockFrame, isShowing,1,100);
         }
         void UnlockDessert(CustomerManager& customerManager,int CustomerID, DessertManager& dessertManager,int DessertID,ChatFrame& chatFrame, TextManager& textManager, UnlockFrame& unlockFrame,bool& isShowing,int TextID, int UnlockPreference)
         {

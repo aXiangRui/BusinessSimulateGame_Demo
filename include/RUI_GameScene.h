@@ -102,6 +102,10 @@ class RUI_GameScene: public RUI_Scene
             lasticon.InitIcon(75,250,50,50,5,"nexticon");
             Icons.push_back(lasticon);
 
+            RUI_Icon AddCabinetIcon;
+            AddCabinetIcon.InitIcon(680,410,50,50,6,"sun");
+            Icons.push_back(AddCabinetIcon);
+
             LastTime = SDL_GetTicks();
             TestClock.SetStartTime(TestEvent.ReturnClockTime());
 
@@ -237,16 +241,16 @@ class RUI_GameScene: public RUI_Scene
 
             for(int i = 0; i < Icons.size(); i++)
             {
-                if(i <= 3)
+                if(i != 4 && i != 5)
                     Icons[i].onRender(Renderer);
-                    else
+                else
+                {
+                    if(TestEvent.GetIsReadingPage())
                     {
-                        if(TestEvent.GetIsReadingPage())
-                        {
-                            if(i == 4){Icons[i].onRender(Renderer);}
-                            if(i == 5){Icons[i].onRender(Renderer,1);} 
-                        }
-                    }        
+                        if(i == 4){Icons[i].onRender(Renderer);}
+                        if(i == 5){Icons[i].onRender(Renderer,1);} 
+                    }
+                }        
             }
             if(cabinetFrame.GetCabinetID() != -1)
             {
@@ -445,6 +449,16 @@ class RUI_GameScene: public RUI_Scene
                                         ReadingPage = ReadingPage - 1;
                                         if(ReadingPage < 0)
                                             ReadingPage = 0;
+                                    }
+                                }
+                                case 6:
+                                {
+                                    if(Cabinets.size() < 24)
+                                    {
+                                        Cabinet a;
+                                        a.InitCabinet(Cabinets.size(),0);
+                                        Cabinets.push_back(a);
+                                        TotalMoney = TotalMoney - 1000 * Cabinets.size() -1000;
                                     }
                                 }
                                 default:

@@ -446,8 +446,10 @@ class GameEvent
         SDL_Log("读取到总人数为%d",TotalCustomers);
         file01.close();
 
+        int number;
         std::ifstream file02("./save/Cabinet.txt");
-        for(int i = 0; i < 24; i++)
+        file02 >> number;
+        for(int i = 0; i < number; i++)
         {
             int a,b;
             file02 >> a >> b;
@@ -487,6 +489,7 @@ class GameEvent
         file01.close();
 
         std::ofstream file02("./save/Cabinet.txt");
+        file02 << Cabinets.size() << std::endl;
         for(int i = 0; i < Cabinets.size(); i++)
         {
             file02 << i <<" "<< Cabinets[i].GetDessertID();
