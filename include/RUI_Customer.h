@@ -419,7 +419,7 @@ class Customer
                     payPrice = price * ChooseNumber;
                     TotalMoney = TotalMoney + payPrice;
 
-                    SDL_Log("增加价钱%d,%d,%d",payPrice,price,ChooseNumber);
+                    // SDL_Log("增加价钱%d,%d,%d",payPrice,price,ChooseNumber);
                     payCharm.SetPrice(payPrice);
                     payCharm.SetStartTime(CurrentTime);
                     payCharm.SetStopTime(CurrentTime);

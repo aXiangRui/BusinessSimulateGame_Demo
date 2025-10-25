@@ -1,15 +1,18 @@
-537
-13 陈攻 default 450 100 3 1 17 
-21 莫鸣 default 530 0 3 3 18 
-23 陈沙 default 450 0 3 1 11 
-3 林航 LinHang 530 100 3 1 5 
-24 灵山 default 450 200 3 1 22 
-18 陈猎 default 530 200 3 3 16 
-10 林泉 default 450 300 3 2 17 
-2 陈青野 ChenQingye 530 300 3 2 7 
-17 程慎 default 650 0 3 2 1 
-11 郑语嫣 ZhengYuyan 730 0 3 3 2 
-7 郑小涛 default 650 100 3 3 19 
-6 林波 default 730 148 3 3 4 
-27 姚嘉人 default 352 344 1 5 21 
-24 唐堂 TangTang 202 448 1 1 15 
+547
+2 陈青野 ChenQingye 582 330 4 4 16 
+25 祁遇 default 582 200 4 2 22 
+6 林波 default 346 448 1 1 15 
+12 郑一 default 450 300 3 1 17 
+100 陈沙 default 616 450 0 1 32765 
+7 郑小涛 default 582 228 4 2 14 
+24 灵山 default 582 134 4 3 19 
+19 路知春 default 52 396 1 3 0 
+5 祁是 default 582 128 4 1 21 
+18 陈猎 default 582 42 4 1 17 
+93 秋芒 QiuMang 448 476 0 2 32765 
+95 陈攻 default 448 450 0 3 32765 
+96 林瑯 default 470 450 0 1 32765 
+90 唐堂 TangTang 484 450 0 3 32765 
+97 姚嘉人 default 616 450 0 4 32765 
+91 秋天 QiuTian 616 450 0 2 32765 
+92 林航 LinHang 616 450 0 4 32765 
