@@ -68,7 +68,8 @@ class Customer
 
             NameFont = TTF_OpenFont("./resources/font/namidiansong.ttf",16);
             color = {10,10,10,255};
-            NameSurface = TTF_RenderUTF8_Blended(NameFont, CustomerName.c_str(), color);
+            std::string totalname = CustomerName + " " + std::to_string(preference);
+            NameSurface = TTF_RenderUTF8_Blended(NameFont, totalname.c_str(), color);
             if(!NameSurface)
                 SDL_Log("%s",CustomerName.c_str());
             NameW = NameSurface->w; NameH = NameSurface->h;
@@ -345,13 +346,16 @@ class Customer
             if(x < 200 && y < 450)
             {
                 SetChooseID(rand()%CabinetSize);
-                ChooseTime = currentTime;
                 CurrentStage = CustomerStage::Choose;
             }
         }
 
         void ChooseDessert(std::vector<Cabinet>&Cabinets, int currentTime, ProductManager pManager)
         {
+            if( ChooseTime == 0)
+            {
+                ChooseTime = currentTime;
+            }
             if(x < Cabinets[chooseID].GetX() + 32)
             {
                 toward = 1;
@@ -383,6 +387,7 @@ class Customer
                     SDL_Log("价格为%d",price);
                     payPrice = price * ChooseNumber;
                     CurrentStage = CustomerStage::Buy;
+                    ChooseTime = 0;
                 }
             }
         }
@@ -408,7 +413,12 @@ class Customer
                     toward = 1;
             }
             if(x > 350 && y < 150)
-            {
+            {       
+                if( PayTime == 0)
+                {
+                    PayTime = CurrentTime;
+                    SDL_Log("%s此时的时间%d",CustomerName.c_str(),PayTime);
+                }
                 toward = 1;
                 if(CurrentTime - PayTime >= 1000 && isGoingPay == 1)
                 {
@@ -424,16 +434,20 @@ class Customer
                     payCharm.SetStartTime(CurrentTime);
                     payCharm.SetStopTime(CurrentTime);
                     // SDL_Log("已付款，当前总金额:%d",TotalMoney);
-                    SitTime = CurrentTime;
                     
                     SDL_Log("此时%s数据%d,%d",CustomerName.c_str(),ChooseNumber,chooseID);
                     CurrentStage = CustomerStage::Eat;
+                    PayTime = 0;
                 }
             }
         }
 
         void Eat(std::vector<Chair>& Chairs, int CurrentTime, Customer& customer, std::vector<Cabinet>& Cabinets)
         {
+            if(SitTime == 0)
+            {
+                SitTime = CurrentTime;
+            }
             if(isEating == -1)
             {
                 for(int i = 0; i < Chairs.size(); i++)
@@ -499,6 +513,7 @@ class Customer
                         // preference = preference + 5;
                         customer.AddPreference(Cabinets[chooseID].GetDessertID(),ChooseNumber);
                         CurrentStage = CustomerStage::Leave;
+                        SitTime = 0;
                     }
                 }
             }

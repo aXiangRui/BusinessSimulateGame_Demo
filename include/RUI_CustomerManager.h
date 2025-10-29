@@ -43,6 +43,7 @@ class CustomerManager
                 // SDL_Log("%d",a.GetHasJoined());
                 Customers.push_back(a);
             }
+            File.close();
         }
         hasloaded = 1;
     }
@@ -74,6 +75,7 @@ class CustomerManager
             SDL_Log("%d",a.GetHasJoined());
             Customers.push_back(a);
         }
+        File.close();
     }
 
     void Save()
@@ -90,6 +92,24 @@ class CustomerManager
             file << Customers[i].GetCustomerPreference() << " ";
             file << std::endl;
         }
+        file.close();
+    }
+
+    void Reset()
+    {
+        std::ofstream file("./save/Customers.txt");
+        file << "#以下数据依次为ID，喜欢的甜点ID,顾客名字,顾客地址,是否已解锁(1表示已解锁,0表示未解锁),好感度"<<std::endl;
+        for(int i = 0; i < Customers.size(); i++)
+        {
+            file << Customers[i].GetCustomerID() << " ";
+            file << Customers[i].GetPreferDessertID() << " ";
+            file << Customers[i].GetCustomerName() << " ";
+            file << Customers[i].GetCustomerPath() << " ";
+            file << Customers[i].GetWhetherAppear() << " ";
+            file << 0 << " ";
+            file << std::endl;
+        }
+        file.close();
     }
 
     int GetCustomerID(int i)
