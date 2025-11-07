@@ -274,11 +274,11 @@ class Customer
                 SDL_RenderCopyEx(Renderer,NormalTexture,nullptr,&Rect,0,0,SDL_FLIP_HORIZONTAL);
             }
 
-            NameTexture = SDL_CreateTextureFromSurface(Renderer, NameSurface);
+            // create a local texture for the name surface and destroy it immediately
+            SDL_Texture* nameTex = SDL_CreateTextureFromSurface(Renderer, NameSurface);
             NameRect = {x+15,y,NameW,NameH};
-            SDL_RenderCopy(Renderer, NameTexture, nullptr, &NameRect);
-            // SDL_FreeSurface(NameSurface);
-            SDL_DestroyTexture(NameTexture);
+            SDL_RenderCopy(Renderer, nameTex, nullptr, &NameRect);
+            SDL_DestroyTexture(nameTex);
 
             if(payCharm.GetMoney() != 0)
                 payCharm.onRender(Renderer);
@@ -510,14 +510,39 @@ class Customer
                     if(CurrentTime - SitTime >= 18000 + rand()% 5000)
                     {    
                         Chairs[isEating].SetUsing(0);
-                        // preference = preference + 5;
+                        // 更新 manager 中的模板顾客的喜好值
                         customer.AddPreference(Cabinets[chooseID].GetDessertID(),ChooseNumber);
+                        // 将最新的喜好值同步回当前场景中的顾客实例
+                        this->preference = customer.GetCustomerPreference();
+                        // 更新名字的 Surface（用于 onRenderWithName）
+                        RefreshNameSurface();
                         CurrentStage = CustomerStage::Leave;
                         SitTime = 0;
                     }
                 }
             }
             payCharm.SetStopTime(CurrentTime);
+        }
+
+        // 刷新名字的 surface（在 preference 或名字变更后调用）
+        void RefreshNameSurface()
+        {
+            if(!NameFont)
+                NameFont = TTF_OpenFont("./resources/font/namidiansong.ttf",16);
+            if(NameSurface)
+            {
+                SDL_FreeSurface(NameSurface);
+                NameSurface = nullptr;
+            }
+            std::string totalname = CustomerName + " " + std::to_string(preference);
+            NameSurface = TTF_RenderUTF8_Blended(NameFont, totalname.c_str(), color);
+            if(!NameSurface)
+                SDL_Log("RefreshNameSurface: failed for %s", CustomerName.c_str());
+            else
+            {
+                NameW = NameSurface->w;
+                NameH = NameSurface->h;
+            }
         }
 
         void SetChooseID(int i)
@@ -706,6 +731,15 @@ class Customer
             if(preference > 2000)
                     preference = 2000;
             SDL_Log("当前喜好值%d",preference);
+        }
+
+        void Clean()
+        {
+            // NameTexture is created/destroyed each render call now, so don't destroy it here.
+            if(NameSurface)
+                SDL_FreeSurface(NameSurface);
+            // NormalTexture is owned by ResourceManager (shared). Do NOT destroy it here.
+            TTF_CloseFont(NameFont);
         }
 
     private:

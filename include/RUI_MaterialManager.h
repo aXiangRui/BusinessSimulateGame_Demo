@@ -68,7 +68,7 @@ class MaterialManager
         File << "#---0---奶油类" << std::endl;
         File << "#---1---草莓类" << std::endl;
         File << "#---2---巧克力类" << std::endl;
-        File << "#---3---樱桃类" << std::endl;
+        File << "#---3---水果类" << std::endl;
         File << "#---4---咖啡类" << std::endl;
         File << "#---5---饼干类" << std::endl;
         File << "#---6---果汁类" << std::endl;

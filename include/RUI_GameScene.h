@@ -43,6 +43,7 @@ class RUI_GameScene: public RUI_Scene
             BackgroundMusic.quit();
             reg.InitRegister();
             unlockFrame.init();
+            Icons.Init();
             if(!Mix_PlayingMusic())
             {
                 if(rand() % 2 == 1) 
@@ -77,34 +78,6 @@ class RUI_GameScene: public RUI_Scene
                 desk.initDesk(i);
                 Desks.push_back(desk);
             }
-
-            RUI_Icon testicon;
-            testicon.InitIcon(10,10,50,50,0,"sun");
-            Icons.push_back(testicon);
-
-            RUI_Icon CookingIcon;
-            CookingIcon.InitIcon(740,470,50,50,1,"cooking");
-            Icons.push_back(CookingIcon);
-
-            RUI_Icon exiticon;
-            exiticon.InitIcon(740,530,50,50,2,"exiticon");
-            Icons.push_back(exiticon);
-
-            RUI_Icon readicon;
-            readicon.InitIcon(740,410,50,50,3,"readicon");
-            Icons.push_back(readicon);
-
-            RUI_Icon nexticon;
-            nexticon.InitIcon(675,250,50,50,4,"nexticon");
-            Icons.push_back(nexticon);
-
-            RUI_Icon lasticon;
-            lasticon.InitIcon(75,250,50,50,5,"nexticon");
-            Icons.push_back(lasticon);
-
-            RUI_Icon AddCabinetIcon;
-            AddCabinetIcon.InitIcon(680,410,50,50,6,"sun");
-            Icons.push_back(AddCabinetIcon);
 
             LastTime = SDL_GetTicks();
             TestClock.SetStartTime(TestEvent.ReturnClockTime());
@@ -231,27 +204,30 @@ class RUI_GameScene: public RUI_Scene
 
             reg.onRender(Renderer);
 
-            TestClock.RenderHour(Renderer);
             TestEvent.onRender(Renderer);
+            TestClock.RenderHour(Renderer);
  
             for(int i = 0; i < Cabinets.size(); i++)
             {
                 Cabinets[i].onRender(Renderer);
             } 
 
-            for(int i = 0; i < Icons.size(); i++)
-            {
-                if(i != 4 && i != 5)
-                    Icons[i].onRender(Renderer);
-                else
-                {
-                    if(TestEvent.GetIsReadingPage())
-                    {
-                        if(i == 4){Icons[i].onRender(Renderer);}
-                        if(i == 5){Icons[i].onRender(Renderer,1);} 
-                    }
-                }        
-            }
+            // for(int i = 0; i < Icons.size(); i++)
+            // {
+            //     if(i != 4 && i != 5)
+            //         Icons[i].onRender(Renderer);
+            //     else
+            //     {
+            //         if(TestEvent.GetIsReadingPage())
+            //         {
+            //             if(i == 4){Icons[i].onRender(Renderer);}
+            //             if(i == 5){Icons[i].onRender(Renderer,1);} 
+            //         }
+            //     }        
+            // }
+            bool a = TestEvent.GetIsReadingPage();
+            Icons.onRender(Renderer, a);
+
             if(cabinetFrame.GetCabinetID() != -1)
             {
                 //SDL_Log("当前面包柜id%d",cabinetFrame.GetCabinetID());
@@ -273,8 +249,8 @@ class RUI_GameScene: public RUI_Scene
             if(CheckSetting == 1)
             {
                 TestEvent.SettingProductRender(Renderer,ReadingPage);
-                Icons[4].onRender(Renderer);
-                Icons[5].onRender(Renderer,1);
+                Icons.Icons[4].onRender(Renderer);
+                Icons.Icons[5].onRender(Renderer,1);
             }
 
             if(isSummaryShowing)
@@ -384,9 +360,9 @@ class RUI_GameScene: public RUI_Scene
                         }
                         
                     }
-                    for(int i = 0; i < Icons.size(); i++)
+                    for(int i = 0; i < Icons.Icons.size(); i++)
                     {
-                        if(Icons[i].isClicked(mx,my))
+                        if(Icons.Icons[i].isClicked(mx,my))
                         {
                             switch(i)
                             {
@@ -456,7 +432,7 @@ class RUI_GameScene: public RUI_Scene
                                     if(Cabinets.size() < 24)
                                     {
                                         Cabinet a;
-                                        a.InitCabinet(Cabinets.size(),0);
+                                        a.InitCabinet(Cabinets.size(),0,0);
                                         Cabinets.push_back(a);
                                         TotalMoney = TotalMoney - 1000 * Cabinets.size() -1000;
                                     }
@@ -525,11 +501,11 @@ class RUI_GameScene: public RUI_Scene
                             }
                         }
                     }
-                    for(int i = 0; i < Icons.size(); i++)
+                    for(int i = 0; i < Icons.Icons.size(); i++)
                     {
-                        if(Icons[i].isHovered(mx,my))
+                        if(Icons.Icons[i].isHovered(mx,my))
                         {
-                            if(i <= 3)
+                            if(i <= 3 || i >= 6)
                             {
                                 SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
                                 j = 1;
@@ -587,7 +563,7 @@ class RUI_GameScene: public RUI_Scene
             Chairs.clear();
             Desks.clear();
             Cabinets.clear();
-            Icons.clear();
+            Icons.Quit();
             TestEvent.quit();
             dessertManager.Save();
             dessertManager.quit();
@@ -618,7 +594,7 @@ class RUI_GameScene: public RUI_Scene
         CabinetFrame cabinetFrame;
         // std::queue<ChatFrame> ChatFrames;
         ChatFrame chatFrame; 
-        std::vector<RUI_Icon> Icons;
+        GameIcon Icons;
         Register reg;
 
         Uint32 CurrentTime;

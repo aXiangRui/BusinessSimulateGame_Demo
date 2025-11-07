@@ -12,12 +12,13 @@ class Cabinet
     Cabinet() = default;
     ~Cabinet() = default;
 
-    void InitCabinet(int id,int did)
+    void InitCabinet(int id,int did,int number)
     {
         CabinetID = id;
         x = (CabinetID / 12) * 200 + 100 * (CabinetID % 2) + 20;
         y = (CabinetID / 2 % 6) * 40 + 200; 
         DessertID = did;
+        dessertNumber = number;
         // DessertID = rand() % 4;
     }
 
@@ -39,6 +40,16 @@ class Cabinet
     void SetDessertID(int id)
     {
         DessertID = id;
+    }
+
+    int GetDessertNumber()
+    {
+        return dessertNumber;
+    }
+
+    void SetDessertNumber(int number)
+    {
+        dessertNumber = number;
     }
 
     bool isClicked(int mx, int my)
@@ -66,6 +77,7 @@ class Cabinet
     int DessertID;
     int x,y;
     SDL_Texture* CabinetTexture = nullptr;
+    int dessertNumber;
 };
 
 class CabinetFrame

@@ -66,6 +66,7 @@ class Clock
         SDL_Texture* Texture = SDL_CreateTextureFromSurface(Renderer,image);
         SDL_FreeSurface(image);
         SDL_RenderCopy(Renderer, Texture, nullptr, &Rect);
+        SDL_DestroyTexture(Texture);
     }
 
 };

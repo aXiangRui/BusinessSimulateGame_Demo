@@ -3,15 +3,30 @@
 #---0---奶油类
 #---1---草莓类
 #---2---巧克力类
-#---3---樱桃类
+#---3---水果类
 #---4---咖啡类
 #---5---饼干类
 #---6---果汁类
 1 0 0 奶油 cream 10 5 5 1 
-1 1 1 小草莓 strawberry 2 2 5 1 
+1 1 1 大草莓 strawberry 2 2 5 1 
 1 2 2 巧克力棒 chocolatestick 10 10 10 1 
 1 3 3 樱桃 cherry 2 2 5 1 
-1 4 0 裱花奶油 cream02 10 5 5 0 
-1 5 4 咖啡液 coffee 0 5 20 0 
-1 6 5 饼干 cookie 10 10 10 0 
-1 7 6 甜酒 wine 2 5 25 0 
+1 4 0 裱花奶油 cream02 10 5 5 1 
+1 5 4 咖啡液 coffee 0 5 20 1
+1 6 5 饼干 cookie 10 10 10 1
+1 7 6 甜酒 wine 2 5 25 1
+1 8 1 小草莓 defaultmaterial 2 2 5 1
+1 9 2 十字巧克力 defaultmaterial 15 10 15 1
+1 10 2 巧克力银球 defaultmaterial 15 15 20 1
+1 11 2 巧克力金球 defaultmaterial 20 25 20 1
+1 12 2 巧克力酱 defaultmaterial 10 10 10 1
+1 13 2 巧克力牌 defaultmaterial 15 10 15 1
+1 14 1 草莓酱 defaultmaterial 5 5 5 1
+1 15 1 草莓冻干 defaultmaterial 10 5 10 1
+1 16 3 糖渍樱桃 defaultmaterial 10 5 5 1
+1 17 4 可可粉 defaultmaterial 0 10 10 1
+1 18 5 饼干碎 defaultmaterial 10 15 10 1
+1 19 6 苹果汁 defaultmaterial 5 10 10 1
+1 20 6 葡萄汁 defaultmaterial 5 15 5 1
+1 21 3 哈密瓜 defaultmaterial 10 10 15 1
+1 22 3 蓝莓 defaultmaterial 5 10 15 1

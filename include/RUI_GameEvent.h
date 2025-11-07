@@ -52,6 +52,7 @@ class GameEvent
             if(Customers[i].GetCustomerID() == id)
             {
                 SwapCustomer(Customers[i], Customers[Customers.size()-1]);
+                Customers[Customers.size()-1].Clean();
                 Customers.pop_back();
                 SDL_Log("删除顾客: removed id=%d", id);
                 // 从队列中移除该 id，防止留下空洞
@@ -451,10 +452,10 @@ class GameEvent
         file02 >> number;
         for(int i = 0; i < number; i++)
         {
-            int a,b;
-            file02 >> a >> b;
+            int a,b,num;
+            file02 >> a >> b >> num;
             Cabinet c;
-            c.InitCabinet(a,b);
+            c.InitCabinet(a,b,num);
             Cabinets.push_back(c);
         }
         file02.close();
@@ -493,6 +494,7 @@ class GameEvent
         for(int i = 0; i < Cabinets.size(); i++)
         {
             file02 << i <<" "<< Cabinets[i].GetDessertID();
+            file02 << " " << Cabinets[i].GetDessertNumber();
             file02 << std::endl;
         }
         file02.close();

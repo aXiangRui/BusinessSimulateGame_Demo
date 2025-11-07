@@ -129,6 +129,13 @@ class Material
             newRect.y = newRect.y - i * 20;
             SDL_RenderCopy(Renderer, MaterialTexture, nullptr, &newRect);
         };
+
+        void Upgrade()
+        {
+            SweetLevel = SweetLevel/10 + 1 + SweetLevel;
+            FullLevel = FullLevel/10 + 1 + FullLevel;
+            TasteLevel = TasteLevel/10 + 1 + SweetLevel;
+        }
         
     private:
         int SweetLevel;
@@ -145,4 +152,5 @@ class Material
         SDL_Texture* MaterialTexture;
         SDL_Rect Rect;
         int LastTime;
+        int Level;
 };
