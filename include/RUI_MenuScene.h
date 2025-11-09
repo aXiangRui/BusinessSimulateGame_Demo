@@ -50,7 +50,7 @@ class RUI_MenuScene: public RUI_Scene
         {
             //SDL_Log("渲染菜单中");
 
-            SDL_SetRenderDrawColor(Renderer,105,100,235,255);
+            SDL_SetRenderDrawColor(Renderer,230,200,200,255);
             SDL_RenderClear(Renderer);
             for(int i = 0; i < Btns.size(); i++)
             {

@@ -79,6 +79,7 @@ class GameEvent
         Cook a;
         a.Init();
         Cooks.push_back(a);
+        customerFrame.Init();
     }
 
     void quit()
@@ -114,6 +115,24 @@ class GameEvent
         {
             case SDL_MOUSEBUTTONDOWN:
             {
+                if(whetherRenderCustomerFrame == 1)
+                {
+                    whetherRenderCustomerFrame = 0;
+                    RenderTime = 0;
+                }
+                int mx = event.button.x; int my = event.button.y;
+                for(int i = 0; i < Customers.size(); i++)
+                {
+                    if( mx >= Customers[i].getX() && mx <= Customers[i].getX() + 64 && whetherRenderCustomerFrame == 0)
+                    {
+                        if( my >= Customers[i].getY() && my <= Customers[i].getY() + 64)
+                        {
+                            std::string dessertAddress = dessertManager.GetDessertPath(Customers[i].GetPreferDessertID());
+                            customerFrame.SetCustomer(Customers[i].GetCustomerName(), dessertAddress);
+                            whetherRenderCustomerFrame = 1;
+                        }
+                    }
+                }
                 break;
             }
             case SDL_MOUSEMOTION:
@@ -297,6 +316,15 @@ class GameEvent
         {
             Cooks[i].onUpdate(CurrentTime);
         }
+        if( whetherRenderCustomerFrame == 1 && RenderTime == 0)
+        {
+            RenderTime = CurrentTime;
+        }
+        if( CurrentTime - RenderTime > 5000 && RenderTime != 0)
+        {
+            whetherRenderCustomerFrame = 0;
+            RenderTime = 0;
+        }
     }
 
     void onRender(SDL_Renderer* Renderer)
@@ -346,6 +374,11 @@ class GameEvent
         Chat.RenderTitle(Renderer);
     }
 
+    void onCustomerRender(SDL_Renderer* Renderer)
+    {
+        customerFrame.onRender(Renderer);
+    }
+
     void SettingProductRender(SDL_Renderer* Renderer, int j)
     {
         std::string title = "设置产品中,当前第" + std::to_string(j+1) + "页";
@@ -387,6 +420,11 @@ class GameEvent
     void SetIsReadingPage(int i)
     {
         isReadingPage = i;
+    }
+
+    bool GetWhetherRenderCustomerFrame()
+    {
+        return whetherRenderCustomerFrame;
     }
 
     void Load(int& TotalMoney, int& TotalCustomers, int& TotalDessert,std::vector<Cabinet>& Cabinets,CustomerManager& customerManager)
@@ -505,6 +543,9 @@ class GameEvent
         Clock timeClock;
         Uint32 CurrentTime;
         Uint32 LastTime;
+        CustomerFrame customerFrame;
         int isReadingPage;
         int DailyTotalPerson;
+        bool whetherRenderCustomerFrame = 0;
+        int RenderTime = 0;
 };

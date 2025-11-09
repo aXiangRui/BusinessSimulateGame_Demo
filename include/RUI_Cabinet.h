@@ -273,3 +273,55 @@ class PayCharm
     SDL_Texture* PriceTexture = nullptr;
     SDL_Color color;
 };
+
+class CustomerFrame
+{
+    public:
+        CustomerFrame() = default;
+        ~CustomerFrame() = default;
+
+        void Init()
+        {
+            TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
+            backgroundTexture = ResourceManager::instance()->FindTexture("saving");
+            backgroundRect = { 100, 0, 600, 600};
+            dessertRect = { 200, 200, 200, 200};
+        }
+
+        void SetCustomer(std::string customerName, std::string dessertAddress)
+        {
+            dessertTexture = ResourceManager::instance()->FindTexture(dessertAddress.c_str());
+            CustomerName = customerName;
+            DescribeText = "喜欢的甜品:";
+            customerNameSurface = TTF_RenderUTF8_Blended( TextFont, customerName.c_str(), TextColor);
+            describeTextSurface = TTF_RenderUTF8_Blended( TextFont, DescribeText.c_str(), TextColor);
+            customerNameRect = { 150, 100, customerNameSurface->w, customerNameSurface->h};
+            describeRect = { 150, 200, describeTextSurface->w, describeTextSurface->h};
+        }
+
+        void onRender(SDL_Renderer* Renderer)
+        {
+            customerNameTexture = SDL_CreateTextureFromSurface( Renderer, customerNameSurface);
+            describeTexture = SDL_CreateTextureFromSurface( Renderer, describeTextSurface );
+            SDL_RenderCopy( Renderer, backgroundTexture, nullptr, &backgroundRect );
+            SDL_RenderCopy( Renderer, customerNameTexture, nullptr,&customerNameRect);
+            SDL_RenderCopy( Renderer, describeTexture, nullptr, &describeRect);
+            SDL_RenderCopy( Renderer, dessertTexture, nullptr, &dessertRect);
+        }
+    
+    private:
+        SDL_Texture* backgroundTexture;
+        SDL_Texture* dessertTexture;
+        SDL_Texture* describeTexture;
+        SDL_Texture* customerNameTexture;
+        SDL_Rect backgroundRect;
+        SDL_Rect customerNameRect;
+        SDL_Rect describeRect;
+        SDL_Rect dessertRect;
+        TTF_Font* TextFont;
+        std::string CustomerName;
+        std::string DescribeText;
+        SDL_Surface* customerNameSurface;
+        SDL_Surface* describeTextSurface;
+        SDL_Color TextColor = { 10, 10, 10, 255};
+};

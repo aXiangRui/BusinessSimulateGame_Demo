@@ -173,5 +173,6 @@ class Dessert
     bool isClicked;
     bool WhetherBase;
     bool WhetherUnlock;
+    int level;
     SDL_Rect Rect;
 };

@@ -175,7 +175,7 @@ class RUI_GameScene: public RUI_Scene
 
             if(!TextFont)
                 TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
-            SDL_Color color = { 10, 10, 10, 255};
+            
             if(TotalMoney < 0)
             color = {200, 40, 40, 255};
             std::string Title = "总金额" + std::to_string(TotalMoney);
@@ -212,19 +212,6 @@ class RUI_GameScene: public RUI_Scene
                 Cabinets[i].onRender(Renderer);
             } 
 
-            // for(int i = 0; i < Icons.size(); i++)
-            // {
-            //     if(i != 4 && i != 5)
-            //         Icons[i].onRender(Renderer);
-            //     else
-            //     {
-            //         if(TestEvent.GetIsReadingPage())
-            //         {
-            //             if(i == 4){Icons[i].onRender(Renderer);}
-            //             if(i == 5){Icons[i].onRender(Renderer,1);} 
-            //         }
-            //     }        
-            // }
             bool a = TestEvent.GetIsReadingPage();
             Icons.onRender(Renderer, a);
 
@@ -265,6 +252,10 @@ class RUI_GameScene: public RUI_Scene
                 chatFrame.RenderFrame(Renderer);
                 chatFrame.RenderTitle(Renderer);
                 chatFrame.RenderContent(Renderer);
+            }
+            if(TestEvent.GetWhetherRenderCustomerFrame())
+            {
+                TestEvent.onCustomerRender(Renderer);
             }
             // SDL_Rect BackGroundWallRect = {0,6,800,600};
             // SDL_RenderCopy(Renderer,BackgroundWall,nullptr,&BackGroundWallRect);
@@ -578,7 +569,7 @@ class RUI_GameScene: public RUI_Scene
             }
             return false;
         }
-                SDL_Texture* Background;
+        SDL_Texture* Background;
         SDL_Texture* BackgroundWall;
         TTF_Font* TextFont;
         CustomerManager customerManager;
@@ -592,10 +583,10 @@ class RUI_GameScene: public RUI_Scene
         std::vector<Desk> Desks;
         std::vector<Cabinet> Cabinets;
         CabinetFrame cabinetFrame;
-        // std::queue<ChatFrame> ChatFrames;
         ChatFrame chatFrame; 
         GameIcon Icons;
         Register reg;
+        SDL_Color color = { 10, 10, 10, 255};
 
         Uint32 CurrentTime;
         Uint32 LastTime;

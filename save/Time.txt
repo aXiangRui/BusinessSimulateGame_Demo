@@ -1,5 +1,17 @@
-803
-31 陈沙 default 670 352 4 2 1 
-38 莫鸣 default 406 502 0 1 0 
-30 路知春 default 624 352 4 2 3 
-28 姚嘉人 default 590 270 4 2 3 
+876
+0 唐堂 TangTang 580 148 3 1 23 
+21 姚嘉人 default 650 96 3 1 12 
+17 郑小涛 default 530 300 3 2 15 
+14 祁遇 default 450 300 3 1 16 
+11 祁妙 default 530 200 3 1 19 
+8 林瑯 default 450 200 3 2 7 
+9 程慎 default 530 100 3 3 23 
+25 南爵 default 450 100 3 1 14 
+27 陈青野 ChenQingye 212 448 1 2 23 
+24 莫鸣 default 530 0 3 1 1 
+26 秋天 QiuTian 252 344 1 3 20 
+22 路知春 default 662 352 4 1 4 
+23 郑语嫣 ZhengYuyan 538 0 4 3 3 
+29 林泉 default 564 450 0 1 0 
+32 陈攻 default 766 450 0 2 0 
+31 夏依依 XiaYiyi 780 450 0 2 0 
