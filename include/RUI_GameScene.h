@@ -417,6 +417,7 @@ class RUI_GameScene: public RUI_Scene
                                         if(ReadingPage < 0)
                                             ReadingPage = 0;
                                     }
+                                    break;
                                 }
                                 case 6:
                                 {
@@ -427,6 +428,7 @@ class RUI_GameScene: public RUI_Scene
                                         Cabinets.push_back(a);
                                         TotalMoney = TotalMoney - 1000 * Cabinets.size() -1000;
                                     }
+                                    break;
                                 }
                                 default:
                                 break;
@@ -435,7 +437,7 @@ class RUI_GameScene: public RUI_Scene
                     }
                     for(int i = 0; i < Cabinets.size(); i++)
                     {
-                        if(isSettingNewProduct == 0)
+                        if(isSettingNewProduct == 0 && TestEvent.GetWhetherRenderCustomerFrame() == 0)
                         {
                             if(Cabinets[i].isClicked(mx, my))
                             {

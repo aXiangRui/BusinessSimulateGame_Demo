@@ -283,9 +283,9 @@ class CustomerFrame
         void Init()
         {
             TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
-            backgroundTexture = ResourceManager::instance()->FindTexture("saving");
+            backgroundTexture = ResourceManager::instance()->FindTexture("backgroundFrame");
             backgroundRect = { 100, 0, 600, 600};
-            dessertRect = { 200, 200, 200, 200};
+            dessertRect = { 275, 150, 250, 250};
         }
 
         void SetCustomer(std::string customerName, std::string dessertAddress)
@@ -295,8 +295,8 @@ class CustomerFrame
             DescribeText = "喜欢的甜品:";
             customerNameSurface = TTF_RenderUTF8_Blended( TextFont, customerName.c_str(), TextColor);
             describeTextSurface = TTF_RenderUTF8_Blended( TextFont, DescribeText.c_str(), TextColor);
-            customerNameRect = { 150, 100, customerNameSurface->w, customerNameSurface->h};
-            describeRect = { 150, 200, describeTextSurface->w, describeTextSurface->h};
+            customerNameRect = { 350, 50, customerNameSurface->w, customerNameSurface->h};
+            describeRect = { 350, 150, describeTextSurface->w, describeTextSurface->h};
         }
 
         void onRender(SDL_Renderer* Renderer)

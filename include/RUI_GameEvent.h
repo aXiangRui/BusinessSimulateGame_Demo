@@ -114,25 +114,29 @@ class GameEvent
         switch(event.type)
         {
             case SDL_MOUSEBUTTONDOWN:
-            {
-                if(whetherRenderCustomerFrame == 1)
+            {     
+                
+                if(whetherRenderCustomerFrame == 1 )
                 {
                     whetherRenderCustomerFrame = 0;
                     RenderTime = 0;
+                    stillShow = 1;
                 }
                 int mx = event.button.x; int my = event.button.y;
                 for(int i = 0; i < Customers.size(); i++)
                 {
-                    if( mx >= Customers[i].getX() && mx <= Customers[i].getX() + 64 && whetherRenderCustomerFrame == 0)
+                    if( mx >= Customers[i].getX() && mx <= Customers[i].getX() + 64 && whetherRenderCustomerFrame == 0 && stillShow == 0)
                     {
                         if( my >= Customers[i].getY() && my <= Customers[i].getY() + 64)
                         {
                             std::string dessertAddress = dessertManager.GetDessertPath(Customers[i].GetPreferDessertID());
                             customerFrame.SetCustomer(Customers[i].GetCustomerName(), dessertAddress);
                             whetherRenderCustomerFrame = 1;
+                            break;
                         }
                     }
                 }
+                stillShow = 0;
                 break;
             }
             case SDL_MOUSEMOTION:
@@ -343,7 +347,11 @@ class GameEvent
             else
             {
                 Customers[i].OnRender(Renderer);
-            }        
+            } 
+            if( Customers[i].GetCurrentStage() >= 2 && Customers[i].GetCurrentStage() <= 3)
+            {
+                Customers[i].RenderCake(Renderer);
+            }       
         }
     }
 
@@ -427,6 +435,11 @@ class GameEvent
         return whetherRenderCustomerFrame;
     }
 
+    void SetWhetherRenderCustomerFrame( bool whether)
+    {
+        whetherRenderCustomerFrame = whether;
+    }
+
     void Load(int& TotalMoney, int& TotalCustomers, int& TotalDessert,std::vector<Cabinet>& Cabinets,CustomerManager& customerManager)
     {
         std::ifstream file("./save/Time.txt");
@@ -447,7 +460,8 @@ class GameEvent
                 std::string cPath;
                 int x,y,stage;
                 int chooseid,choosenumber;
-                iss >> cID >> cName >>cPath >> x >> y >> stage>> choosenumber >> chooseid;
+                int number;
+                iss >> cID >> cName >>cPath >> x >> y >> stage>> choosenumber >> chooseid >> number;
                 Customer a;
                 for(int i = 0; i < customerManager.GetCustomersSize(); i++)
                 {
@@ -471,6 +485,7 @@ class GameEvent
                     Customers.back().SetCurrentStage(stage);
                     Customers.back().SetChooseNumber(choosenumber);
                     Customers.back().SetChooseID(chooseid);
+                    Customers.back().SetEatNumber(number);
                     SDL_Log("当前选择食物数量及id%d,%d",Customers.back().GetChooseNumber(),Customers.back().GetChooseID());
                 }
                     
@@ -517,6 +532,7 @@ class GameEvent
             file << Customers[i].GetCurrentStage() << " ";
             file << Customers[i].GetChooseNumber() << " ";
             file << Customers[i].GetChooseID() << " ";
+            file << Customers[i].GetEatNumber() << " ";
             file << std::endl;
         }
         file.close();
@@ -548,4 +564,5 @@ class GameEvent
         int DailyTotalPerson;
         bool whetherRenderCustomerFrame = 0;
         int RenderTime = 0;
+        bool stillShow = 0;
 };

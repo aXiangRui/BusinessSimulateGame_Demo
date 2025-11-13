@@ -1,17 +1,15 @@
-876
-0 唐堂 TangTang 580 148 3 1 23 
-21 姚嘉人 default 650 96 3 1 12 
-17 郑小涛 default 530 300 3 2 15 
-14 祁遇 default 450 300 3 1 16 
-11 祁妙 default 530 200 3 1 19 
-8 林瑯 default 450 200 3 2 7 
-9 程慎 default 530 100 3 3 23 
-25 南爵 default 450 100 3 1 14 
-27 陈青野 ChenQingye 212 448 1 2 23 
-24 莫鸣 default 530 0 3 1 1 
-26 秋天 QiuTian 252 344 1 3 20 
-22 路知春 default 662 352 4 1 4 
-23 郑语嫣 ZhengYuyan 538 0 4 3 3 
-29 林泉 default 564 450 0 1 0 
-32 陈攻 default 766 450 0 2 0 
-31 夏依依 XiaYiyi 780 450 0 2 0 
+1209
+0 唐堂 TangTang 582 58 4 3 0 0 
+7 祁妙 default 530 0 3 5 1 2 
+5 陈攻 default 450 100 3 5 1 2 
+1 秋天 QiuTian 530 100 3 7 0 5 
+13 路弥 default 450 200 3 5 0 4 
+12 程慎 default 530 200 3 4 1 3 
+14 陈沙 default 450 300 3 4 1 4 
+10 祁是 default 450 110 3 4 0 4 
+20 祁遇 default 240 148 2 3 0 3 
+17 唐玉树 default 102 150 2 5 0 5 
+19 莫鸣 default 52 176 2 3 0 3 
+15 陈青野 ChenQingye 152 252 1 3 1 3 
+24 郑语嫣 ZhengYuyan 192 448 1 5 1 5 
+23 秋芒 QiuMang 378 502 0 4 0 4 

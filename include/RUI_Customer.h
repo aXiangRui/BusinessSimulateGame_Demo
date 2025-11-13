@@ -35,47 +35,7 @@ class Customer
         SDL_Color color;
         int NameW,NameH;
 
-        void InitCustomer(int id, int preferid, std::string name, std::string path, int appear, int prefer)
-        {
-            CustomerID = id;
-            PreferDessertID = preferid;
-            CustomerName = name;
-            PathName = path;
-            x = 800;
-            y = 450;
-            SitTime = 0;
-            ChooseTime = 0;
-            WhetherAppear = appear;
-            preference = prefer;
-
-            CurrentStage = CustomerStage::Enter;
-            EnterFinish = 0;
-            ChooseFinish = 0;
-            BuyFinish = 0;
-            EatFinsih = 0;
-            QuitFinish = 0;
-            toward = 0;
-            isEating = -1;
-            isGoingPay = 0;
-            PayTime = 0;
-            isFront = 0;
-            Queue = 0;
-            ChooseNumber = 0;
-            payPrice = 0;
-            hasJoined = 0;
-            isHovered = 0;
-            RandomDelay = rand() % 10000;
-
-            NameFont = TTF_OpenFont("./resources/font/namidiansong.ttf",16);
-            color = {10,10,10,255};
-            std::string totalname = CustomerName + " " + std::to_string(preference);
-            NameSurface = TTF_RenderUTF8_Blended(NameFont, totalname.c_str(), color);
-            if(!NameSurface)
-                SDL_Log("%s",CustomerName.c_str());
-            NameW = NameSurface->w; NameH = NameSurface->h;
-
-            payCharm.Init();
-        }
+        void InitCustomer(int id, int preferid, std::string name, std::string path, int appear, int prefer);
 
         void SetCurrentStage(int i)
         {
@@ -145,24 +105,7 @@ class Customer
             y = my;
         }
 
-        void SetChooseNumber()
-        {
-            if( preference <= Level[1])
-                ChooseNumber = 1;
-            else if( preference <= Level[3])
-                ChooseNumber = rand() % 2 + 1;
-            else if( preference <= Level[5])
-                ChooseNumber = rand() % 3 + 1;
-            else if( preference <= Level[7])
-                ChooseNumber = rand() % 4 + 1;
-            else
-            {
-                ChooseNumber = rand() % 5 + 1;
-                if(ChooseNumber < 2)
-                    ChooseNumber++;
-            }    
-            SDL_Log("%s当前好感度:%d,选择数量%d",CustomerName.c_str(),preference,ChooseNumber);
-        }
+        void SetChooseNumber();
 
         int GetCustomerID()
         {
@@ -283,6 +226,8 @@ class Customer
             if(payCharm.GetMoney() != 0)
                 payCharm.onRender(Renderer);
         }
+
+        void RenderCake(SDL_Renderer* Renderer);
 
         void Update(std::vector<Chair>& Chairs,
             int currentTime, 
@@ -506,7 +451,6 @@ class Customer
                     {
                         toward = 0;
                     }
-                    
                     if(CurrentTime - SitTime >= 18000 + rand()% 5000)
                     {    
                         Chairs[isEating].SetUsing(0);
@@ -518,6 +462,28 @@ class Customer
                         RefreshNameSurface();
                         CurrentStage = CustomerStage::Leave;
                         SitTime = 0;
+                    }
+                    if( waitingTime == 0)
+                    {
+                        waitingTime = CurrentTime;
+                    }
+                    if( eatNumber == 0 && CurrentTime - waitingTime > 2000)
+                    {
+                        Chairs[isEating].SetUsing(0);
+                        customer.AddPreference(Cabinets[chooseID].GetDessertID(),ChooseNumber);
+                        this->preference = customer.GetCustomerPreference();
+                        RefreshNameSurface();
+                        CurrentStage = CustomerStage::Leave;
+                        SitTime = 0;
+                        waitingTime = 0;
+                    }                
+                    if( CurrentTime - waitingTime > 2000 && waitingTime != 0)
+                    {
+                        // SDL_Log("当前时间差:%d %d %d",CurrentTime, CurrentTime - waitingTime, waitingTime);
+                        eatNumber--;
+                        if( eatNumber < 0)
+                            eatNumber = 0;
+                        waitingTime = 0;
                     }
                 }
             }
@@ -554,6 +520,9 @@ class Customer
         {
             return chooseID;
         }
+
+        void SetEatNumber( int number );
+        int GetEatNumber();
 
         void LeaveStore()
         {
@@ -729,7 +698,7 @@ class Customer
             }
             // preference = preference + 5;
             if(preference > 2000)
-                    preference = 2000;
+                preference = 2000;
             SDL_Log("当前喜好值%d",preference);
         }
 
@@ -777,4 +746,9 @@ class Customer
         bool WhetherAppear;
         int Level[10] = {5,20,50,100,200,350,500,700,1000,1500};
         PayCharm payCharm;
+
+        SDL_Texture* CakeTexture;
+        SDL_Rect CakeRect;
+        int waitingTime;
+        int eatNumber;
 };

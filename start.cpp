@@ -28,7 +28,7 @@ RUI_Scene* CreateScene = nullptr;
 RUI_SceneManager SceneManager;
 MusicPlayer BackgroundMusic;
 // Define ResourceManager singleton storage to satisfy linker
-ResourceManager* ResourceManager::Manager = nullptr;
+// ResourceManager* ResourceManager::Manager = nullptr;
 const int FPS = 60;
 
 int main(int argc, char* argv[]) 
