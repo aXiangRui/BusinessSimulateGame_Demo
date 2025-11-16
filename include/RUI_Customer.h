@@ -443,6 +443,7 @@ class Customer
                 }
                 if(x == Chairs[isEating].GetX() && y == Chairs[isEating].GetY())
                 {
+                    onSeat = 1;
                     if(isEating % 2 == 0)
                     {
                         toward = 1;
@@ -467,7 +468,7 @@ class Customer
                     {
                         waitingTime = CurrentTime;
                     }
-                    if( eatNumber == 0 && CurrentTime - waitingTime > 2000)
+                    if( eatNumber == 0 && CurrentTime - waitingTime > 5000)
                     {
                         Chairs[isEating].SetUsing(0);
                         customer.AddPreference(Cabinets[chooseID].GetDessertID(),ChooseNumber);
@@ -746,8 +747,11 @@ class Customer
         bool WhetherAppear;
         int Level[10] = {5,20,50,100,200,350,500,700,1000,1500};
         PayCharm payCharm;
+        bool onSeat;
 
         SDL_Texture* CakeTexture;
+        SDL_Texture* PlateTexture;
+        SDL_Rect PlateRect;
         SDL_Rect CakeRect;
         int waitingTime;
         int eatNumber;

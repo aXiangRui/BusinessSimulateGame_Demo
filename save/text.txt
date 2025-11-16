@@ -11,4 +11,36 @@ end
 
 end
 新闻
+end
+材料
+奶油：打发到软性发泡的抹面奶油，量大管饱
+大草莓：多次选育的结果，在保持酸甜口感的同时拥有饱满体型，卖相良好
+巧克力棒：兼有巧克力浓香和棒状脆皮口感的材料，也许很受小朋友喜欢？
+樱桃：完整的外壳、鲜明的色彩都证明它很适合用于最后的装饰，做成果酱也好吃
+持续更新中...
+end
+
+1 0 0 奶油 cream 10 5 5 1 
+1 1 1 大草莓 strawberry 2 2 5 1 
+1 2 2 巧克力棒 chocolatestick 10 10 10 1 
+1 3 3 樱桃 cherry 2 2 5 1 
+1 4 0 裱花奶油 cream02 10 5 5 1 
+1 5 4 咖啡液 coffee 0 5 20 1
+1 6 5 饼干 cookie 10 10 10 1
+1 7 6 甜酒 wine 2 5 25 1
+1 8 1 小草莓 defaultmaterial 2 2 5 1
+1 9 2 十字巧克力 defaultmaterial 15 10 15 1
+1 10 2 巧克力银球 defaultmaterial 15 15 20 1
+1 11 2 巧克力金球 defaultmaterial 20 25 20 1
+1 12 2 巧克力酱 defaultmaterial 10 10 10 1
+1 13 2 巧克力牌 defaultmaterial 15 10 15 1
+1 14 1 草莓酱 defaultmaterial 5 5 5 1
+1 15 1 草莓冻干 defaultmaterial 10 5 10 1
+1 16 3 糖渍樱桃 defaultmaterial 10 5 5 1
+1 17 4 可可粉 defaultmaterial 0 10 10 1
+1 18 5 饼干碎 defaultmaterial 10 15 10 1
+1 19 6 苹果汁 defaultmaterial 5 10 10 1
+1 20 6 葡萄汁 defaultmaterial 5 15 5 1
+1 21 3 哈密瓜 defaultmaterial 10 10 15 1
+1 22 3 蓝莓 defaultmaterial 5 10 15 1
 

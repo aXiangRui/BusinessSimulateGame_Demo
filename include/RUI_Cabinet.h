@@ -5,6 +5,7 @@
 #include"RUI_ResourceManager.h"
 #include"RUI_DessertManager.h"
 #include"RUI_ProductManager.h"
+#include"RUI_TextManager.h"
 
 class Cabinet
 {
@@ -324,4 +325,57 @@ class CustomerFrame
         SDL_Surface* customerNameSurface;
         SDL_Surface* describeTextSurface;
         SDL_Color TextColor = { 10, 10, 10, 255};
+};
+
+class MaterialFrame
+{
+    public:
+    MaterialFrame() = default;
+    ~MaterialFrame() = default;
+
+    void Init()
+    {
+        backgroundTexture = ResourceManager::instance()->FindTexture("saving");
+        backgroundRect = {100, 0, 600, 600};
+        textFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
+    }
+
+    void SetTitle(std::string name, std::string address, std::string des)
+    {
+        title = name;
+        describe = des;
+        SDL_Log("%s %s",title.c_str(),describe.c_str());
+        titleSurface = TTF_RenderUTF8_Blended( textFont, title.c_str(), color);
+        describeSurface = TTF_RenderUTF8_Blended_Wrapped(textFont, describe.c_str(),color,400);
+        titleRect = { 150, 70, titleSurface->w, titleSurface->h};
+        describeRect = { 150, 100, describeSurface->w, describeSurface->h };
+        materialTexture = ResourceManager::instance()->FindTexture(address.c_str());
+        materialRect = { 150, 130, 100, 100};
+    }
+
+    void onRender( SDL_Renderer* Renderer)
+    {
+        titleTexture = SDL_CreateTextureFromSurface(Renderer, titleSurface);
+        describeTexture = SDL_CreateTextureFromSurface( Renderer, describeSurface);
+        SDL_RenderCopy(Renderer, backgroundTexture, nullptr, &backgroundRect);
+        SDL_RenderCopy(Renderer, titleTexture, nullptr, &titleRect);
+        SDL_RenderCopy(Renderer, describeTexture, nullptr, &describeRect);
+        SDL_RenderCopy(Renderer, materialTexture, nullptr, &materialRect);
+    }
+
+    private:
+    SDL_Texture* backgroundTexture;
+    SDL_Rect backgroundRect;
+    SDL_Texture* materialTexture;
+    SDL_Rect materialRect;
+    TTF_Font* textFont;
+    SDL_Surface* titleSurface;
+    SDL_Rect titleRect;
+    SDL_Texture* titleTexture;
+    SDL_Surface* describeSurface;
+    SDL_Rect describeRect;
+    SDL_Texture* describeTexture;
+    std::string title;
+    std::string describe;
+    SDL_Color color = {10, 10, 10, 255};
 };

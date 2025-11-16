@@ -31,6 +31,7 @@ void Customer::InitCustomer(int id, int preferid, std::string name, std::string 
     isHovered = 0;
     RandomDelay = rand() % 10000;
     waitingTime = 0;
+    onSeat = 0;
 
     NameFont = TTF_OpenFont("./resources/font/namidiansong.ttf",16);
     color = {10,10,10,255};
@@ -42,20 +43,66 @@ void Customer::InitCustomer(int id, int preferid, std::string name, std::string 
 
     payCharm.Init();
     CakeTexture = ResourceManager::instance()->FindTexture("smallcake");
+    PlateTexture = ResourceManager::instance()->FindTexture("tinyplate");
 }
 
 void Customer::RenderCake(SDL_Renderer* Renderer)
-{
+{  
+    if(toward == 0)
+    {
+        PlateRect = { x - 16, y - 8, 64, 64};
+    }
+    else
+    {
+        PlateRect = {x + 16, y - 8, 64, 64};
+    }
+    if(onSeat)
+    {
+        if( toward == 0)
+        {
+            PlateRect = { x - 24, y - 12, 64, 64};
+        }
+        else
+        {
+            PlateRect = { x + 24, y - 12, 64, 64};
+        }
+    }
+    if(toward == 0)
+    {
+        SDL_RenderCopy(Renderer, PlateTexture, nullptr, &PlateRect);
+    }
+    else
+    {
+        SDL_RenderCopyEx( Renderer, PlateTexture, nullptr, &PlateRect, 0, 0, SDL_FLIP_HORIZONTAL);
+    }
+    
     for( int i = 0; i < eatNumber; i++)
     {
         if(toward == 0)
-            CakeRect = {x - 4,y - i * 8,64,64};
+        {
+            CakeRect = {x - 16, y - i * 8 - 12, 64, 64};
+        }    
         else
         {
-            CakeRect = {x + 8, y - i * 8, 64, 64};
+            CakeRect = {x + 16, y - i * 8 - 12, 64, 64};
+            PlateRect = { x + 16, y, 64, 64};
+        }
+        if(CurrentStage == CustomerStage::Eat && onSeat == 1)
+        {
+            if(toward == 0)
+            {
+                CakeRect = {x - 24, y - i * 8 - 14, 64, 64};
+            }
+            
+            else
+            {
+                CakeRect = {x + 24, y - i * 8 - 14, 64, 64};    
+            }
         }
         if(toward == 0)
+        {
             SDL_RenderCopy(Renderer, CakeTexture, nullptr, &CakeRect);
+        }
         else
         {
             SDL_RenderCopyEx( Renderer, CakeTexture, nullptr, &CakeRect, 0, 0, SDL_FLIP_HORIZONTAL);

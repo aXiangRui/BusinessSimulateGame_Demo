@@ -16,6 +16,7 @@ class TextManager
 
     std::vector<std::string>CustomerText;
     std::vector<std::string>StoreText;
+    std::vector<std::string>MaterialText;
 
     void Init()
     {
@@ -48,6 +49,17 @@ class TextManager
                 {
                     File >> text;
                     CustomerText.push_back(text);
+                    if(text == "end")
+                        break;
+                }
+            }
+            if(string == "材料")
+            {
+                std::string text;
+                while(true)
+                {
+                    File >> text;
+                    MaterialText.push_back(text);
                     if(text == "end")
                         break;
                 }
