@@ -468,7 +468,7 @@ class Customer
                     {
                         waitingTime = CurrentTime;
                     }
-                    if( eatNumber == 0 && CurrentTime - waitingTime > 5000)
+                    if( eatNumber == 0 && CurrentTime - waitingTime > 3000)
                     {
                         Chairs[isEating].SetUsing(0);
                         customer.AddPreference(Cabinets[chooseID].GetDessertID(),ChooseNumber);

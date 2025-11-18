@@ -63,6 +63,7 @@ class RUI_GameScene: public RUI_Scene
             textManager.Init();         
             Background = ResourceManager::instance()->FindTexture("hall");
             BackgroundWall = ResourceManager::instance()->FindTexture("hallwall");
+            NightTexture = ResourceManager::instance()->FindTexture("night");
             TextFont = nullptr;
             cabinetFrame.InitFrame();
             summaryFrame.Init();
@@ -92,6 +93,10 @@ class RUI_GameScene: public RUI_Scene
             CurrentCabnet = -1;
             ChatDelayTime = 0;
             isMaterialFrameShowing = 0;
+            currentalpha = 0;
+            NightChanged = 0;
+
+            BackGroundRect = {0,0,800,600};
             
             SDL_Log("进入游戏场景");
         }
@@ -128,6 +133,22 @@ class RUI_GameScene: public RUI_Scene
         void TimeChange()
         {
             int PresentTime = TestClock.ReturnHour();
+            if( PresentTime >= 18 && NightChanged == 0)
+            {
+                currentalpha = ( PresentTime - 17 ) * 20;
+                NightChanged = 1;
+            }
+            else if( PresentTime <= 7 && NightChanged == 0)
+            {
+                currentalpha =  (8 - PresentTime) * 20;
+                NightChanged = 1;
+            }
+            else if( NightChanged == 0)
+            {
+                currentalpha = 0;
+            }
+            CurrentTime = SDL_GetTicks();
+
             if(PresentTime >= 7 && PresentTime < 22)
             {
                 CurrentTime = SDL_GetTicks();
@@ -135,6 +156,7 @@ class RUI_GameScene: public RUI_Scene
                 {          
                     LastTime = CurrentTime;
                     TestClock.UpdateTime();
+                    NightChanged = 0;
                 }
             }
             else
@@ -160,6 +182,7 @@ class RUI_GameScene: public RUI_Scene
                             TotalCustomers = 0;
                             isSummaryShowing = 0;
                         } 
+                        NightChanged = 0;
                     }
                 }
                 else
@@ -168,6 +191,7 @@ class RUI_GameScene: public RUI_Scene
                     {          
                         LastTime = CurrentTime;
                         TestClock.UpdateTime();
+                        NightChanged = 0;
                     }
                 }
                 
@@ -191,9 +215,9 @@ class RUI_GameScene: public RUI_Scene
             //SDL_SetRenderDrawColor(Renderer,80,80,235,255);
             SDL_RenderClear(Renderer);
 
-            SDL_Rect BackGroundRect = {0,0,800,600};
             SDL_RenderCopy(Renderer,Background,nullptr,&BackGroundRect);
             SDL_RenderCopy(Renderer,MoneyTexture,nullptr,&TextRect);
+
             SDL_DestroyTexture(MoneyTexture);
 
             for(int i = 0; i < Chairs.size(); i++)
@@ -209,6 +233,10 @@ class RUI_GameScene: public RUI_Scene
             reg.onRender(Renderer);
 
             TestEvent.onRender(Renderer);
+            
+            SDL_SetTextureAlphaMod(NightTexture, currentalpha);
+            SDL_RenderCopy(Renderer,NightTexture, nullptr, &BackGroundRect);
+
             TestClock.RenderHour(Renderer);
  
             for(int i = 0; i < Cabinets.size(); i++)
@@ -277,6 +305,8 @@ class RUI_GameScene: public RUI_Scene
         {
             SDL_Log("退出游戏场景");        
             customerManager.Save();  
+            materialManager.Save();
+            materialManager.quit();
             TestEvent.Save(TotalMoney,TotalCustomers, TotalDessert, Cabinets);
             Btns.clear();
             Chairs.clear();
@@ -299,6 +329,7 @@ class RUI_GameScene: public RUI_Scene
         }
         SDL_Texture* Background;
         SDL_Texture* BackgroundWall;
+        SDL_Texture* NightTexture;
         TTF_Font* TextFont;
         CustomerManager customerManager;
         DessertManager dessertManager;
@@ -336,11 +367,17 @@ class RUI_GameScene: public RUI_Scene
         int TotalCustomers;
         int ReadingPage;
         int CurrentCabnet;
+        int currentalpha = 0;
+        bool NightChanged;
 
         GameEvent TestEvent;
         SummaryFrame summaryFrame;
         CheckUpdate CheckEvent;
         UnlockFrame unlockFrame;
+        SDL_Rect BackGroundRect = {0,0,800,600};
+
+        enum TimeStage {day, night, trans};
+        TimeStage CurrentStage = day;
         private:
 
 };

@@ -36,7 +36,8 @@ class DessertManager
             std::string dPath;
             bool whetherbase;
             bool whetherunlock;
-            iss>>cID>>SweetNumber>>FullNumber>>TasteNumber>>dname>>dPath>>whetherbase>>whetherunlock;
+            int level;
+            iss>>cID>>SweetNumber>>FullNumber>>TasteNumber>>dname>>dPath>>whetherbase>>whetherunlock>>level;
             SDL_Log("新甜品id:%d,甜度:%d,饱腹感:%d,味道:%d,名字:%s,路径:%s",
             cID,
             SweetNumber,
@@ -47,6 +48,7 @@ class DessertManager
         );
             Dessert a;
             a.InitLevel(cID,SweetNumber,FullNumber,TasteNumber,dname,dPath,whetherbase,whetherunlock);
+            a.SetLevel(level);
             Desserts.push_back(a);
         }
     }
@@ -66,6 +68,7 @@ class DessertManager
             File << Desserts[i].GetDessertPath() << " ";
             File << Desserts[i].GetWhetherBase() << " ";
             File << Desserts[i].GetWhetherUnlock() << " ";
+            File << Desserts[i].GetLevel() << " ";
             File << std::endl;
         }
 

@@ -25,6 +25,7 @@ class Dessert
         price = SweetLevel/10 * 3 + FullLevel/10 * 1 + TasteLevel/10 * 2;
         lastTime = 0;
         isClicked = 0;
+        level = 1;
 
         x = 200;
         y = 200;
@@ -102,6 +103,16 @@ class Dessert
     {
         w = mw;
         h = mh;
+    }
+
+    void SetLevel( int level)
+    {
+        this->level = level;
+    }
+
+    int GetLevel()
+    {
+        return level;
     }
 
     bool GetWhetherUnlock()

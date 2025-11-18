@@ -36,7 +36,7 @@ class Clock
 
     int ReturnDay()
     {
-        return (ClockTime / 24) + 1;
+        return ((ClockTime / 24) % 12 ) + 1;
     }
 
     int ReturnAllHour()
@@ -49,7 +49,7 @@ class Clock
         if(!TimeFont)
             TimeFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
         std::string j;
-        j = "第" + std::to_string(ReturnDay()) + "天";
+        j = std::to_string(ReturnDay()) + "月";
         if(ReturnHour() >= 10)
             j = j + std::to_string(ReturnHour()) + ":00" ;
         else

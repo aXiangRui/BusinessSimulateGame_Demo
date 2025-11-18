@@ -42,10 +42,12 @@ class MaterialManager
                 int fulllevel;
                 int tastelevel;
                 bool unlock;
-                iss>>Kind>>MID>>type>>Name>>Path>>sweetlevel>>fulllevel>>tastelevel>>unlock;
+                int level;
+                iss>>Kind>>MID>>type>>Name>>Path>>sweetlevel>>fulllevel>>tastelevel>>unlock>>level;
                 
                 Material a;
-                a.InitMaterial(MID,type,Name,Path,sweetlevel,fulllevel,tastelevel,unlock);
+                a.InitMaterial(MID,type,Name,Path,sweetlevel,fulllevel,tastelevel,unlock);      
+                a.SetLevel(level);
                 SDL_Log("读取到材料%s",Name.c_str());
                 if(Kind == 0)
                 {
@@ -83,6 +85,7 @@ class MaterialManager
             File << DecorationMaterial[i].GetFullNumber() << " ";
             File << DecorationMaterial[i].GetTasteNumber() << " ";
             File << DecorationMaterial[i].GetWhetherUnlock() << " ";
+            File << DecorationMaterial[i].GetLevel() <<" ";
             File << std::endl;
         }
     }

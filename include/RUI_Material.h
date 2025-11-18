@@ -26,6 +26,7 @@ class Material
             w = 256; h = 256;
             Rect = {x,y,w,h};
             LastTime = 0;
+            Level = 1;
         }
 
         void AddSweetNumber(int SweetNumber)
@@ -71,6 +72,16 @@ class Material
         void SetWhetherUnlock(bool unlock)
         {
             WhetherUnlock = unlock;
+        }
+
+        int GetLevel()
+        {
+            return Level;
+        }
+
+        void SetLevel( int level )
+        {
+            this->Level = level;
         }
 
         std::string GetName()
