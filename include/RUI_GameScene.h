@@ -35,7 +35,7 @@ class RUI_GameScene: public RUI_Scene
 
         void onEnter()
         {               
-            customerManager.InitCustomerManager();   
+            customerManager.InitCustomerManager();  
             materialManager.InitMaterialManager();
             TestEvent.Load(TotalMoney,TotalCustomers, TotalDessert, Cabinets, customerManager);
             TestEvent.onEnter();
@@ -135,12 +135,12 @@ class RUI_GameScene: public RUI_Scene
             int PresentTime = TestClock.ReturnHour();
             if( PresentTime >= 18 && NightChanged == 0)
             {
-                currentalpha = ( PresentTime - 17 ) * 20;
+                currentalpha = ( PresentTime - 17 ) * 30;
                 NightChanged = 1;
             }
             else if( PresentTime <= 7 && NightChanged == 0)
             {
-                currentalpha =  (8 - PresentTime) * 20;
+                currentalpha =  (8 - PresentTime) * 30;
                 NightChanged = 1;
             }
             else if( NightChanged == 0)
@@ -305,6 +305,7 @@ class RUI_GameScene: public RUI_Scene
         {
             SDL_Log("退出游戏场景");        
             customerManager.Save();  
+            // customerManager.Reset();
             materialManager.Save();
             materialManager.quit();
             TestEvent.Save(TotalMoney,TotalCustomers, TotalDessert, Cabinets);

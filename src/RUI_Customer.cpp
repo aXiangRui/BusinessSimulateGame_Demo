@@ -32,6 +32,9 @@ void Customer::InitCustomer(int id, int preferid, std::string name, std::string 
     RandomDelay = rand() % 10000;
     waitingTime = 0;
     onSeat = 0;
+    addNumber = 0;
+    whetherRenderAdd = 0;
+    EatTime = 0;
 
     NameFont = TTF_OpenFont("./resources/font/namidiansong.ttf",16);
     color = {10,10,10,255};
@@ -138,4 +141,14 @@ void Customer::SetChooseNumber()
     }
     eatNumber = ChooseNumber;
     SDL_Log("%s当前好感度:%d,选择数量%d",CustomerName.c_str(),preference,ChooseNumber);
+}
+
+void Customer::RenderAddFrame(SDL_Renderer* Renderer)
+{
+    std::string add = "+" + std::to_string(addNumber);
+    AddFrameSurface = TTF_RenderUTF8_Blended(NameFont, add.c_str(), color);
+    AddFrameRect = {x-10, y, AddFrameSurface->w,AddFrameSurface->h};
+    AddFrameTexture = SDL_CreateTextureFromSurface(Renderer, AddFrameSurface);
+    SDL_FreeSurface(AddFrameSurface);
+    SDL_RenderCopy(Renderer, AddFrameTexture, nullptr, &AddFrameRect );
 }

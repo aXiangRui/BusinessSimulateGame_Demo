@@ -192,6 +192,10 @@ class Customer
 
             if(payCharm.GetMoney() != 0)
                 payCharm.onRender(Renderer);
+            if(whetherRenderAdd == 1)
+            {
+                RenderAddFrame(Renderer);
+            }
         }
 
         void onRenderWithName(SDL_Renderer* Renderer)
@@ -229,6 +233,8 @@ class Customer
 
         void RenderCake(SDL_Renderer* Renderer);
 
+        void RenderAddFrame(SDL_Renderer* Renderer);
+
         void Update(std::vector<Chair>& Chairs,
             int currentTime, 
             std::vector<Cabinet>& Cabtines,
@@ -257,7 +263,7 @@ class Customer
                 }
                 case CustomerStage::Eat:
                 {
-                    Eat(Chairs, currentTime, customer, Cabtines);
+                    Eat(Chairs, currentTime, customer, Cabtines, pManager);
                     break;
                 }
                 case CustomerStage::Leave:
@@ -387,7 +393,7 @@ class Customer
             }
         }
 
-        void Eat(std::vector<Chair>& Chairs, int CurrentTime, Customer& customer, std::vector<Cabinet>& Cabinets)
+        void Eat(std::vector<Chair>& Chairs, int CurrentTime, Customer& customer, std::vector<Cabinet>& Cabinets, ProductManager productManager)
         {
             if(SitTime == 0)
             {
@@ -455,36 +461,42 @@ class Customer
                     if(CurrentTime - SitTime >= 18000 + rand()% 5000)
                     {    
                         Chairs[isEating].SetUsing(0);
-                        // 更新 manager 中的模板顾客的喜好值
-                        customer.AddPreference(Cabinets[chooseID].GetDessertID(),ChooseNumber);
+                        // 更新 manager 中的模板顾客的喜好值                       
+                        customer.AddPreference(productManager.products[Cabinets[chooseID].GetDessertID()].GetDessertID(),ChooseNumber);
                         // 将最新的喜好值同步回当前场景中的顾客实例
                         this->preference = customer.GetCustomerPreference();
                         // 更新名字的 Surface（用于 onRenderWithName）
                         RefreshNameSurface();
                         CurrentStage = CustomerStage::Leave;
                         SitTime = 0;
+                        whetherRenderAdd = 1;
                     }
-                    if( waitingTime == 0)
+                    if( waitingTime == 0 && eatNumber == 0)
                     {
                         waitingTime = CurrentTime;
+                    }
+                    if( EatTime == 0)
+                    {
+                        EatTime = CurrentTime;
                     }
                     if( eatNumber == 0 && CurrentTime - waitingTime > 3000)
                     {
                         Chairs[isEating].SetUsing(0);
-                        customer.AddPreference(Cabinets[chooseID].GetDessertID(),ChooseNumber);
+                        addNumber = customer.AddPreference(productManager.products[Cabinets[chooseID].GetDessertID()].GetDessertID(),ChooseNumber);
+                        whetherRenderAdd = 1;
                         this->preference = customer.GetCustomerPreference();
                         RefreshNameSurface();
                         CurrentStage = CustomerStage::Leave;
                         SitTime = 0;
                         waitingTime = 0;
                     }                
-                    if( CurrentTime - waitingTime > 2000 && waitingTime != 0)
+                    if( CurrentTime - EatTime > 1000 && EatTime != 0)
                     {
                         // SDL_Log("当前时间差:%d %d %d",CurrentTime, CurrentTime - waitingTime, waitingTime);
                         eatNumber--;
                         if( eatNumber < 0)
                             eatNumber = 0;
-                        waitingTime = 0;
+                        EatTime = 0;
                     }
                 }
             }
@@ -680,27 +692,30 @@ class Customer
             return WhetherAppear;
         }
 
-        void AddPreference(int DessertID,int chooseNumber)
+        int AddPreference(int DessertID,int chooseNumber)
         {
             if(PreferDessertID == -1)
             {
                 preference = preference + 6 * chooseNumber;
-
+                addNumber = 6 * chooseNumber;
             }
             else if(DessertID == PreferDessertID)
             {
                 preference = preference + 6 * chooseNumber;
+                addNumber = 6 * chooseNumber;
                 // SDL_Log("01增加了%d",6*chooseNumber);
             }
             else
             {
                 preference = preference + chooseNumber;
+                addNumber = chooseNumber;
                 //  SDL_Log("02增加了%d",chooseNumber);
             }
             // preference = preference + 5;
             if(preference > 2000)
                 preference = 2000;
             SDL_Log("当前喜好值%d",preference);
+            return addNumber;
         }
 
         void Clean()
@@ -741,6 +756,7 @@ class Customer
         int ChooseNumber;
         int payPrice;
         int RandomDelay;
+        int EatTime;
 
         bool hasJoined;
         bool isHovered;
@@ -753,6 +769,11 @@ class Customer
         SDL_Texture* PlateTexture;
         SDL_Rect PlateRect;
         SDL_Rect CakeRect;
+        SDL_Texture* AddFrameTexture;
+        SDL_Rect AddFrameRect;
+        SDL_Surface* AddFrameSurface;
         int waitingTime;
         int eatNumber;
+        int addNumber;
+        bool whetherRenderAdd;
 };
