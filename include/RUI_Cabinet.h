@@ -287,11 +287,19 @@ class CustomerFrame
             backgroundTexture = ResourceManager::instance()->FindTexture("backgroundFrame");
             backgroundRect = { 100, 0, 600, 600};
             dessertRect = { 275, 150, 250, 250};
+            dessertTexture = nullptr;
         }
 
         void SetCustomer(std::string customerName, std::string dessertAddress)
         {
-            dessertTexture = ResourceManager::instance()->FindTexture(dessertAddress.c_str());
+            if(dessertAddress != "nullptr")
+            {
+                dessertTexture = ResourceManager::instance()->FindTexture(dessertAddress.c_str());
+            }
+            else
+            {
+                dessertTexture = nullptr;
+            }
             CustomerName = customerName;
             DescribeText = "喜欢的甜品:";
             customerNameSurface = TTF_RenderUTF8_Blended( TextFont, customerName.c_str(), TextColor);
@@ -307,7 +315,8 @@ class CustomerFrame
             SDL_RenderCopy( Renderer, backgroundTexture, nullptr, &backgroundRect );
             SDL_RenderCopy( Renderer, customerNameTexture, nullptr,&customerNameRect);
             SDL_RenderCopy( Renderer, describeTexture, nullptr, &describeRect);
-            SDL_RenderCopy( Renderer, dessertTexture, nullptr, &dessertRect);
+            if(dessertTexture != nullptr)
+                SDL_RenderCopy( Renderer, dessertTexture, nullptr, &dessertRect);
         }
     
     private:

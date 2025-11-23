@@ -129,7 +129,13 @@ class GameEvent
                     {
                         if( my >= Customers[i].getY() && my <= Customers[i].getY() + 64)
                         {
-                            std::string dessertAddress = dessertManager.GetDessertPath(Customers[i].GetPreferDessertID());
+                            std::string dessertAddress;
+                            if(Customers[i].GetPreferDessertID() != -1)
+                                dessertAddress = dessertManager.GetDessertPath(Customers[i].GetPreferDessertID());
+                            else
+                            {
+                                dessertAddress = "nullptr";
+                            }
                             customerFrame.SetCustomer(Customers[i].GetCustomerName(), dessertAddress);
                             whetherRenderCustomerFrame = 1;
                             break;

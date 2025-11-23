@@ -281,11 +281,11 @@ class Customer
                 toward = 0;
                 x = x - speed;
             }
-            else if(x < 450 && y <= 500 && x >=200 )
+            else if(x < 450 && y <= 520 && x >=200 )
             {
                 y = y + speed;
             }
-            else if(x >= 200 && x < 450 && y > 500)
+            else if(x >= 200 && x < 450 && y > 520)
             {
                 toward = 0;
                 x = x - speed;
@@ -469,7 +469,7 @@ class Customer
                         RefreshNameSurface();
                         CurrentStage = CustomerStage::Leave;
                         SitTime = 0;
-                        whetherRenderAdd = 1;
+                        whetherRenderAdd = 0;
                     }
                     if( waitingTime == 0 && eatNumber == 0)
                     {
@@ -479,11 +479,16 @@ class Customer
                     {
                         EatTime = CurrentTime;
                     }
+                    if( eatNumber == 0 && CurrentTime - waitingTime > 1000)
+                    {
+                        addNumber = customer.GetAddNumber(productManager.products[Cabinets[chooseID].GetDessertID()].GetDessertID(),ChooseNumber);
+                        whetherRenderAdd = 1;
+                    }
                     if( eatNumber == 0 && CurrentTime - waitingTime > 3000)
                     {
                         Chairs[isEating].SetUsing(0);
-                        addNumber = customer.AddPreference(productManager.products[Cabinets[chooseID].GetDessertID()].GetDessertID(),ChooseNumber);
-                        whetherRenderAdd = 1;
+                        whetherRenderAdd = 0;
+                        customer.AddPreference(productManager.products[Cabinets[chooseID].GetDessertID()].GetDessertID(),ChooseNumber);
                         this->preference = customer.GetCustomerPreference();
                         RefreshNameSurface();
                         CurrentStage = CustomerStage::Leave;
@@ -692,7 +697,7 @@ class Customer
             return WhetherAppear;
         }
 
-        int AddPreference(int DessertID,int chooseNumber)
+        void AddPreference(int DessertID,int chooseNumber)
         {
             if(PreferDessertID == -1)
             {
@@ -715,14 +720,17 @@ class Customer
             if(preference > 2000)
                 preference = 2000;
             SDL_Log("当前喜好值%d",preference);
-            return addNumber;
         }
+
+        int GetAddNumber(int DessertID,int chooseNumber);
 
         void Clean()
         {
             // NameTexture is created/destroyed each render call now, so don't destroy it here.
             if(NameSurface)
                 SDL_FreeSurface(NameSurface);
+            if(AddFrameSurface)
+                SDL_FreeSurface(AddFrameSurface);
             // NormalTexture is owned by ResourceManager (shared). Do NOT destroy it here.
             TTF_CloseFont(NameFont);
         }

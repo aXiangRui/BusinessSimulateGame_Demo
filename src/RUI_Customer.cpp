@@ -40,6 +40,7 @@ void Customer::InitCustomer(int id, int preferid, std::string name, std::string 
     color = {10,10,10,255};
     std::string totalname = CustomerName + " " + std::to_string(preference);
     NameSurface = TTF_RenderUTF8_Blended(NameFont, totalname.c_str(), color);
+    AddFrameSurface = nullptr;
     if(!NameSurface)
         SDL_Log("%s",CustomerName.c_str());
     NameW = NameSurface->w; NameH = NameSurface->h;
@@ -146,9 +147,30 @@ void Customer::SetChooseNumber()
 void Customer::RenderAddFrame(SDL_Renderer* Renderer)
 {
     std::string add = "+" + std::to_string(addNumber);
-    AddFrameSurface = TTF_RenderUTF8_Blended(NameFont, add.c_str(), color);
-    AddFrameRect = {x-10, y, AddFrameSurface->w,AddFrameSurface->h};
+    if(AddFrameSurface == nullptr)
+    {
+        AddFrameSurface = TTF_RenderUTF8_Blended(NameFont, add.c_str(), color);
+        AddFrameRect = {x-10, y, AddFrameSurface->w,AddFrameSurface->h};
+    }
     AddFrameTexture = SDL_CreateTextureFromSurface(Renderer, AddFrameSurface);
-    SDL_FreeSurface(AddFrameSurface);
     SDL_RenderCopy(Renderer, AddFrameTexture, nullptr, &AddFrameRect );
+}
+
+int Customer::GetAddNumber(int DessertID,int chooseNumber)
+{
+    if(PreferDessertID == -1)
+            {
+                addNumber = 6 * chooseNumber;
+            }
+            else if(DessertID == PreferDessertID)
+            {
+                addNumber = 6 * chooseNumber;
+                // SDL_Log("01增加了%d",6*chooseNumber);
+            }
+            else
+            {
+                addNumber = chooseNumber;
+                //  SDL_Log("02增加了%d",chooseNumber);
+            }
+            return addNumber;
 }
