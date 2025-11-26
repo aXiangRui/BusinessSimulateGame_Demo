@@ -136,11 +136,19 @@ class RUI_GameScene: public RUI_Scene
             if( PresentTime >= 18 && NightChanged == 0)
             {
                 currentalpha = ( PresentTime - 17 ) * 30;
+                if( currentalpha  > 150)
+                {
+                    currentalpha = 150;
+                } 
                 NightChanged = 1;
             }
             else if( PresentTime <= 7 && NightChanged == 0)
             {
                 currentalpha =  (8 - PresentTime) * 30;
+                if( currentalpha  > 150)
+                {
+                    currentalpha = 150;
+                } 
                 NightChanged = 1;
             }
             else if( NightChanged == 0)

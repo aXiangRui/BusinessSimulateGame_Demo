@@ -56,7 +56,7 @@ class DessertManager
     void Save()
     {
         std::ofstream File("./save/Desserts.txt");
-        File << "#以下数据依次为ID,甜度,饱腹感,口感,名字,储存地址,是否为基类蛋糕(即可合成),是否已解锁";
+        File << "#以下数据依次为ID,甜度,饱腹感,口感,名字,储存地址,是否为基类蛋糕(即可合成),是否已解锁,等级";
         File << std::endl;
         for(int i = 0; i < Desserts.size(); i++)
         {

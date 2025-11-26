@@ -105,7 +105,14 @@ class CustomerManager
             file << Customers[i].GetPreferDessertID() << " ";
             file << Customers[i].GetCustomerName() << " ";
             file << Customers[i].GetCustomerPath() << " ";
-            file << Customers[i].GetWhetherAppear() << " ";
+            if( i == 2 )
+            {
+                file << 1 << " ";
+            }
+            else
+            {            
+                file << 0 << " ";
+            }         
             file << 0 << " ";
             file << std::endl;
         }

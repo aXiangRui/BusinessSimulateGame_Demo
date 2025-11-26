@@ -150,7 +150,7 @@ void Customer::RenderAddFrame(SDL_Renderer* Renderer)
     if(AddFrameSurface == nullptr)
     {
         AddFrameSurface = TTF_RenderUTF8_Blended(NameFont, add.c_str(), color);
-        AddFrameRect = {x-10, y, AddFrameSurface->w,AddFrameSurface->h};
+        AddFrameRect = {x + 10, y, AddFrameSurface->w,AddFrameSurface->h};
     }
     AddFrameTexture = SDL_CreateTextureFromSurface(Renderer, AddFrameSurface);
     SDL_RenderCopy(Renderer, AddFrameTexture, nullptr, &AddFrameRect );

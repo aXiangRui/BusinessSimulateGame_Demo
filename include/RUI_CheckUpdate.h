@@ -17,9 +17,15 @@ class CheckUpdate
 
         void update(CustomerManager& customerManager, DessertManager& dessertManager, MaterialManager& materialManager, ChatFrame& chatFrame, TextManager& textManager, UnlockFrame& unlockFrame,bool& isShowing)
         {            
-            UnlockDessert(customerManager, 0, dessertManager, 3, chatFrame, textManager, unlockFrame,isShowing,1,50);               
+            UnlockDessert(customerManager, 0, dessertManager, 3, chatFrame, textManager, unlockFrame,isShowing,1,50);  
+            /*蛋糕胚解锁区*/             
             UnlockCustomer(customerManager, 3, 10, chatFrame, textManager,unlockFrame, isShowing,2, 100);
+            UnlockCustomer(customerManager, 2, 0, chatFrame, textManager, unlockFrame, isShowing, 3, 1);
+            UnlockCustomer(customerManager, 0, 1,chatFrame, textManager, unlockFrame, isShowing, 4, 20);
+            UnlockCustomer(customerManager, 1, 3, chatFrame, textManager, unlockFrame, isShowing, 5, 20);
+            /*顾客解锁区*/
             UnlockMaterial(customerManager, 1, materialManager, 4, chatFrame, textManager,unlockFrame, isShowing,1,100);
+            /*材料解锁区*/
         }
         void UnlockDessert(CustomerManager& customerManager,int CustomerID, DessertManager& dessertManager,int DessertID,ChatFrame& chatFrame, TextManager& textManager, UnlockFrame& unlockFrame,bool& isShowing,int TextID, int UnlockPreference)
         {
