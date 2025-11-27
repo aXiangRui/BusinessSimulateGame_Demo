@@ -727,12 +727,12 @@ class Customer
         void Clean()
         {
             // NameTexture is created/destroyed each render call now, so don't destroy it here.
-            if(NameSurface)
-                SDL_FreeSurface(NameSurface);
-            if(AddFrameSurface)
-                SDL_FreeSurface(AddFrameSurface);
-            // NormalTexture is owned by ResourceManager (shared). Do NOT destroy it here.
-            TTF_CloseFont(NameFont);
+            // if(NameSurface)
+                // SDL_FreeSurface(NameSurface);
+            // if(AddFrameSurface)
+            //     SDL_FreeSurface(AddFrameSurface);
+            // // NormalTexture is owned by ResourceManager (shared). Do NOT destroy it here.
+            // TTF_CloseFont(NameFont);
         }
 
     private:

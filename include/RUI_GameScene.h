@@ -67,6 +67,7 @@ class RUI_GameScene: public RUI_Scene
             TextFont = nullptr;
             cabinetFrame.InitFrame();
             summaryFrame.Init();
+            CheckEvent.init();
 
             for(int i = 0; i < 16; i++)
             {
@@ -126,7 +127,9 @@ class RUI_GameScene: public RUI_Scene
                     ChatDelayTime = 0;
                 }
             }
-            CheckEvent.update(customerManager, dessertManager, materialManager, chatFrame, textManager, unlockFrame, isChatFrameShowing);
+            std::vector<Customer>customers = TestEvent.GetCustomers();
+            CheckEvent.update(customerManager, dessertManager, materialManager, chatFrame, textManager, unlockFrame, isChatFrameShowing,customers);
+            TestEvent.SetCustomers(customers);
             unlockFrame.SetTime(CurrentTime);
         }
 

@@ -202,6 +202,7 @@ class GameEvent
                         if(customerManager.Customers[i].WhetherAdd(Customers.size(),timeClock))
                         {
                             // SDL_Log("可以生成%d",i);
+                            SDL_Log("%s的值为%d",customerManager.Customers[i].GetCustomerName().c_str(), customerManager.Customers[i].GetHasJoined());
                             Customer a;
                             a.InitCustomer(
                                 TotalCustomers,
@@ -446,6 +447,16 @@ class GameEvent
         whetherRenderCustomerFrame = whether;
     }
 
+    std::vector<Customer> GetCustomers()
+    {
+        return Customers;
+    }
+
+    void SetCustomers(std::vector<Customer>Customers)
+    {
+        this->Customers = Customers;
+    }
+
     void Load(int& TotalMoney, int& TotalCustomers, int& TotalDessert,std::vector<Cabinet>& Cabinets,CustomerManager& customerManager)
     {
         std::ifstream file("./save/Time.txt");
@@ -475,6 +486,7 @@ class GameEvent
                     {
                         a = customerManager.Customers[i];
                         customerManager.Customers[i].SetHasJoined(1);
+                        SDL_Log("%s",customerManager.GetCustomerName(i).c_str());
                     }
                 }
                 bool overload = 0;

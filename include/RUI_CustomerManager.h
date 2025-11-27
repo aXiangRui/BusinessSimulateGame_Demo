@@ -69,10 +69,8 @@ class CustomerManager
             int pre;
             int app;
             iss>>cID>>pID>>cName>>cPath>>app>>pre;
-            SDL_Log("%d %d %s %s %d",cID,pID,cName.c_str(),cPath.c_str(),app);
             Customer a;
             a.InitCustomer(cID,pID,cName,cPath,app,pre);
-            SDL_Log("%d",a.GetHasJoined());
             Customers.push_back(a);
         }
         File.close();
@@ -152,6 +150,30 @@ class CustomerManager
     bool GetWhetherAppear(int i)
     {
         return Customers[i].GetWhetherAppear();
+    }
+
+    Customer GetCustomerByName(std::string name)
+    {
+        for(int i = 0; i < Customers.size(); i++)
+        {
+            if(Customers[i].GetCustomerName() == name)
+            {
+                return Customers[i];
+            }
+        }
+        return Customers[0];
+    }
+
+    int GetCustomerIDByName(std::string name)
+    {
+        for(int i = 0; i < Customers.size(); i++)
+        {
+            if(Customers[i].GetCustomerName() == name)
+            {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private:

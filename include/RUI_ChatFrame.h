@@ -179,7 +179,7 @@ class UnlockFrame
                 DelayTime = CurrentTime;
                 WhetherRender = 1;
             }
-            if(CurrentTime - DelayTime >= 5000)
+            if(CurrentTime - DelayTime >= 10000)
             {
                 DelayTime = 0;
                 WhetherRender = 0;

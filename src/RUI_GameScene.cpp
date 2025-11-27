@@ -186,6 +186,14 @@ void RUI_GameScene::onInput(const SDL_Event& event,SDL_Renderer* Renderer, bool&
                             }
                             break;
                         }
+                        case 7:
+                        {
+                            for(int i = 0; i < 5; i++)
+                            {
+                                SDL_Log("%s %d",customerManager.Customers[i].GetCustomerName().c_str(),customerManager.Customers[i].GetHasJoined());
+                            }
+                            break;
+                        }
                         default:
                         break;
                     }

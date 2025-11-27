@@ -47,6 +47,8 @@ class TextManager
                 std::string text;
                 while(true)
                 {
+                    int n;
+                    File >> n;
                     File >> text;
                     CustomerText.push_back(text);
                     if(text == "end")
