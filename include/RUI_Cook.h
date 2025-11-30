@@ -3,6 +3,8 @@
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_image.h>
 #include"RUI_ResourceManager.h"
+#include"RUI_Product.h"
+#include"RUI_Cabinet.h"
 
 class Cook
 {
@@ -27,7 +29,7 @@ class Cook
         toward = 1;
     }
 
-    void onUpdate(int CurrentTime)
+    void onUpdate(int CurrentTime, std::vector<SmallCake>& cakes, std::vector<Cabinet> Cabinets)
     {
         if(Choose == 1)
         {
@@ -93,6 +95,15 @@ class Cook
                 Send = 0;
                 Choose = 1;
                 SendTime = 0;
+                for(int i = 0; i < 8; i++)
+                {
+                    SmallCake a;
+                    int num = cakes.size();
+                    a.init(num, rand() % Cabinets.size());
+                    cakes.push_back(a);
+                    // productID.push_back(rand() % Cabinets.size());
+                    SDL_Log("新增%d号面包柜甜点",cakes.back().GetID()+1);
+                }
             }
         }
     }

@@ -187,3 +187,37 @@ class Dessert
     int level;
     SDL_Rect Rect;
 };
+
+class SmallCake
+{
+    public:
+    SmallCake() = default;
+    ~SmallCake() = default;
+
+    void init(int i,int dessertID)
+    {
+        cakeTexture = ResourceManager::instance()->FindTexture("smallcake");
+        cakeRect = {100, 100 - 8 * i, 64, 64};
+        id = dessertID;
+    }
+
+    void onRender(SDL_Renderer* Renderer)
+    {
+        SDL_RenderCopy(Renderer,  cakeTexture, nullptr, &cakeRect);
+    }
+
+    void SetID(int dessertID)
+    {
+        id  = dessertID;
+    }
+
+    int GetID()
+    {
+        return id;
+    }
+
+    private:
+    SDL_Texture* cakeTexture;
+    SDL_Rect cakeRect;
+    int id;
+};

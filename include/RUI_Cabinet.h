@@ -20,7 +20,6 @@ class Cabinet
         y = (CabinetID / 2 % 6) * 40 + 200; 
         DessertID = did;
         dessertNumber = number;
-        // DessertID = rand() % 4;
     }
 
     int GetX()
@@ -53,6 +52,11 @@ class Cabinet
         dessertNumber = number;
     }
 
+    void AddDessertNumber(int number)
+    {
+        dessertNumber += number;
+    }
+
     bool isClicked(int mx, int my)
     {
         if(mx >= x && mx <= x + 64)
@@ -63,6 +67,12 @@ class Cabinet
             }
         }
         return false;
+    }
+
+    void RemoveDessert(int number)
+    {
+        this->dessertNumber -= number;
+        SDL_Log("此时的甜点数%d",dessertNumber);
     }
 
     void onRender(SDL_Renderer* Renderer)
@@ -157,6 +167,7 @@ class CabinetFrame
         SDL_RenderCopy(Renderer, QuitIcon, nullptr, &QuitRect);
         DessertName = Manager.GetProductName(cab.GetDessertID()) + " " + std::to_string(Manager.GetProductPrice(cab.GetDessertID())) + "元";
         CabinetID = "第" + std::to_string(IntCabinetID + 1) + "个面包柜";
+        dessertNumber = "当前甜点数:" + std::to_string(cab.GetDessertNumber());
 
         if(TextFont == nullptr)
         {
@@ -172,21 +183,29 @@ class CabinetFrame
             TitleSurface = TTF_RenderUTF8_Blended(TextFont, CabinetID.c_str(), color);
         if(DessertSurface == nullptr)
             DessertSurface = TTF_RenderUTF8_Blended(TextFont, DessertName.c_str(), color);
+        if(DessertNumberSurface == nullptr)
+            DessertNumberSurface = TTF_RenderUTF8_Blended(TextFont, dessertNumber.c_str(), color);
 
         if(TitleTexture == nullptr)
             TitleTexture = SDL_CreateTextureFromSurface(Renderer,TitleSurface);
         if(DessertNameTexture == nullptr)
             DessertNameTexture = SDL_CreateTextureFromSurface(Renderer,DessertSurface);
+        if(DessertNumberTexture == nullptr)
+            DessertNumberTexture = SDL_CreateTextureFromSurface(Renderer, DessertNumberSurface);
 
         int tw = TitleSurface->w; int th = TitleSurface->h;
         int dw = DessertSurface->w; int dh = DessertSurface->h;
 
         TitleRect = {200,100,tw,th};
         DessertRect = {200, 400, dw, dh};
+        NumberRect = {400, 300, DessertNumberSurface->w, DessertNumberSurface->h};
 
         SDL_RenderCopy(Renderer, TitleTexture, nullptr, &TitleRect);
         SDL_RenderCopy(Renderer, DessertNameTexture, nullptr, &DessertRect);
+        SDL_RenderCopy(Renderer, DessertNumberTexture, nullptr, &NumberRect);
         Manager.onRender(Renderer,cab.GetDessertID());
+        SDL_FreeSurface(TitleSurface);
+        SDL_FreeSurface(DessertNumberSurface);
     }
 
     private:
@@ -195,14 +214,18 @@ class CabinetFrame
     SDL_Texture* TitleTexture = nullptr;
     SDL_Texture* DessertNameTexture = nullptr;
     SDL_Texture* QuitIcon = nullptr;
+    SDL_Texture* DessertNumberTexture = nullptr;
     SDL_Rect Rect;
     SDL_Rect QuitRect;
     SDL_Rect TitleRect;
     SDL_Rect DessertRect;
+    SDL_Rect NumberRect;
     SDL_Surface* TitleSurface = nullptr;
     SDL_Surface* DessertSurface = nullptr;
+    SDL_Surface* DessertNumberSurface = nullptr;
     std::string DessertName;
     std::string CabinetID;
+    std::string dessertNumber;
     SDL_Color color;
     int IntCabinetID;
 };

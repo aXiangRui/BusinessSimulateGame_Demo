@@ -35,6 +35,8 @@ void Customer::InitCustomer(int id, int preferid, std::string name, std::string 
     addNumber = 0;
     whetherRenderAdd = 0;
     EatTime = 0;
+    chooseChange = 0;
+    removeCheck = 0;
 
     NameFont = TTF_OpenFont("./resources/font/namidiansong.ttf",16);
     color = {10,10,10,255};

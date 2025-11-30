@@ -185,7 +185,19 @@ class RUI_GameScene: public RUI_Scene
                             isSummaryShowing = 1;
                             TotalMoney = TotalMoney - 10 * TotalDessert;
                             SDL_Log("今日卖出甜品%d份",TotalDessert);
-                            SDL_Log("今日顾客共有%d人",TotalCustomers);                           
+                            SDL_Log("今日顾客共有%d人",TotalCustomers);   
+                            for(int i = 0; i < Cabinets.size(); i++)
+                            {
+                                if(Cabinets[i].GetDessertNumber() < 20)
+                                {
+                                    TotalMoney  -= 10 * (20 - Cabinets[i].GetDessertNumber());
+                                    Cabinets[i].SetDessertNumber(20);
+                                }
+                            }  
+                            for(int i = 0; i < 16; i++)
+                            {
+                                Chairs[i].SetUsing(0);
+                            }                      
                         }
                         if(TestClock.ReturnHour() == 6)
                         {

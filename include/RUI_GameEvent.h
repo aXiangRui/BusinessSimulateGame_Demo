@@ -32,6 +32,7 @@ class GameEvent
     MaterialManager materialManager;
     ChatFrame Chat;
     std::vector<Cook> Cooks;
+    std::vector<SmallCake>smallCakes;
 
     void AddCustomer(Customer cus)
     {
@@ -80,6 +81,7 @@ class GameEvent
         a.Init();
         Cooks.push_back(a);
         customerFrame.Init();
+        CakeSubTime = 0;
     }
 
     void quit()
@@ -325,7 +327,7 @@ class GameEvent
         }
         for(int i = 0; i < Cooks.size(); i++)
         {
-            Cooks[i].onUpdate(CurrentTime);
+            Cooks[i].onUpdate(CurrentTime, smallCakes, Cabinets);
         }
         if( whetherRenderCustomerFrame == 1 && RenderTime == 0)
         {
@@ -336,6 +338,21 @@ class GameEvent
             whetherRenderCustomerFrame = 0;
             RenderTime = 0;
         }
+        if( smallCakes.size() != 0)
+        {
+            if( CakeSubTime == 0)
+            {
+                CakeSubTime = CurrentTime;
+            }
+            if( CurrentTime - CakeSubTime >= 1000 )
+            {
+                int id = smallCakes[smallCakes.size()-1].GetID();
+                Cabinets[id].AddDessertNumber(1);
+                SDL_Log("第%d号柜子新增一个甜点",id+1);
+                smallCakes.pop_back();
+                CakeSubTime = 0;
+            }
+        }
     }
 
     void onRender(SDL_Renderer* Renderer)
@@ -343,6 +360,10 @@ class GameEvent
         for(int i = 0; i < Cooks.size(); i++)
         {
             Cooks[i].onRender(Renderer);
+        }
+        for( int i = 0; i < smallCakes.size(); i++)
+        {
+            smallCakes[i].onRender(Renderer);
         }
         for(int i = 0; i < Customers.size(); i++)
         {
@@ -583,4 +604,5 @@ class GameEvent
         bool whetherRenderCustomerFrame = 0;
         int RenderTime = 0;
         bool stillShow = 0;
+        int CakeSubTime = 0;
 };
