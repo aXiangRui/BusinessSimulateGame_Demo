@@ -197,8 +197,26 @@ class SmallCake
     void init(int i,int dessertID)
     {
         cakeTexture = ResourceManager::instance()->FindTexture("smallcake");
-        cakeRect = {100, 100 - 8 * i, 64, 64};
+        int x,y;   
         id = dessertID;
+        if(i % 4 % 2 == 1)
+        {
+            x = 100;
+        }
+        else
+        {
+            x = 108;
+        }
+        if( i % 4 / 2 == 0)
+        {
+            x += 4;
+        }
+        y = 100 - 8 * (i/4);
+        if( i % 4 / 2 == 0)
+        {
+            y -= 4;
+        }
+        cakeRect = { x, y, 64, 64};
     }
 
     void onRender(SDL_Renderer* Renderer)

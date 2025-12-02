@@ -11,6 +11,7 @@
 #include"RUI_MaterialManager.h"
 #include"RUI_ChatFrame.h"
 #include"RUI_Cook.h"
+#include"RUI_StoreServer.h"
 #include<vector>
 #include<string>
 #include<fstream>
@@ -32,6 +33,7 @@ class GameEvent
     MaterialManager materialManager;
     ChatFrame Chat;
     std::vector<Cook> Cooks;
+    std::vector<StoreServer> servers;
     std::vector<SmallCake>smallCakes;
 
     void AddCustomer(Customer cus)
@@ -80,6 +82,9 @@ class GameEvent
         Cook a;
         a.Init();
         Cooks.push_back(a);
+        StoreServer b;
+        b.init();
+        servers.push_back(b);
         customerFrame.Init();
         CakeSubTime = 0;
     }
@@ -173,7 +178,8 @@ class GameEvent
         DessertManager dessertManager,
         int& TotalMoney,
         int& TotalCustomers,
-        int& TotalDessert
+        int& TotalDessert,
+        int ClockTime
         )
     {       
         if(TotalCustomers >= 10000000)
@@ -327,7 +333,7 @@ class GameEvent
         }
         for(int i = 0; i < Cooks.size(); i++)
         {
-            Cooks[i].onUpdate(CurrentTime, smallCakes, Cabinets);
+            Cooks[i].onUpdate(CurrentTime, smallCakes, Cabinets, ClockTime);
         }
         if( whetherRenderCustomerFrame == 1 && RenderTime == 0)
         {
@@ -361,6 +367,10 @@ class GameEvent
         {
             Cooks[i].onRender(Renderer);
         }
+        // for(int i = 0; i < servers.size(); i++)
+        // {
+        //     servers[i].onRender(Renderer);
+        // }
         for( int i = 0; i < smallCakes.size(); i++)
         {
             smallCakes[i].onRender(Renderer);

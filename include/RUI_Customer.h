@@ -378,6 +378,7 @@ class Customer
         {
             if(y >= 150 + Queue * 2)
             {
+                toward = 1;
                 y = y - speed;
             }
             else if(x <= maxNumber(350 - Queue * 20 , 0))

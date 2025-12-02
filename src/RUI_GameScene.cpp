@@ -14,42 +14,6 @@ void RUI_GameScene::onInput(const SDL_Event& event,SDL_Renderer* Renderer, bool&
             int my = event.button.y;
             if(CheckSetting)
             {
-                // if(CheckRect(200,400,0,200,mx,my))
-                // {
-                //     Cabinets[CurrentCabnet].SetDessertID(ReadingPage*6);
-                //     CheckSetting = 0;
-                //     isSettingNewProduct = 1;
-                // }
-                // if(CheckRect(200,400,200,400,mx,my))
-                // {
-                //     Cabinets[CurrentCabnet].SetDessertID(ReadingPage*6+1);
-                //     CheckSetting = 0;
-                //     isSettingNewProduct = 1;
-                // }
-                // if(CheckRect(200,400,400,600,mx,my))
-                // {
-                //     Cabinets[CurrentCabnet].SetDessertID(ReadingPage*6+2);
-                //     CheckSetting = 0;
-                //     isSettingNewProduct = 1;
-                // }
-                // if(CheckRect(400,600,0,200,mx,my))
-                // {
-                //     Cabinets[CurrentCabnet].SetDessertID(ReadingPage*6+3);
-                //     CheckSetting = 0;
-                //     isSettingNewProduct = 1;
-                // }
-                // if(CheckRect(400,600,200,400,mx,my))
-                // {
-                //     Cabinets[CurrentCabnet].SetDessertID(ReadingPage*6+4);
-                //     CheckSetting = 0;
-                //     isSettingNewProduct = 1;
-                // }
-                // if(CheckRect(400,600,400,600,mx,my))
-                // {
-                //     Cabinets[CurrentCabnet].SetDessertID(ReadingPage*6+5);
-                //     CheckSetting = 0;
-                //     isSettingNewProduct = 1;
-                // }
                 // 一步计算偏移量，无需分支判断
                 if (mx >= 200 && mx <= 600 && my >= 0 && my <= 600) {
                     int offset = ((mx > 400) ? 3 : 0) + (my / 200);
@@ -174,24 +138,24 @@ void RUI_GameScene::onInput(const SDL_Event& event,SDL_Renderer* Renderer, bool&
                         }
                         case 6:
                         {
-                            // if(Cabinets.size() < 24)
-                            // {
-                            //     Cabinet a;
-                            //     a.InitCabinet(Cabinets.size(),0,0);
-                            //     Cabinets.push_back(a);
-                            //     TotalMoney = TotalMoney - 1000 * Cabinets.size() -1000;
-                            // }
+                            if(Cabinets.size() < 24)
+                            {
+                                Cabinet a;
+                                a.InitCabinet(Cabinets.size(),0,0);
+                                Cabinets.push_back(a);
+                                TotalMoney = TotalMoney - 1000 * Cabinets.size() -1000;
+                            }
                             bool a = 0;
-                            if( isMaterialFrameShowing == 1 && a == 0)
-                            {
-                                isMaterialFrameShowing = 0;
-                                a = 1;
-                            }
-                            if( isMaterialFrameShowing == 0  & a == 0)
-                            {
-                                materialFrame.SetTitle("奶油", "cream", textManager.MaterialText[0]);
-                                isMaterialFrameShowing = 1;
-                            }
+                            // if( isMaterialFrameShowing == 1 && a == 0)
+                            // {
+                            //     isMaterialFrameShowing = 0;
+                            //     a = 1;
+                            // }
+                            // if( isMaterialFrameShowing == 0  & a == 0)
+                            // {
+                            //     materialFrame.SetTitle("奶油", "cream", textManager.MaterialText[0]);
+                            //     isMaterialFrameShowing = 1;
+                            // }
                             break;
                         }
                         case 7:

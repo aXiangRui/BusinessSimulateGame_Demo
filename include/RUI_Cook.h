@@ -29,80 +29,83 @@ class Cook
         toward = 1;
     }
 
-    void onUpdate(int CurrentTime, std::vector<SmallCake>& cakes, std::vector<Cabinet> Cabinets)
+    void onUpdate(int CurrentTime, std::vector<SmallCake>& cakes, std::vector<Cabinet> Cabinets, int ClockTime)
     {
-        if(Choose == 1)
+        if(ClockTime >= 6 && ClockTime <= 22)
         {
-            if(x >= 10)
+            if(Choose == 1)
             {
-                x = x - WalkSpeed;
-                toward = 0;
-            }
-            else if( y >= 10)
-            {
-                y = y - WalkSpeed;
-            }
-            else if(ChooseTime == 0)
-            {
-                ChooseTime = CurrentTime;
-            }
-            else if( CurrentTime - ChooseTime >= 2000)
-            {
-                Choose = 0;
-                isCooking = 1;
-                ChooseTime = 0;
-            }
-        }
-        if(isCooking == 1)
-        {
-            if( x <= 350)
-            {
-                toward = 1;
-                x = x + WalkSpeed;
-            }
-            else if( y <= 80)
-            {
-                y = y + WalkSpeed;
-            }
-            else if( CookingTime == 0)
-            {
-                CookingTime = CurrentTime;
-            }
-            else if( CurrentTime - CookingTime >= 2000)
-            {
-                isCooking = 0;
-                Send = 1;
-                CookingTime = 0;
-            }
-        }
-        if(Send == 1)
-        {
-            if(x >= 100)
-            {
-                toward = 0;
-                x = x - WalkSpeed;
-            }
-            else if(y <= 80)
-            {
-                y = y + WalkSpeed;
-            }
-            else if(SendTime == 0)
-            {
-                SendTime = CurrentTime;
-            }
-            else if(CurrentTime - SendTime >= 2000)
-            {
-                Send = 0;
-                Choose = 1;
-                SendTime = 0;
-                for(int i = 0; i < 8; i++)
+                if(x >= 10)
                 {
-                    SmallCake a;
-                    int num = cakes.size();
-                    a.init(num, rand() % Cabinets.size());
-                    cakes.push_back(a);
-                    // productID.push_back(rand() % Cabinets.size());
-                    SDL_Log("新增%d号面包柜甜点",cakes.back().GetID()+1);
+                    x = x - WalkSpeed;
+                    toward = 0;
+                }
+                else if( y >= 10)
+                {
+                    y = y - WalkSpeed;
+                }
+                else if(ChooseTime == 0)
+                {
+                    ChooseTime = CurrentTime;
+                }
+                else if( CurrentTime - ChooseTime >= 2000)
+                {
+                    Choose = 0;
+                    isCooking = 1;
+                    ChooseTime = 0;
+                }
+            }
+            if(isCooking == 1)
+            {
+                if( x <= 350)
+                {
+                    toward = 1;
+                    x = x + WalkSpeed;
+                }
+                else if( y <= 80)
+                {
+                    y = y + WalkSpeed;
+                }
+                else if( CookingTime == 0)
+                {
+                    CookingTime = CurrentTime;
+                }
+                else if( CurrentTime - CookingTime >= 2000)
+                {
+                    isCooking = 0;
+                    Send = 1;
+                    CookingTime = 0;
+                }
+            }
+            if(Send == 1)
+            {
+                if(x >= 100)
+                {
+                    toward = 0;
+                    x = x - WalkSpeed;
+                }
+                else if(y <= 80)
+                {
+                    y = y + WalkSpeed;
+                }
+                else if(SendTime == 0)
+                {
+                    SendTime = CurrentTime;
+                }
+                else if(CurrentTime - SendTime >= 2000)
+                {
+                    Send = 0;
+                    Choose = 1;
+                    SendTime = 0;
+                    for(int i = 0; i < 13; i++)
+                    {
+                        SmallCake a;
+                        int num = cakes.size();
+                        a.init(num, rand() % Cabinets.size());
+                        cakes.push_back(a);
+                        // productID.push_back(rand() % Cabinets.size());
+                        SDL_Log("新增%d号面包柜甜点",cakes.back().GetID()+1);
+                    }
                 }
             }
         }
