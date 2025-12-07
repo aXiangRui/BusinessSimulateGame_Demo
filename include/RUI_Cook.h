@@ -97,7 +97,7 @@ class Cook
                     Send = 0;
                     Choose = 1;
                     SendTime = 0;
-                    for(int i = 0; i < 13; i++)
+                    for(int i = 0; i < 12; i++)
                     {
                         SmallCake a;
                         int num = cakes.size();

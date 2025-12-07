@@ -241,7 +241,8 @@ class Customer
             DessertManager dessertManager,
             ProductManager pManager,
             Customer& customer,
-            int&  TotalMoney
+            int&  TotalMoney,
+            Register& res
         )
         {
             switch(CurrentStage)
@@ -258,7 +259,7 @@ class Customer
                 }
                 case CustomerStage::Buy:
                 {
-                    Pay(currentTime,TotalMoney,pManager,Cabtines);
+                    Pay(currentTime,TotalMoney,pManager,Cabtines,res);
                     break;
                 }
                 case CustomerStage::Eat:
@@ -374,7 +375,7 @@ class Customer
             }
         }
 
-        void Pay(int CurrentTime, int& TotalMoney, ProductManager& pManager, std::vector<Cabinet>& Cabinets)
+        void Pay(int CurrentTime, int& TotalMoney, ProductManager& pManager, std::vector<Cabinet>& Cabinets, Register& res)
         {
             if(y >= 150 + Queue * 2)
             {
@@ -400,10 +401,10 @@ class Customer
                 if( PayTime == 0)
                 {
                     PayTime = CurrentTime;
-                    SDL_Log("%s此时的时间%d",CustomerName.c_str(),PayTime);
+                    // SDL_Log("%s此时的时间%d",CustomerName.c_str(),PayTime);
                 }
                 toward = 1;
-                if(CurrentTime - PayTime >= 1000 && isGoingPay == 1)
+                if(CurrentTime - PayTime >= 1000 && isGoingPay == 1 && res.GetIsPaying() == 1)
                 {
                     if(payPrice >= 1000)
                         SDL_Log("warnning!!!!价格超标，数据异常:%d",payPrice);

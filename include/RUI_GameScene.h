@@ -112,7 +112,7 @@ class RUI_GameScene: public RUI_Scene
                 TestEvent.SetClock(TestClock);
                 TestEvent.onUpdate(Chairs,
                     Cabinets,customerManager,
-                    dessertManager,TotalMoney,
+                    dessertManager,reg,TotalMoney,
                     TotalCustomers,TotalDessert, TestClock.ReturnHour());
             }
             else

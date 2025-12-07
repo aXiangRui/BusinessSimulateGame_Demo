@@ -12,6 +12,7 @@
 #include"RUI_ChatFrame.h"
 #include"RUI_Cook.h"
 #include"RUI_StoreServer.h"
+#include"RUI_Chair.h"
 #include<vector>
 #include<string>
 #include<fstream>
@@ -83,8 +84,11 @@ class GameEvent
         a.Init();
         Cooks.push_back(a);
         StoreServer b;
-        b.init();
-        servers.push_back(b);
+        for(int i = 0; i < 3; i++)
+        {
+            b.init();
+            servers.push_back(b);
+        }
         customerFrame.Init();
         CakeSubTime = 0;
     }
@@ -175,7 +179,8 @@ class GameEvent
     void onUpdate(std::vector<Chair>& Chairs,
         std::vector<Cabinet>& Cabinets,
         CustomerManager& customerManager,
-        DessertManager dessertManager,
+        DessertManager& dessertManager,
+        Register& res,
         int& TotalMoney,
         int& TotalCustomers,
         int& TotalDessert,
@@ -240,7 +245,7 @@ class GameEvent
             for(int j = 0; j < customerManager.GetCustomersSize(); j++)
             {
                 if(Customers[i].GetCustomerName() == customerManager.GetCustomerName(j))           
-                    Customers[i].Update(Chairs, CurrentTime, Cabinets, dessertManager, productManager, customerManager.Customers[j], TotalMoney);
+                    Customers[i].Update(Chairs, CurrentTime, Cabinets, dessertManager, productManager, customerManager.Customers[j], TotalMoney, res);
             }
             //差点找不到顾客类刷新了哈哈哈哈
             if(Customers[i].GetQuit() && Customers[i].getX() > 800 && Customers[i].getY() > 350) 
@@ -350,13 +355,29 @@ class GameEvent
             {
                 CakeSubTime = CurrentTime;
             }
-            if( CurrentTime - CakeSubTime >= 1000 )
+            // if( CurrentTime - CakeSubTime >= 1000 )
+            // {
+            //     int id = smallCakes[smallCakes.size()-1].GetID();
+            //     Cabinets[id].AddDessertNumber(1);
+            //     SDL_Log("第%d号柜子新增一个甜点",id+1);
+            //     smallCakes.pop_back();
+            //     CakeSubTime = 0;
+            // }
+        }
+        for(int i = 0; i < servers.size(); i++)
+        {
+            servers[i].update(CurrentTime, smallCakes, Cabinets, res, payQueue.size());
+        }   
+        int payServer = 0;
+        for(int i = 0; i < servers.size(); i++)
+        {
+            if( payServer > 0 && servers[i].GetCurrentStage() == 1)
             {
-                int id = smallCakes[smallCakes.size()-1].GetID();
-                Cabinets[id].AddDessertNumber(1);
-                SDL_Log("第%d号柜子新增一个甜点",id+1);
-                smallCakes.pop_back();
-                CakeSubTime = 0;
+                servers[i].SetCurrentStage(0);
+            }
+            if(servers[i].GetCurrentStage() == 1 && payServer == 0)
+            {
+                payServer = 1;
             }
         }
     }
@@ -367,13 +388,13 @@ class GameEvent
         {
             Cooks[i].onRender(Renderer);
         }
-        // for(int i = 0; i < servers.size(); i++)
-        // {
-        //     servers[i].onRender(Renderer);
-        // }
         for( int i = 0; i < smallCakes.size(); i++)
         {
             smallCakes[i].onRender(Renderer);
+        }
+        for(int i = 0; i < servers.size(); i++)
+        {
+            servers[i].onRender(Renderer);
         }
         for(int i = 0; i < Customers.size(); i++)
         {

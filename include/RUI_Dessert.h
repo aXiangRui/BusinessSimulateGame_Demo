@@ -197,9 +197,19 @@ class SmallCake
     void init(int i,int dessertID)
     {
         cakeTexture = ResourceManager::instance()->FindTexture("smallcake");
-        int x,y;   
         id = dessertID;
-        if(i % 4 % 2 == 1)
+        currentID = i;
+        SetPosition();
+    }
+    void updateID(int currentID)
+    {
+        this->currentID = currentID;
+        SetPosition();
+    }
+
+    void SetPosition()
+    {
+        if(currentID % 4 % 2 == 1)
         {
             x = 100;
         }
@@ -207,12 +217,12 @@ class SmallCake
         {
             x = 108;
         }
-        if( i % 4 / 2 == 0)
+        if( currentID % 4 / 2 == 0)
         {
             x += 4;
         }
-        y = 100 - 8 * (i/4);
-        if( i % 4 / 2 == 0)
+        y = 100 - 8 * (currentID/4);
+        if( currentID % 4 / 2 == 0)
         {
             y -= 4;
         }
@@ -238,4 +248,8 @@ class SmallCake
     SDL_Texture* cakeTexture;
     SDL_Rect cakeRect;
     int id;
+    int currentID;//这个是用来标记它是第几个
+    int x,y;   
 };
+
+int RemoveSmallCakesByID(std::vector<SmallCake>& smallcakes, int targetID);

@@ -129,7 +129,18 @@ class Register
         SDL_RenderCopy(Renderer,RegisterTexture,nullptr,&Rect);
     }
 
+    void SetIsPaying(bool a)
+    {
+        isPaying = a;
+    }
+
+    bool GetIsPaying()
+    {
+        return isPaying;
+    }
+
     private:
     SDL_Texture* RegisterTexture;
     int x,y;
+    bool isPaying;
 };

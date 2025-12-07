@@ -54,6 +54,7 @@ class Cabinet
 
     void AddDessertNumber(int number)
     {
+        SDL_Log("添加了%d搁甜点",number);
         dessertNumber += number;
     }
 
