@@ -17,7 +17,7 @@ class DessertManager
 
     void InitDessertManager()
     {
-        std::ifstream File("./save/Desserts.txt");
+        std::ifstream File("./save/Desserts.rui");
         std::string string;
         int line = 0;
         while(std::getline(File,string))
@@ -55,7 +55,7 @@ class DessertManager
 
     void Save()
     {
-        std::ofstream File("./save/Desserts.txt");
+        std::ofstream File("./save/Desserts.rui");
         File << "#以下数据依次为ID,甜度,饱腹感,口感,名字,储存地址,是否为基类蛋糕(即可合成),是否已解锁,等级";
         File << std::endl;
         for(int i = 0; i < Desserts.size(); i++)

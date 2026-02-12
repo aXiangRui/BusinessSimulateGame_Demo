@@ -29,7 +29,7 @@ class ProductManager
             a.InitPlate(200,200,i);
             plates.push_back(a);
         }
-        std::ifstream File("./save/Product.txt");
+        std::ifstream File("./save/Product.rui");
         std::string string;
         int line = 0;
         while(std::getline(File,string))
@@ -59,7 +59,7 @@ class ProductManager
 
     void Save()
     {
-        std::ofstream file("./save/Product.txt");
+        std::ofstream file("./save/Product.rui");
         file << "#以下数据依次表示内容:产品id,基类甜点id,三种装饰物id,盘子尺寸" << std::endl;
         for(int i = 0; i < products.size(); i++)
         {

@@ -103,7 +103,7 @@ class StoreServer
         {
             y -= speed;
         }
-        else if( x < 350 )
+        else if( x < 250 )
         {
             x += speed;
             toward = 1;
@@ -112,9 +112,9 @@ class StoreServer
         {
             y += TargetSpeedChangeY( 130, y , speed);
         }
-        else if( x > 350)
+        else if( x > 250)
         {
-            x -= TargetSpeedChangeX( 350, x, speed);
+            x -= TargetSpeedChangeX( 250, x, speed);
             toward = 0;
         }
         if( QueueNumber != 0 && reg.GetIsPaying() == 0 )

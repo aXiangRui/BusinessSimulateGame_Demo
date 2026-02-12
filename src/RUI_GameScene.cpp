@@ -279,6 +279,23 @@ void RUI_GameScene::onInput(const SDL_Event& event,SDL_Renderer* Renderer, bool&
             }
             break;
         }
+        case SDL_KEYDOWN:
+        {
+            switch(event.key.keysym.sym)
+            {
+                case SDLK_c:
+                {
+                    SceneManager.ChooseScene(RUI_SceneManager::SceneType::Create);
+                    break;
+                }
+                case SDLK_ESCAPE:
+                {
+                    SceneManager.ChooseScene(RUI_SceneManager::SceneType::Menu);
+                    break;
+                }
+            }
+            break;
+        }
         default:
             break;
     }

@@ -22,7 +22,7 @@ class MaterialManager
     {
         if(1)
         {
-            std::ifstream File("./save/Material.txt");
+            std::ifstream File("./save/Material.rui");
             std::string string;
             int line = 0;
             while(std::getline(File,string))
@@ -64,7 +64,7 @@ class MaterialManager
 
     void Save()
     {
-        std::ofstream File("./save/Material.txt");
+        std::ofstream File("./save/Material.rui");
         File << "以下数据依次为种类(1为装饰,0为基类),ID,食材种类,名字,储存地址,甜度,饱腹感,口感，是否解锁" << std::endl;
         File << "#食材分类如下:" << std::endl;
         File << "#---0---奶油类" << std::endl;

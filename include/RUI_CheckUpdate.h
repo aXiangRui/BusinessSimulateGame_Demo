@@ -102,7 +102,7 @@ class CheckUpdate
         void Load()
         {
             UnlockCustomers.clear();
-            std::ifstream File("./save/UnlockList.txt");
+            std::ifstream File("./save/UnlockList.rui");
             std::string string;
             int line = 0;
             while(std::getline(File,string))

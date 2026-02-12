@@ -101,6 +101,7 @@ class GameEvent
         plates.clear();
         Btns.clear();
         Cooks.clear();
+        servers.clear();
     }
 
     void RemoveIdFromQueue(int id)
@@ -382,19 +383,27 @@ class GameEvent
         }
     }
 
+    void ServerRender(SDL_Renderer* Renderer)
+    {
+        for(int i = 0; i < servers.size(); i++)
+        {
+            servers[i].onRender(Renderer);
+        }
+    }
+
+    void SmallcakeRender( SDL_Renderer* Renderer)
+    {      
+        for( int i = 0; i < smallCakes.size(); i++)
+        {
+            smallCakes[i].onRender(Renderer);
+        }
+    }
+
     void onRender(SDL_Renderer* Renderer)
     {
         for(int i = 0; i < Cooks.size(); i++)
         {
             Cooks[i].onRender(Renderer);
-        }
-        for( int i = 0; i < smallCakes.size(); i++)
-        {
-            smallCakes[i].onRender(Renderer);
-        }
-        for(int i = 0; i < servers.size(); i++)
-        {
-            servers[i].onRender(Renderer);
         }
         for(int i = 0; i < Customers.size(); i++)
         {
@@ -511,7 +520,7 @@ class GameEvent
 
     void Load(int& TotalMoney, int& TotalCustomers, int& TotalDessert,std::vector<Cabinet>& Cabinets,CustomerManager& customerManager)
     {
-        std::ifstream file("./save/Time.txt");
+        std::ifstream file("./save/Time.rui");
         std::string string;
         int time;
         file >> time;
@@ -563,7 +572,7 @@ class GameEvent
         }
         file.close();
 
-        std::ifstream file01("./save/Total.txt");
+        std::ifstream file01("./save/Total.rui");
         file01 >> TotalCustomers;
         file01 >> TotalMoney;
         file01 >> TotalDessert;
@@ -571,7 +580,7 @@ class GameEvent
         file01.close();
 
         int number;
-        std::ifstream file02("./save/Cabinet.txt");
+        std::ifstream file02("./save/Cabinet.rui");
         file02 >> number;
         for(int i = 0; i < number; i++)
         {
@@ -586,7 +595,7 @@ class GameEvent
 
     void Save(int& TotalMoney, int& TotalCustomers, int& TotalDessert, std::vector<Cabinet>& Cabinets)
     {
-        std::ofstream file("./save/Time.txt");
+        std::ofstream file("./save/Time.rui");
         if(!file)
         {
             SDL_Log("Save: failed to open save file for writing");
@@ -607,13 +616,13 @@ class GameEvent
         }
         file.close();
 
-        std::ofstream file01("./save/Total.txt");
+        std::ofstream file01("./save/Total.rui");
         file01 << TotalCustomers <<std::endl;
         file01 << TotalMoney << std::endl;
         file01 << TotalDessert << std::endl;
         file01.close();
 
-        std::ofstream file02("./save/Cabinet.txt");
+        std::ofstream file02("./save/Cabinet.rui");
         file02 << Cabinets.size() << std::endl;
         for(int i = 0; i < Cabinets.size(); i++)
         {

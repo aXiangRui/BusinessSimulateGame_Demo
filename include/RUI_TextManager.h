@@ -20,7 +20,7 @@ class TextManager
 
     void Init()
     {
-        std::ifstream File("./save/Text.txt");
+        std::ifstream File("./save/Text.rui");
         std::string string;
         int line = 0;
         while(std::getline(File,string))

@@ -252,6 +252,8 @@ class RUI_GameScene: public RUI_Scene
             {
                 Desks[i].onRender(Renderer);
             }
+            TestEvent.SmallcakeRender(Renderer);
+            TestEvent.ServerRender(Renderer);
 
             reg.onRender(Renderer);
 

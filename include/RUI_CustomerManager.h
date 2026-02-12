@@ -19,7 +19,7 @@ class CustomerManager
     {
         if(hasloaded == 0)
         {
-            std::ifstream File("./save/Customers.txt");
+            std::ifstream File("./save/Customers.rui");
             std::string string;
             int line = 0;
             while(std::getline(File,string))
@@ -51,7 +51,7 @@ class CustomerManager
     void update()
     {
         Customers.clear();
-        std::ifstream File("./save/Customers.txt");
+        std::ifstream File("./save/Customers.rui");
         std::string string;
         int line = 0;
         while(std::getline(File,string))
@@ -78,7 +78,7 @@ class CustomerManager
 
     void Save()
     {
-        std::ofstream file("./save/Customers.txt");
+        std::ofstream file("./save/Customers.rui");
         file << "#以下数据依次为ID，喜欢的甜点ID,顾客名字,顾客地址,是否已解锁(1表示已解锁,0表示未解锁),好感度"<<std::endl;
         for(int i = 0; i < Customers.size(); i++)
         {
@@ -95,7 +95,7 @@ class CustomerManager
 
     void Reset()
     {
-        std::ofstream file("./save/Customers.txt");
+        std::ofstream file("./save/Customers.rui");
         file << "#以下数据依次为ID，喜欢的甜点ID,顾客名字,顾客地址,是否已解锁(1表示已解锁,0表示未解锁),好感度"<<std::endl;
         for(int i = 0; i < Customers.size(); i++)
         {
