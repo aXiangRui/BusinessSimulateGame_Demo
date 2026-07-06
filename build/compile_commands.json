@@ -1,0 +1,62 @@
+[
+{
+  "directory": "D:/game/moni02/build",
+  "command": "D:\\save\\x86_64-8.1.0-release-posix-seh-rt_v6-rev0\\mingw64\\bin\\g++.exe  @CMakeFiles/TestDessertShop.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\TestDessertShop.dir\\src\\RUI_Customer.cpp.obj -c D:\\game\\moni02\\src\\RUI_Customer.cpp",
+  "file": "D:/game/moni02/src/RUI_Customer.cpp",
+  "output": "CMakeFiles/TestDessertShop.dir/src/RUI_Customer.cpp.obj"
+},
+{
+  "directory": "D:/game/moni02/build",
+  "command": "D:\\save\\x86_64-8.1.0-release-posix-seh-rt_v6-rev0\\mingw64\\bin\\g++.exe  @CMakeFiles/TestDessertShop.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\TestDessertShop.dir\\src\\RUI_Dessert.cpp.obj -c D:\\game\\moni02\\src\\RUI_Dessert.cpp",
+  "file": "D:/game/moni02/src/RUI_Dessert.cpp",
+  "output": "CMakeFiles/TestDessertShop.dir/src/RUI_Dessert.cpp.obj"
+},
+{
+  "directory": "D:/game/moni02/build",
+  "command": "D:\\save\\x86_64-8.1.0-release-posix-seh-rt_v6-rev0\\mingw64\\bin\\g++.exe  @CMakeFiles/TestDessertShop.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\TestDessertShop.dir\\src\\RUI_GameScene.cpp.obj -c D:\\game\\moni02\\src\\RUI_GameScene.cpp",
+  "file": "D:/game/moni02/src/RUI_GameScene.cpp",
+  "output": "CMakeFiles/TestDessertShop.dir/src/RUI_GameScene.cpp.obj"
+},
+{
+  "directory": "D:/game/moni02/build",
+  "command": "D:\\save\\x86_64-8.1.0-release-posix-seh-rt_v6-rev0\\mingw64\\bin\\g++.exe  @CMakeFiles/TestDessertShop.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\TestDessertShop.dir\\src\\RUI_GameSerializer.cpp.obj -c D:\\game\\moni02\\src\\RUI_GameSerializer.cpp",
+  "file": "D:/game/moni02/src/RUI_GameSerializer.cpp",
+  "output": "CMakeFiles/TestDessertShop.dir/src/RUI_GameSerializer.cpp.obj"
+},
+{
+  "directory": "D:/game/moni02/build",
+  "command": "D:\\save\\x86_64-8.1.0-release-posix-seh-rt_v6-rev0\\mingw64\\bin\\g++.exe  @CMakeFiles/TestDessertShop.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\TestDessertShop.dir\\src\\RUI_GameWorld.cpp.obj -c D:\\game\\moni02\\src\\RUI_GameWorld.cpp",
+  "file": "D:/game/moni02/src/RUI_GameWorld.cpp",
+  "output": "CMakeFiles/TestDessertShop.dir/src/RUI_GameWorld.cpp.obj"
+},
+{
+  "directory": "D:/game/moni02/build",
+  "command": "D:\\save\\x86_64-8.1.0-release-posix-seh-rt_v6-rev0\\mingw64\\bin\\g++.exe  @CMakeFiles/TestDessertShop.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\TestDessertShop.dir\\src\\RUI_Product.cpp.obj -c D:\\game\\moni02\\src\\RUI_Product.cpp",
+  "file": "D:/game/moni02/src/RUI_Product.cpp",
+  "output": "CMakeFiles/TestDessertShop.dir/src/RUI_Product.cpp.obj"
+},
+{
+  "directory": "D:/game/moni02/build",
+  "command": "D:\\save\\x86_64-8.1.0-release-posix-seh-rt_v6-rev0\\mingw64\\bin\\g++.exe  @CMakeFiles/TestDessertShop.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\TestDessertShop.dir\\src\\RUI_ResourceManager.cpp.obj -c D:\\game\\moni02\\src\\RUI_ResourceManager.cpp",
+  "file": "D:/game/moni02/src/RUI_ResourceManager.cpp",
+  "output": "CMakeFiles/TestDessertShop.dir/src/RUI_ResourceManager.cpp.obj"
+},
+{
+  "directory": "D:/game/moni02/build",
+  "command": "D:\\save\\x86_64-8.1.0-release-posix-seh-rt_v6-rev0\\mingw64\\bin\\g++.exe  @CMakeFiles/TestDessertShop.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\TestDessertShop.dir\\src\\RUI_TimeOfDaySystem.cpp.obj -c D:\\game\\moni02\\src\\RUI_TimeOfDaySystem.cpp",
+  "file": "D:/game/moni02/src/RUI_TimeOfDaySystem.cpp",
+  "output": "CMakeFiles/TestDessertShop.dir/src/RUI_TimeOfDaySystem.cpp.obj"
+},
+{
+  "directory": "D:/game/moni02/build",
+  "command": "D:\\save\\x86_64-8.1.0-release-posix-seh-rt_v6-rev0\\mingw64\\bin\\g++.exe  @CMakeFiles/TestDessertShop.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\TestDessertShop.dir\\src\\RUI_Tool.cpp.obj -c D:\\game\\moni02\\src\\RUI_Tool.cpp",
+  "file": "D:/game/moni02/src/RUI_Tool.cpp",
+  "output": "CMakeFiles/TestDessertShop.dir/src/RUI_Tool.cpp.obj"
+},
+{
+  "directory": "D:/game/moni02/build",
+  "command": "D:\\save\\x86_64-8.1.0-release-posix-seh-rt_v6-rev0\\mingw64\\bin\\g++.exe  @CMakeFiles/TestDessertShop.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\TestDessertShop.dir\\start.cpp.obj -c D:\\game\\moni02\\start.cpp",
+  "file": "D:/game/moni02/start.cpp",
+  "output": "CMakeFiles/TestDessertShop.dir/start.cpp.obj"
+}
+]

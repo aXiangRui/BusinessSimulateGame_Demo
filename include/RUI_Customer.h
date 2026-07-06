@@ -329,38 +329,38 @@ class Customer
                 y = y - speed;
             }
             else if(x == Cabinets[chooseID].GetX() + 32 && y == Cabinets[chooseID].GetY() - 16)
-            {
-                toward = 0;
-                if(Cabinets[chooseID].GetDessertNumber() < ChooseNumber)
                 {
-                    SDL_Log("%d %d",Cabinets[chooseID].GetDessertNumber(),ChooseNumber);
-                    ChooseNumber = Cabinets[chooseID].GetDessertNumber();
-                    eatNumber = ChooseNumber;
-                    SDL_Log("由于少于需求，需求数量已更改为%d",ChooseNumber); 
-                    Cabinets[chooseID].RemoveDessert(ChooseNumber);
-                    removeCheck = 1; 
-                    if( ChooseNumber == 0 && chooseChange <= 3)
+                    toward = 0;
+                    if(Cabinets[chooseID].GetDessertNumber() < ChooseNumber)
                     {
-                        SDL_Log("当前橱柜无甜点，切换橱柜");
-                        chooseChange++;
-                        chooseID = rand() % Cabinets.size();
-                        SetChooseNumber();  // 移除错误的条件判断，直接切换
-                        ChooseTime = currentTime;  
-                        removeCheck = 0;  
-                        return;  // 退出当前逻辑，重新执行选择
+                        SDL_Log("%d %d",Cabinets[chooseID].GetDessertNumber(),ChooseNumber);
+                        ChooseNumber = Cabinets[chooseID].GetDessertNumber();
+                        eatNumber = ChooseNumber;
+                        SDL_Log("由于少于需求，需求数量已更改为%d",ChooseNumber); 
+                        if( ChooseNumber == 0 && chooseChange <= 3)
+                        {
+                            SDL_Log("当前橱柜无甜点，切换橱柜");
+                            chooseChange++;
+                            chooseID = rand() % Cabinets.size();
+                            SetChooseNumber();  // 移除错误的条件判断，直接切换
+                            ChooseTime = currentTime;  
+                            removeCheck = 0;  
+                            return;  // 退出当前逻辑，重新执行选择
+                        }
+                        if( chooseChange > 3 )
+                        {
+                            if(ChooseNumber == 0)
+                                CurrentStage = CustomerStage::Buy;
+                            // 三次都没买上运气确实不太好啊hhh
+                        }
+                        Cabinets[chooseID].RemoveDessert(ChooseNumber);
+                        removeCheck = 1; 
                     }
-                    if( chooseChange > 3 )
+                    if(removeCheck == 0)
                     {
-                        if(ChooseNumber == 0)
-                            CurrentStage = CustomerStage::Buy;
-                        // 三次都没买上运气确实不太好啊hhh
+                        Cabinets[chooseID].RemoveDessert(ChooseNumber);
+                        removeCheck = 1;
                     }
-                }
-                if(removeCheck == 0)
-                {
-                    Cabinets[chooseID].RemoveDessert(ChooseNumber);
-                    removeCheck = 1;
-                }
                 if(currentTime - ChooseTime >= 5000 + rand() % 500 - 250)
                 {
                     int dID = Cabinets[chooseID].GetDessertID();
@@ -746,15 +746,12 @@ class Customer
             {
                 preference = preference + 6 * chooseNumber;
                 addNumber = 6 * chooseNumber;
-                // SDL_Log("01增加了%d",6*chooseNumber);
             }
             else
             {
                 preference = preference + chooseNumber;
                 addNumber = chooseNumber;
-                //  SDL_Log("02增加了%d",chooseNumber);
             }
-            // preference = preference + 5;
             if(preference > 2000)
                 preference = 2000;
             SDL_Log("当前喜好值%d",preference);

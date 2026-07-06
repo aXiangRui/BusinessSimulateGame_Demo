@@ -1,302 +1,542 @@
 #include "../include/RUI_GameScene.h"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 extern int WindowWidth;
 extern int WindowHeight;
 
-void RUI_GameScene::onInput(const SDL_Event& event,SDL_Renderer* Renderer, bool& running)
-{  
-    TestEvent.input(event);
-    switch(event.type)
-    {               
-        case SDL_MOUSEBUTTONDOWN:
-        {            
-            int mx = event.button.x;
-            int my = event.button.y;
-            if(CheckSetting)
-            {
-                // 一步计算偏移量，无需分支判断
-                if (mx >= 200 && mx <= 600 && my >= 0 && my <= 600) {
-                    int offset = ((mx > 400) ? 3 : 0) + (my / 200);
-                    Cabinets[CurrentCabnet].SetDessertID(ReadingPage * 6 + offset);
-                    CheckSetting = 0;
-                    isSettingNewProduct = 1;
-                }
-            }
-            if( isChatFrameShowing )
-            {
-                if(mx >= 200 && mx <= 600)
-                {
-                    isChatFrameShowing = 0;
-                    ChatDelayTime = 0;
-                }
-            }
-            if( isSummaryShowing )
-            {
-                if( mx >= 200 && mx <= 600)
-                {
-                    isSummaryShowing = 0;
-                }
-            }
-            for(int i = 0; i < Btns.size(); i++)
-            {
-                if(isSettingNewProduct)
-                {
-                    if(Btns[i].RUI_isClicked(mx,my))
-                    {
-                        Btns[i].setClicked(true);
-                        switch(i)
-                        {
-                            case 0:
-                            {
-                                CheckSetting = 1;
-                                ReadingPage = 0;
-                                isSettingNewProduct = 0;
-                                break;
-                            }
-                            default:
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        Btns[i].setClicked(false);
-                    }
-                }
-                
-            }
-            for(int i = 0; i < Icons.Icons.size(); i++)
-            {
-                if(Icons.Icons[i].isClicked(mx,my))
-                {
-                    switch(i)
-                    {
-                        case 1:
-                        {
-                            SceneManager.ChooseScene(RUI_SceneManager::SceneType::Create);
-                            break;
-                        }
-                        case 2:
-                        {
-                            SceneManager.ChooseScene(RUI_SceneManager::SceneType::Menu);
-                            break;
-                        }
-                        case 3:
-                        {
-                            if(WhetherReadingProduct == 0)
-                            {
-                                WhetherReadingProduct = 1;
-                                TestEvent.SetIsReadingPage(1);
-                                ReadingPage = 0;
-                                if( isMaterialFrameShowing == 1)
-                                {
-                                    isMaterialFrameShowing = 0;
-                                }
-                            }
-                            else
-                            {
-                                WhetherReadingProduct = 0;
-                                TestEvent.SetIsReadingPage(0);
-                                ReadingPage = -1;
-                            }                                       
-                            break;
-                        }
-                        case 4:
-                        {
-                            if(TestEvent.GetIsReadingPage())
-                            {
-                                ReadingPage = ReadingPage + 1;
-                                if(ReadingPage > TestEvent.GetProductNumber()/6)
-                                {
-                                    ReadingPage = TestEvent.GetProductNumber() / 6;
-                                }
-                            }
-                            if(CheckSetting)
-                            {                        
-                                ReadingPage = ReadingPage + 1;
-                                if(ReadingPage > TestEvent.GetProductNumber()/6)
-                                {
-                                    ReadingPage = TestEvent.GetProductNumber() / 6;
-                                }
-                            }
-                            break;
-                        }
-                        case 5:
-                        {
-                            if(TestEvent.GetIsReadingPage())
-                            {
-                                ReadingPage = ReadingPage - 1;
-                                if(ReadingPage < 0)
-                                    ReadingPage = 0;
-                            }
-                            if(CheckSetting)
-                            { 
-                                ReadingPage = ReadingPage - 1;
-                                if(ReadingPage < 0)
-                                    ReadingPage = 0;
-                            }
-                            break;
-                        }
-                        case 6:
-                        {
-                            if(Cabinets.size() < 24)
-                            {
-                                Cabinet a;
-                                a.InitCabinet(Cabinets.size(),0,0);
-                                Cabinets.push_back(a);
-                                TotalMoney = TotalMoney - 1000 * Cabinets.size() -1000;
-                            }
-                            bool a = 0;
-                            // if( isMaterialFrameShowing == 1 && a == 0)
-                            // {
-                            //     isMaterialFrameShowing = 0;
-                            //     a = 1;
-                            // }
-                            // if( isMaterialFrameShowing == 0  & a == 0)
-                            // {
-                            //     materialFrame.SetTitle("奶油", "cream", textManager.MaterialText[0]);
-                            //     isMaterialFrameShowing = 1;
-                            // }
-                            break;
-                        }
-                        case 7:
-                        {
-                            for(int i = 0; i < 5; i++)
-                            {
-                                SDL_Log("%s %d",customerManager.Customers[i].GetCustomerName().c_str(),customerManager.Customers[i].GetHasJoined());
-                            }
-                            break;
-                        }
-                        default:
-                        break;
-                    }
-                }
-            }
-            for(int i = 0; i < Cabinets.size(); i++)
-            {
-                if(isSettingNewProduct == 0 && TestEvent.GetWhetherRenderCustomerFrame() == 0)
-                {
-                    if(Cabinets[i].isClicked(mx, my))
-                    {
-                        CurrentCabnet = i;
-                        cabinetFrame.SetCabinetID(i);
-                        isSettingNewProduct = 1;
-                    }
-                }
-            }
-            if(cabinetFrame.GetCabinetID() != -1)
-            {
-                if(mx >= 580 && mx <= 612)
-                {
-                    if(my >= 100 && my <= 132)
-                    {
-                        cabinetFrame.SetCabinetID(-1);
-                        isSettingNewProduct = 0;
-                        cabinetFrame.quit();
-                    }
-                }
-            }
-            break;
-        }
-        case SDL_MOUSEMOTION:
-        {
-            int mx = event.motion.x;
-            int my = event.motion.y;
-            int j = 0;
-            if(CheckSetting)
-            {
-                if(mx >= 200 && mx <= 600)
-                {
-                    if(my >= 0 & my <= 600)
-                    {
-                        SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
-                        j = 1;
-                    }
-                }
-            }
-            for(int i = 0; i < Btns.size(); i++)
-            {
-                if(isSettingNewProduct)
-                {
-                    if(Btns[i].RUI_isHovered(mx,my))
-                    {
-                        Btns[i].setHovered(true);
-                        SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
-                        j = 1;
-                    }
-                    else
-                    {
-                        Btns[i].setHovered(false);
-                        Btns[i].setClicked(false);
-                    }
-                }
-            }
-            for(int i = 0; i < Icons.Icons.size(); i++)
-            {
-                if(Icons.Icons[i].isHovered(mx,my))
-                {
-                    if(i <= 3 || i >= 6)
-                    {
-                        SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
-                        j = 1;
-                    }    
-                    else
-                    {
-                        if(TestEvent.GetIsReadingPage())
-                        {
-                            SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
-                            j = 1;
-                        }
-                    }
-                }
-            }
-            for(int i = 0; i < Cabinets.size(); i++)
-            {
-                if(CheckSetting == 0)
-                {
-                    if(Cabinets[i].isClicked(mx,my))
-                    {
-                        SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
-                        j = 1;
-                    }
-                }
-            } 
+// ===== 场景生命周期 ============================================================
 
-            if(cabinetFrame.GetCabinetID() != -1)
+void RUI_GameScene::onEnter()
+{
+    // 初始化管理器
+    customerManager.InitCustomerManager();
+    materialManager.InitMaterialManager();
+
+    // 加载存档
+    GameSerializer::Load(clock, world.GetCustomers(),
+        world.GetCooks(), world.GetServers(),
+        cabinets, customerManager,
+        totalMoney, totalCustomers, totalDessert);
+
+    // 初始化游戏世界
+    world.OnEnter();
+    world.SetReadingPage(0);
+
+    // 初始化场景 UI
+    MenuButton btn0((WindowWidth - 320) / 2, 450, 320, 64, "设置新甜点", 0);
+    buttons.push_back(btn0);
+
+    BackgroundMusic.quit();
+    reg.InitRegister();
+    unlockFrame.init();
+    icons.Init();
+
+    // 随机背景音乐
+    if (!Mix_PlayingMusic())
+    {
+        if (rand() % 2 == 1)
+        {
+            gameMusic.setMusic(ResourceManager::instance()->FindMusic("gamemusic"));
+            gameMusic.play(-1);
+        }
+        else
+        {
+            gameMusic.setMusic(ResourceManager::instance()->FindMusic("gamemusic02"));
+            gameMusic.play(-1);
+        }
+    }
+
+    dessertManager.InitDessertManager();
+    textManager.Init();
+
+    // 加载贴图
+    background = ResourceManager::instance()->FindTexture("hall");
+    backgroundWall = ResourceManager::instance()->FindTexture("hallwall");
+    nightTexture = ResourceManager::instance()->FindTexture("night");
+    textFont = nullptr;
+
+    cabinetFrame.InitFrame();
+    summaryFrame.Init();
+    checkEvent.init();
+
+    // 初始化桌椅
+    for (int i = 0; i < 16; i++)
+    {
+        Chair chair;
+        chair.InitChair(i);
+        chairs.push_back(chair);
+    }
+    for (int i = 0; i < 8; i++)
+    {
+        Desk desk;
+        desk.initDesk(i);
+        desks.push_back(desk);
+    }
+
+    // 初始化时间和时钟
+    timeState = {};
+    timeState.lastTime = SDL_GetTicks();
+    clock.SetStartTime(world.GetClockTime());
+    materialFrame.Init();
+
+    // 重置 UI 状态
+    isReadingProduct = false;
+    isSettingNewProduct = false;
+    isCheckingSetting = false;
+    readingPage = -1;
+    currentCabinet = -1;
+    chatDelayTime = 0;
+    isMaterialFrameShowing = false;
+    isChatShowing = false;
+    isSummaryShowing = false;
+
+    SDL_Log("进入游戏场景");
+}
+
+void RUI_GameScene::onUpdate()
+{
+    Uint32 currentTime = SDL_GetTicks();
+
+    if (!isChatShowing)
+    {
+        // 更新昼夜循环
+        TimeOfDaySystem::Update(clock, timeState,
+            world.GetCustomerCount(),
+            totalMoney, totalDessert, totalCustomers,
+            cabinets, chairs, isSummaryShowing, summaryFrame);
+
+        // 同步时钟到游戏世界并更新
+        world.SetClock(clock);
+        world.OnUpdate(chairs, cabinets, customerManager,
+            dessertManager, reg,
+            totalMoney, totalCustomers, totalDessert,
+            clock.ReturnHour());
+    }
+    else
+    {
+        // 聊天框自动关闭（5秒后）
+        if (chatDelayTime == 0)
+        {
+            chatDelayTime = currentTime;
+        }
+        if (currentTime - chatDelayTime >= 5000)
+        {
+            isChatShowing = false;
+            chatDelayTime = 0;
+        }
+    }
+
+    // 解锁检查
+    std::vector<Customer> customers = world.GetCustomers();
+    checkEvent.update(customerManager, dessertManager,
+        materialManager, chatFrame, textManager,
+        unlockFrame, isChatShowing, customers);
+    world.SetCustomers(customers);
+    unlockFrame.SetTime(currentTime);
+}
+
+void RUI_GameScene::onRender(SDL_Renderer* renderer)
+{
+    // 加载字体
+    if (!textFont)
+    {
+        textFont = TTF_OpenFont("./resources/font/namidiansong.ttf", 36);
+    }
+
+    // 金额颜色（负数变红）
+    SDL_Color moneyColor = textColor;
+    if (totalMoney < 0)
+    {
+        moneyColor = {200, 40, 40, 255};
+    }
+
+    // 渲染金额文字
+    std::string title = "总金额" + std::to_string(totalMoney);
+    SDL_Surface* image = TTF_RenderUTF8_Blended(textFont, title.c_str(), moneyColor);
+    SDL_Rect textRect = {10, 60, image->w, image->h};
+    SDL_Texture* moneyTexture = SDL_CreateTextureFromSurface(renderer, image);
+    SDL_FreeSurface(image);
+
+    SDL_RenderClear(renderer);
+    SDL_RenderCopy(renderer, background, nullptr, &backgroundRect);
+    SDL_RenderCopy(renderer, moneyTexture, nullptr, &textRect);
+    SDL_DestroyTexture(moneyTexture);
+
+    // 渲染桌椅
+    for (int i = 0; i < (int)chairs.size(); i++)
+    {
+        chairs[i].onRender(renderer);
+    }
+    for (int i = 0; i < (int)desks.size(); i++)
+    {
+        desks[i].onRender(renderer);
+    }
+
+    // 渲染游戏世界实体
+    world.RenderCooks(renderer);
+    world.RenderSmallCakes(renderer);
+    world.RenderServers(renderer);
+
+    reg.onRender(renderer);
+    world.RenderCustomers(renderer);
+
+    // 黑夜遮罩
+    SDL_SetTextureAlphaMod(nightTexture, timeState.currentAlpha);
+    SDL_RenderCopy(renderer, nightTexture, nullptr, &backgroundRect);
+
+    // 时间和面包柜
+    clock.RenderHour(renderer);
+    for (int i = 0; i < (int)cabinets.size(); i++)
+    {
+        cabinets[i].onRender(renderer);
+    }
+
+    // 图标
+    icons.onRender(renderer, world.IsReadingPage());
+
+    // 面包柜详情框
+    if (cabinetFrame.GetCabinetID() != -1)
+    {
+        world.RenderCabinetFrame(renderer, cabinetFrame, cabinets);
+    }
+
+    // 产品查看页
+    if (isReadingProduct)
+    {
+        world.RenderProductPage(renderer, readingPage, dessertManager, materialManager);
+    }
+
+    // 按钮
+    for (int i = 0; i < (int)buttons.size(); i++)
+    {
+        if (isSettingNewProduct && !isReadingProduct)
+        {
+            buttons[i].ButtonRender(renderer);
+        }
+    }
+
+    // 材料框
+    if (isMaterialFrameShowing)
+    {
+        materialFrame.onRender(renderer);
+    }
+
+    // 产品设置页
+    if (isCheckingSetting)
+    {
+        world.RenderSettingProduct(renderer, readingPage, dessertManager, materialManager);
+        icons.Icons[4].onRender(renderer);
+        icons.Icons[5].onRender(renderer, 1);
+    }
+
+    // 总结框
+    if (isSummaryShowing)
+    {
+        summaryFrame.onRender(renderer);
+    }
+
+    unlockFrame.onRender(renderer);
+
+    // 聊天框
+    if (isChatShowing)
+    {
+        chatFrame.RenderFrame(renderer);
+        chatFrame.RenderTitle(renderer);
+        chatFrame.RenderContent(renderer);
+    }
+
+    // 顾客信息框
+    if (world.IsRenderingCustomerFrame())
+    {
+        world.RenderCustomerFrame(renderer);
+    }
+
+    SDL_RenderPresent(renderer);
+}
+
+void RUI_GameScene::onExit()
+{
+    SDL_Log("退出游戏场景");
+
+    customerManager.Save();
+    materialManager.Save();
+    materialManager.quit();
+
+    GameSerializer::Save(clock, world.GetCustomers(),
+        world.GetCooks(), world.GetServers(),
+        cabinets, totalMoney, totalCustomers, totalDessert);
+
+    buttons.clear();
+    chairs.clear();
+    desks.clear();
+    cabinets.clear();
+    icons.Quit();
+    world.Quit();
+    dessertManager.Save();
+    dessertManager.quit();
+    gameMusic.quit();
+}
+
+// ===== 输入处理 ================================================================
+
+void RUI_GameScene::onInput(const SDL_Event& event, SDL_Renderer* renderer, bool& running)
+{
+    world.HandleInput(event);
+
+    switch (event.type)
+    {
+    case SDL_MOUSEBUTTONDOWN:
+    {
+        int mx = event.button.x;
+        int my = event.button.y;
+
+        // 产品设置点击
+        if (isCheckingSetting)
+        {
+            if (mx >= 200 && mx <= 600 && my >= 0 && my <= 600)
             {
-                if(mx >= 580 && mx <= 612)
+                int offset = ((mx > 400) ? 3 : 0) + (my / 200);
+                cabinets[currentCabinet].SetDessertID(readingPage * 6 + offset);
+                isCheckingSetting = false;
+                isSettingNewProduct = true;
+            }
+        }
+
+        // 聊天框点击关闭
+        if (isChatShowing)
+        {
+            if (mx >= 200 && mx <= 600)
+            {
+                isChatShowing = false;
+                chatDelayTime = 0;
+            }
+        }
+
+        // 总结框点击关闭
+        if (isSummaryShowing)
+        {
+            if (mx >= 200 && mx <= 600)
+            {
+                isSummaryShowing = false;
+            }
+        }
+
+        // 按钮点击
+        for (int i = 0; i < (int)buttons.size(); i++)
+        {
+            if (isSettingNewProduct)
+            {
+                if (buttons[i].RUI_isClicked(mx, my))
                 {
-                    if(my >= 100 && my <= 132)
+                    buttons[i].setClicked(true);
+                    if (i == 0)
                     {
-                        SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
-                        j = 1;
+                        isCheckingSetting = true;
+                        readingPage = 0;
+                        isSettingNewProduct = false;
                     }
                 }
-            } 
-            
-            if(!j)
-            {
-                SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
-            }
-            break;
-        }
-        case SDL_KEYDOWN:
-        {
-            switch(event.key.keysym.sym)
-            {
-                case SDLK_c:
+                else
                 {
+                    buttons[i].setClicked(false);
+                }
+            }
+        }
+
+        // 图标点击
+        for (int i = 0; i < (int)icons.Icons.size(); i++)
+        {
+            if (icons.Icons[i].isClicked(mx, my))
+            {
+                switch (i)
+                {
+                case 1: // 烹饪场景
                     SceneManager.ChooseScene(RUI_SceneManager::SceneType::Create);
                     break;
-                }
-                case SDLK_ESCAPE:
-                {
+                case 2: // 退出到菜单
                     SceneManager.ChooseScene(RUI_SceneManager::SceneType::Menu);
+                    break;
+                case 3: // 查看产品
+                    if (!isReadingProduct)
+                    {
+                        isReadingProduct = true;
+                        world.SetReadingPage(1);
+                        readingPage = 0;
+                        if (isMaterialFrameShowing)
+                        {
+                            isMaterialFrameShowing = false;
+                        }
+                    }
+                    else
+                    {
+                        isReadingProduct = false;
+                        world.SetReadingPage(0);
+                        readingPage = -1;
+                    }
+                    break;
+                case 4: // 下一页
+                    if (world.IsReadingPage() || isCheckingSetting)
+                    {
+                        readingPage++;
+                        int maxPage = world.GetProductCount() / 6;
+                        if (readingPage > maxPage)
+                        {
+                            readingPage = maxPage;
+                        }
+                    }
+                    break;
+                case 5: // 上一页
+                    if (world.IsReadingPage() || isCheckingSetting)
+                    {
+                        readingPage--;
+                        if (readingPage < 0)
+                        {
+                            readingPage = 0;
+                        }
+                    }
+                    break;
+                case 6: // 添加面包柜
+                    if ((int)cabinets.size() < 24)
+                    {
+                        Cabinet a;
+                        a.InitCabinet((int)cabinets.size(), 0, 0);
+                        cabinets.push_back(a);
+                        totalMoney = totalMoney - 1000 * (int)cabinets.size() - 1000;
+                    }
+                    break;
+                case 7: // 调试：打印顾客状态
+                    for (int j = 0; j < 5; j++)
+                    {
+                        SDL_Log("%s %d",
+                            customerManager.Customers[j].GetCustomerName().c_str(),
+                            customerManager.Customers[j].GetHasJoined());
+                    }
                     break;
                 }
             }
+        }
+
+        // 面包柜点击
+        for (int i = 0; i < (int)cabinets.size(); i++)
+        {
+            if (!isSettingNewProduct && !world.IsRenderingCustomerFrame())
+            {
+                if (cabinets[i].isClicked(mx, my))
+                {
+                    currentCabinet = i;
+                    cabinetFrame.SetCabinetID(i);
+                    isSettingNewProduct = true;
+                }
+            }
+        }
+
+        // 面包柜详情框关闭按钮
+        if (cabinetFrame.GetCabinetID() != -1)
+        {
+            if (mx >= 580 && mx <= 612 && my >= 100 && my <= 132)
+            {
+                cabinetFrame.SetCabinetID(-1);
+                isSettingNewProduct = false;
+                cabinetFrame.quit();
+            }
+        }
+        break;
+    }
+
+    case SDL_MOUSEMOTION:
+    {
+        int mx = event.motion.x;
+        int my = event.motion.y;
+        bool cursorSet = false;
+
+        if (isCheckingSetting)
+        {
+            if (mx >= 200 && mx <= 600 && my >= 0 && my <= 600)
+            {
+                SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                cursorSet = true;
+            }
+        }
+
+        for (int i = 0; i < (int)buttons.size(); i++)
+        {
+            if (isSettingNewProduct)
+            {
+                if (buttons[i].RUI_isHovered(mx, my))
+                {
+                    buttons[i].setHovered(true);
+                    SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                    cursorSet = true;
+                }
+                else
+                {
+                    buttons[i].setHovered(false);
+                    buttons[i].setClicked(false);
+                }
+            }
+        }
+
+        for (int i = 0; i < (int)icons.Icons.size(); i++)
+        {
+            if (icons.Icons[i].isHovered(mx, my))
+            {
+                if (i <= 3 || i >= 6)
+                {
+                    SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                    cursorSet = true;
+                }
+                else
+                {
+                    if (world.IsReadingPage())
+                    {
+                        SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                        cursorSet = true;
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < (int)cabinets.size(); i++)
+        {
+            if (!isCheckingSetting)
+            {
+                if (cabinets[i].isClicked(mx, my))
+                {
+                    SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                    cursorSet = true;
+                }
+            }
+        }
+
+        if (cabinetFrame.GetCabinetID() != -1)
+        {
+            if (mx >= 580 && mx <= 612 && my >= 100 && my <= 132)
+            {
+                SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                cursorSet = true;
+            }
+        }
+
+        if (!cursorSet)
+        {
+            SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
+        }
+        break;
+    }
+
+    case SDL_KEYDOWN:
+    {
+        switch (event.key.keysym.sym)
+        {
+        case SDLK_c:
+            SceneManager.ChooseScene(RUI_SceneManager::SceneType::Create);
+            break;
+        case SDLK_ESCAPE:
+            SceneManager.ChooseScene(RUI_SceneManager::SceneType::Menu);
             break;
         }
-        default:
-            break;
+        break;
+    }
     }
 }

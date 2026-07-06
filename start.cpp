@@ -1,3 +1,4 @@
+#define SDL_MAIN_HANDLED
 #include<iostream>
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_image.h>
@@ -81,7 +82,7 @@ int main(int argc, char* argv[])
 
         int EndTime = SDL_GetTicks();
         int DeltaTime = EndTime - StartTime;
-        if(DeltaTime < 1000/FPS)
+        if( DeltaTime < 1000/FPS)
             Sleep(1000/FPS - DeltaTime);
         else
         {

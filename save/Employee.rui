@@ -1,8 +1,8 @@
 cook
-default 0 0 
+default 352 82
 end
 servers
-default 0 0 5
-default 0 0 5
-default 0 0 5
+default 52 184 5
+default 52 235 5
+default 100 129 5
 end

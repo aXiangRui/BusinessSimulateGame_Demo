@@ -28,6 +28,7 @@ class StoreServer
         x = 0 + rand() % 20;
         y = 200 + rand() % 100;
         toward = 0;
+        Address = "default";
         ServerTexture = ResourceManager::instance()->FindTexture("default");
         DessertTexture = ResourceManager::instance()->FindTexture("smallcake");
         ServerRect = { x, y, 64, 64};
@@ -99,15 +100,15 @@ class StoreServer
 
     void Waiting(int CurrentTime, std::vector<SmallCake>& smallcakes, std::vector<Cabinet>& cabinets, Register& reg, int QueueNumber)
     {
-        if( y > 130 )
-        {
-            y -= speed;
-        }
-        else if( x < 250 )
+        if( x < 250 )
         {
             x += speed;
             toward = 1;
-        }       
+        }    
+        else if( y > 130 )
+        {
+            y -= speed;
+        }   
         else if( y < 130)
         {
             y += TargetSpeedChangeY( 130, y , speed);
@@ -217,7 +218,15 @@ class StoreServer
 
     void Paying(Register& reg, int QueueNumber)
     {
-        if( x < 350)
+        if( y > 110)
+        {
+            y -= speed;
+        }
+        else if( y < 110)
+        {
+            y += TargetSpeedChangeY(110, y, speed);
+        }
+        else if( x < 350)
         {
             x += speed;
             toward = 1;
@@ -226,14 +235,6 @@ class StoreServer
         {
             x -= TargetSpeedChangeX(350, x, speed);
             toward = 0;
-        }
-        else if( y > 110)
-        {
-            y -= speed;
-        }
-        else if( y < 110)
-        {
-            y += TargetSpeedChangeY(110, y, speed);
         }
         if( x == 350 && y == 110)
         {
@@ -277,10 +278,34 @@ class StoreServer
             }
         }   
     }
-
+    void SetPosition(int mx, int my)
+    {
+        x = mx; y = my;
+    }
+    void SetSpeed(int s)
+    {
+        speed = s;
+    }
+    std::string GetAddress()
+    {
+        return Address;
+    }
+    int GetX()
+    {
+        return x;
+    }
+    int GetY()
+    {
+        return y;
+    }
+    int GetSpeed()
+    {
+        return speed;
+    }
     private:
     int x,y;
     int toward;
+    std::string Address;
     SDL_Texture* ServerTexture;
     SDL_Texture* DessertTexture;
     SDL_Rect ServerRect;

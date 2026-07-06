@@ -80,15 +80,6 @@ class GameEvent
         }
         Chat.init();
         isReadingPage = -1;
-        Cook a;
-        a.Init();
-        Cooks.push_back(a);
-        StoreServer b;
-        for(int i = 0; i < 3; i++)
-        {
-            b.init();
-            servers.push_back(b);
-        }
         customerFrame.Init();
         CakeSubTime = 0;
     }
@@ -399,12 +390,17 @@ class GameEvent
         }
     }
 
-    void onRender(SDL_Renderer* Renderer)
+    void CookRender(SDL_Renderer* Renderer)
     {
         for(int i = 0; i < Cooks.size(); i++)
         {
             Cooks[i].onRender(Renderer);
         }
+    }
+
+    void onRender(SDL_Renderer* Renderer)
+    {
+
         for(int i = 0; i < Customers.size(); i++)
         {
             if(Customers[i].GetIsHoverd() == 1)
@@ -591,6 +587,79 @@ class GameEvent
             Cabinets.push_back(c);
         }
         file02.close();
+
+        std::ifstream file03("./save/Employee.rui");
+        Cooks.clear();
+        servers.clear();
+        if(file03.is_open())
+        {
+            std::string line;
+            bool readingCook = false;
+            bool readingServer = false;
+            while(std::getline(file03, line))
+            {
+                if(line == "cook")
+                {
+                    readingCook = true;
+                    readingServer = false;
+                    continue;
+                }
+                else if(line == "servers")
+                {
+                    readingCook = false;
+                    readingServer = true;
+                    continue;
+                }
+                else if(line == "end")
+                {
+                    if(readingCook)
+                    {
+                        readingCook = false;
+                    }
+                    else if(readingServer)
+                    {
+                        readingServer = false;
+                        break;
+                    }
+                    continue;
+                }
+                else if(readingCook && !line.empty())
+                {
+                    std::istringstream iss(line);
+                    std::string texture;
+                    int x, y;
+                    if(iss >> texture >> x >> y)
+                    {
+                        Cook cook;
+                        cook.Init();
+                        cook.SetPosition(x,y);
+                        cook.SetAddress(texture);
+                        Cooks.push_back(cook);
+                        SDL_Log("读取到厨师数据: %s, x=%d, y=%d", texture.c_str(), x, y);
+                    }
+                }
+                else if(readingServer && !line.empty())
+                {
+                    std::istringstream iss(line);
+                    std::string texture;
+                    int x, y, speed;
+                    if(iss >> texture >> x >> y >> speed)
+                    {
+                        StoreServer server;
+                        server.init();
+                        server.SetPosition(x,y);
+                        server.SetSpeed(speed);
+                        servers.push_back(server);
+                        SDL_Log("读取到服务员数据: %s, x=%d, y=%d, speed=%d", texture.c_str(), x, y, speed);
+                    }
+                }
+            }
+            file03.close();
+        }
+        else
+        {
+            SDL_Log("无法打开Employee.rui文件");
+        }
     }
 
     void Save(int& TotalMoney, int& TotalCustomers, int& TotalDessert, std::vector<Cabinet>& Cabinets)
@@ -631,6 +700,21 @@ class GameEvent
             file02 << std::endl;
         }
         file02.close();
+
+        std::ofstream file03("./save/Employee.rui");
+        file03 << "cook" << std::endl;
+        for( int i = 0; i < Cooks.size(); i++)
+        {
+            file03 << Cooks[i].GetAddress() << " " << Cooks[i].GetX() << " " << Cooks[i].GetY() << std::endl;
+        }
+        file03 << "end" << std::endl;
+        file03 << "servers" << std::endl;
+        for( int i = 0; i < servers.size(); i++)
+        {
+            file03 << servers[i].GetAddress() << " " << servers[i].GetX() << " " << servers[i].GetY() << " " << servers[i].GetSpeed() << std::endl;
+        }
+        file03 << "end" << std::endl;
+        file03.close();
     }
 
     private:

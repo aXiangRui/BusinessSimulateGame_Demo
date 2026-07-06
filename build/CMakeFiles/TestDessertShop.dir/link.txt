@@ -1,0 +1,3 @@
+D:\visual_studio\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe -E rm -f CMakeFiles\TestDessertShop.dir/objects.a
+D:\save\x86_64-8.1.0-release-posix-seh-rt_v6-rev0\mingw64\bin\ar.exe qc CMakeFiles\TestDessertShop.dir/objects.a @CMakeFiles\TestDessertShop.dir\objects1.rsp
+D:\save\x86_64-8.1.0-release-posix-seh-rt_v6-rev0\mingw64\bin\g++.exe -g -mwindows -Wl,--whole-archive CMakeFiles\TestDessertShop.dir/objects.a -Wl,--no-whole-archive -o TestDessertShop.exe -Wl,--out-implib,libTestDessertShop.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\TestDessertShop.dir\linkLibs.rsp

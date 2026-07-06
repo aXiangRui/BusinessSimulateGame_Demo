@@ -1,0 +1,1 @@
+  -LD:/game/moni02/SDL2/lib  -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer -lole32 -lwinmm -limm32 -lversion -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 

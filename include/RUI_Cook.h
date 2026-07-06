@@ -23,6 +23,7 @@ class Cook
         CookingTime = 0;
         SendTime = 0;
         CookTexture = ResourceManager::instance()->FindTexture("default");
+        Address = "default";
         x = 200;
         y = 50;
         CookRect = {200,50,64,64};
@@ -120,6 +121,30 @@ class Cook
             SDL_RenderCopyEx(Renderer, CookTexture, nullptr, &CookRect, 0, 0, SDL_FLIP_HORIZONTAL);
     }
 
+    void SetPosition(int mx, int my)
+    {
+        x = mx; y = my;
+    }
+    void SetAddress(std::string add)
+    {
+        Address = add;
+        CookTexture = ResourceManager::instance()->FindTexture(Address.c_str());
+    }
+    std::string GetAddress()
+    {
+        return Address;
+    }
+
+    int GetX()
+    {
+        return x;
+    }
+
+    int GetY()
+    {
+        return y;
+    }
+
     private:
     bool Choose;
     bool isCooking;
@@ -131,6 +156,7 @@ class Cook
     int WalkSpeed;
     bool toward;
     int x,y;
+    std::string Address;
     SDL_Texture* CookTexture;
     SDL_Rect CookRect;
 };
