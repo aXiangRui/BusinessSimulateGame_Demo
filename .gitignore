@@ -6,7 +6,16 @@ MinGW/
 
 mingw64/
 
+#忽视CMake相关编译请求
+build/
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+
 # 可选：忽略编译生成的exe、obj等文件
 *.exe
 *.obj
 *.o
+*.dll

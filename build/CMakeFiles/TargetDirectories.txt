@@ -1,3 +1,0 @@
-D:/game/moni02/build/CMakeFiles/TestDessertShop.dir
-D:/game/moni02/build/CMakeFiles/edit_cache.dir
-D:/game/moni02/build/CMakeFiles/rebuild_cache.dir
