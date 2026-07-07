@@ -22,6 +22,7 @@
 #include "RUI_TextManager.h"
 #include "RUI_CheckUpdate.h"
 #include "RUI_SceneManager.h"
+#include "RUI_Furniture.h"
 
 extern RUI_SceneManager SceneManager;
 extern MusicPlayer BackgroundMusic;
@@ -70,6 +71,7 @@ private:
     std::vector<Chair> chairs;
     std::vector<Desk> desks;
     std::vector<Cabinet> cabinets;
+    std::vector<DeskChairSet> deskChairSets;
     Register reg;
     GameIcon icons;
 
@@ -80,6 +82,9 @@ private:
     SummaryFrame summaryFrame;
     CheckUpdate checkEvent;
     UnlockFrame unlockFrame;
+
+    // ===== 家具网格 =====
+    std::vector<FurnitureGrid> furnitureGrids;
 
     // ===== 音频 =====
     MusicPlayer gameMusic;
@@ -101,6 +106,7 @@ private:
     bool isCheckingSetting = false;
     bool isSummaryShowing = false;
     bool isMaterialFrameShowing = false;
+    bool isFurniturePlacing = false;
     int  readingPage = -1;
     int  currentCabinet = -1;
 };

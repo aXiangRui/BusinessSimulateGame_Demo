@@ -102,7 +102,7 @@ void TimeOfDaySystem::Update(
                     }
 
                     // 重置所有椅子
-                    for (int i = 0; i < 16; i++)
+                    for (int i = 0; i < (int)chairs.size(); i++)
                     {
                         chairs[i].SetUsing(0);
                     }

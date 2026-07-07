@@ -112,6 +112,10 @@ class GameIcon
         RUI_Icon CheckJoinedIcon;
         CheckJoinedIcon.InitIcon(680, 470, 50, 50, 6, "defaulticon");
         Icons.push_back(CheckJoinedIcon);
+
+        RUI_Icon FurniturePlacingIcon;
+        FurniturePlacingIcon.InitIcon(680, 470, 50, 50, 6, "defaulticon");
+        Icons.push_back(FurniturePlacingIcon);
     }
 
     void onRender(SDL_Renderer* Renderer, bool isReading)

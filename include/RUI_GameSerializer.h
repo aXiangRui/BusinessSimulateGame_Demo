@@ -8,6 +8,8 @@
 #include "RUI_Cook.h"
 #include "RUI_StoreServer.h"
 #include "RUI_CustomerManager.h"
+#include "RUI_Furniture.h"
+#include "RUI_Chair.h"
 
 // 游戏存档读写 —— 从 GameWorld 中分离出来的独立模块
 class GameSerializer
@@ -37,4 +39,8 @@ public:
         int totalCustomers,
         int totalDessert
     );
+
+    // 桌椅套装存取
+    static void LoadDeskChairSets(std::vector<DeskChairSet>& sets);
+    static void SaveDeskChairSets(const std::vector<DeskChairSet>& sets);
 };

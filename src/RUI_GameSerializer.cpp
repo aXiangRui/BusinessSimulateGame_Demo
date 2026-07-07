@@ -82,12 +82,31 @@ void GameSerializer::Load(
         std::ifstream file("./save/Cabinet.rui");
         int cabinetCount;
         file >> cabinetCount;
+        // 跳过第一行剩余内容（换行符）
+        file.ignore();
         for (int i = 0; i < cabinetCount; i++)
         {
-            int a, b, num;
-            file >> a >> b >> num;
+            std::string line;
+            if (!std::getline(file, line))
+                break;
+
+            std::istringstream iss(line);
+            std::vector<int> values;
+            int val;
+            while (iss >> val)
+                values.push_back(val);
+
             Cabinet c;
-            c.InitCabinet(a, b, num);
+            if (values.size() >= 5)
+            {
+                // 新格式：id dessertID number x y
+                c.InitCabinet(values[0], values[1], values[2], values[3], values[4]);
+            }
+            else if (values.size() >= 3)
+            {
+                // 旧格式兼容：id dessertID number（位置由公式计算）
+                c.InitCabinet(values[0], values[1], values[2]);
+            }
             cabinets.push_back(c);
         }
     }
@@ -222,6 +241,8 @@ void GameSerializer::Save(
         {
             file << i << " " << cabinets[i].GetDessertID()
                  << " " << cabinets[i].GetDessertNumber()
+                 << " " << cabinets[i].GetX()
+                 << " " << cabinets[i].GetY()
                  << std::endl;
         }
     }
@@ -247,4 +268,101 @@ void GameSerializer::Save(
         }
         file << "end" << std::endl;
     }
+}
+
+// ===== 5. 桌椅套装存取 ==========================================================
+
+void GameSerializer::LoadDeskChairSets(std::vector<DeskChairSet>& sets)
+{
+    sets.clear();
+
+    std::ifstream file("./save/DeskAndChairs.rui");
+    if (!file.is_open())
+    {
+        SDL_Log("DeskAndChairs.rui 不存在，将使用默认布局");
+        return;
+    }
+
+    int setCount = 0;
+    file >> setCount;
+    file.ignore();
+
+    for (int s = 0; s < setCount; s++)
+    {
+        std::string line;
+        if (!std::getline(file, line))
+            break;
+
+        std::istringstream iss(line);
+        int sid, dCnt, cCnt, place;
+        if (!(iss >> sid >> dCnt >> cCnt >> place))
+            break;
+
+        DeskChairSet set;
+        set.InitSet(sid, dCnt, cCnt, static_cast<PlacementType>(place));
+
+        // 读取桌子格点
+        for (int d = 0; d < dCnt; d++)
+        {
+            if (!std::getline(file, line))
+                break;
+            std::istringstream diss(line);
+            int row, col;
+            if (diss >> row >> col)
+                set.SetDeskPos(d, {col, row});
+        }
+
+        // 读取椅子格点
+        for (int c = 0; c < cCnt; c++)
+        {
+            if (!std::getline(file, line))
+                break;
+            std::istringstream ciss(line);
+            int row, col;
+            if (ciss >> row >> col)
+                set.SetChairPos(c, {col, row});
+        }
+
+        sets.push_back(set);
+    }
+
+    SDL_Log("加载了 %d 套桌椅套装", (int)sets.size());
+}
+
+void GameSerializer::SaveDeskChairSets(const std::vector<DeskChairSet>& sets)
+{
+    std::ofstream file("./save/DeskAndChairs.rui");
+    if (!file)
+    {
+        SDL_Log("SaveDeskChairSets: 无法写入文件");
+        return;
+    }
+
+    file << sets.size() << std::endl;
+
+    for (int s = 0; s < (int)sets.size(); s++)
+    {
+        const DeskChairSet& set = sets[s];
+
+        file << set.GetSetID() << " "
+             << set.GetDeskCount() << " "
+             << set.GetChairCount() << " "
+             << static_cast<int>(set.GetPlacement()) << std::endl;
+
+        // 桌子格点 (row col)
+        for (int d = 0; d < set.GetDeskCount(); d++)
+        {
+            GridPos pos = set.GetDeskPos(d);
+            file << pos.row << " " << pos.col << std::endl;
+        }
+
+        // 椅子格点 (row col)
+        for (int c = 0; c < set.GetChairCount(); c++)
+        {
+            GridPos pos = set.GetChairPos(c);
+            file << pos.row << " " << pos.col << std::endl;
+        }
+    }
+
+    SDL_Log("保存了 %d 套桌椅套装", (int)sets.size());
 }

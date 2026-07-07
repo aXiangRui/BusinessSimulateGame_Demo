@@ -456,9 +456,9 @@ class Customer
             }
             else
             {
-                if( x != Chairs[isEating].GetX())
+                if( x != Chairs[isEating].GetRenderX())
                 {
-                    if(x - Chairs[isEating].GetX() >= 0)
+                    if(x - Chairs[isEating].GetRenderX() >= 0)
                     {
                         x = x - speed;
                         toward = 0;
@@ -469,9 +469,9 @@ class Customer
                         toward = 1;
                     }
                 }
-                else if( y != Chairs[isEating].GetY())
+                else if( y != Chairs[isEating].GetRenderY())
                 {
-                    if(y - Chairs[isEating].GetY() >= 0)
+                    if(y - Chairs[isEating].GetRenderY() >= 0)
                     {
                         y = y - speed;
                     }
@@ -480,7 +480,7 @@ class Customer
                         y = y + speed;
                     }        
                 }
-                if(x == Chairs[isEating].GetX() && y == Chairs[isEating].GetY())
+                if(x == Chairs[isEating].GetRenderX() && y == Chairs[isEating].GetRenderY())
                 {
                     onSeat = 1;
                     if(isEating % 2 == 0)

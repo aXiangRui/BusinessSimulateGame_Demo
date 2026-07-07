@@ -6,6 +6,7 @@
 #include"RUI_DessertManager.h"
 #include"RUI_ProductManager.h"
 #include"RUI_TextManager.h"
+#include"RUI_Furniture.h"
 
 class Cabinet
 {
@@ -13,24 +14,46 @@ class Cabinet
     Cabinet() = default;
     ~Cabinet() = default;
 
-    void InitCabinet(int id,int did,int number)
+    static const int GRID_SIZE = 32;
+
+    /// 将坐标吸附到最近的 32×32 格点，offset 对齐 Furniture 网格偏移
+    static int SnapToGrid(int value, int offset = 0)
+    {
+        return ((value - offset + GRID_SIZE / 2) / GRID_SIZE) * GRID_SIZE + offset;
+    }
+
+    void InitCabinet(int id, int did, int number)
     {
         CabinetID = id;
-        x = (CabinetID / 12) * 200 + 100 * (CabinetID % 2) + 20;
-        y = (CabinetID / 2 % 6) * 40 + 200; 
+        // 使用公式计算位置，然后吸附到格点（含偏移）
+        int rawX = (CabinetID / 12) * 200 + 100 * (CabinetID % 2) + 20;
+        int rawY = (CabinetID / 2 % 6) * 40 + 200;
+        x = SnapToGrid(rawX, Furniture::offsetX);
+        y = SnapToGrid(rawY, Furniture::offsetY);
         DessertID = did;
         dessertNumber = number;
     }
 
-    int GetX()
+    void InitCabinet(int id, int did, int number, int x, int y)
     {
-        return x;
+        CabinetID = id;
+        // 自由位置也吸附到格点（含偏移）
+        this->x = SnapToGrid(x, Furniture::offsetX);
+        this->y = SnapToGrid(y, Furniture::offsetY);
+        DessertID = did;
+        dessertNumber = number;
     }
 
-    int GetY()
+    void SetPosition(int newX, int newY)
     {
-        return y;
+        x = SnapToGrid(newX, Furniture::offsetX);
+        y = SnapToGrid(newY, Furniture::offsetY);
     }
+
+    int GetX() { return x; }
+    int GetY() { return y; }
+    int GetRenderX() { return x - RENDER_OFFSET; }
+    int GetRenderY() { return y - RENDER_OFFSET; }
 
     int GetDessertID()
     {
@@ -58,11 +81,17 @@ class Cabinet
         dessertNumber += number;
     }
 
+    // 碰撞箱为 32×32（一个格子），渲染 64×64 居中于格点
+    static const int RENDER_SIZE = 64;
+    static const int HITBOX_SIZE = 32;
+    static const int RENDER_OFFSET = (RENDER_SIZE - HITBOX_SIZE) / 2;  // 8
+
     bool isClicked(int mx, int my)
     {
-        if(mx >= x && mx <= x + 64)
+        // 碰撞箱即格点位置 32×32
+        if(mx >= x && mx <= x + HITBOX_SIZE)
         {
-            if(my >= y && my <= y + 64)
+            if(my >= y && my <= y + HITBOX_SIZE)
             {
                 return true;
             }
@@ -80,8 +109,9 @@ class Cabinet
     {
         if(!CabinetTexture)
             CabinetTexture = ResourceManager::instance()->FindTexture("cabinet");
-        SDL_Rect Rect = {x,y,64,64};
-        SDL_RenderCopy(Renderer,CabinetTexture,nullptr,&Rect);
+        // 渲染尺寸 48×48，居中于 32×32 格点
+        SDL_Rect Rect = {x , y , RENDER_SIZE, RENDER_SIZE};
+        SDL_RenderCopy(Renderer, CabinetTexture, nullptr, &Rect);
     }
     
     private:
@@ -107,6 +137,10 @@ class CabinetFrame
             SDL_FreeSurface(DessertSurface);
             DessertSurface = nullptr;
         }
+        if (DessertNumberSurface) {
+            SDL_FreeSurface(DessertNumberSurface);
+            DessertNumberSurface = nullptr;
+        }
         if (TitleTexture) {
             SDL_DestroyTexture(TitleTexture);
             TitleTexture = nullptr;
@@ -115,10 +149,14 @@ class CabinetFrame
             SDL_DestroyTexture(DessertNameTexture);
             DessertNameTexture = nullptr;
         }
+        if (DessertNumberTexture) {
+            SDL_DestroyTexture(DessertNumberTexture);
+            DessertNumberTexture = nullptr;
+        }
         if (TextFont) {
-        TTF_CloseFont(TextFont);
-        TextFont = nullptr;
-    }
+            TTF_CloseFont(TextFont);
+            TextFont = nullptr;
+        }
     }
 
     void SetCabinetID(int x)
@@ -147,16 +185,31 @@ class CabinetFrame
 
     void quit()
     {
-        SDL_FreeSurface(TitleSurface);
-        SDL_FreeSurface(DessertSurface);
-        TitleSurface = nullptr;
-        DessertSurface = nullptr;
-        SDL_DestroyTexture(TitleTexture);
-        SDL_DestroyTexture(DessertNameTexture);
-        TitleTexture = nullptr;
-        DessertNameTexture = nullptr;
-        if(TextFont)
-        {
+        if (TitleSurface) {
+            SDL_FreeSurface(TitleSurface);
+            TitleSurface = nullptr;
+        }
+        if (DessertSurface) {
+            SDL_FreeSurface(DessertSurface);
+            DessertSurface = nullptr;
+        }
+        if (DessertNumberSurface) {
+            SDL_FreeSurface(DessertNumberSurface);
+            DessertNumberSurface = nullptr;
+        }
+        if (TitleTexture) {
+            SDL_DestroyTexture(TitleTexture);
+            TitleTexture = nullptr;
+        }
+        if (DessertNameTexture) {
+            SDL_DestroyTexture(DessertNameTexture);
+            DessertNameTexture = nullptr;
+        }
+        if (DessertNumberTexture) {
+            SDL_DestroyTexture(DessertNumberTexture);
+            DessertNumberTexture = nullptr;
+        }
+        if (TextFont) {
             TTF_CloseFont(TextFont);
             TextFont = nullptr;
         }
@@ -166,47 +219,107 @@ class CabinetFrame
     {
         SDL_RenderCopy(Renderer, CabinetFrameTexture, nullptr, &Rect);
         SDL_RenderCopy(Renderer, QuitIcon, nullptr, &QuitRect);
+
         DessertName = Manager.GetProductName(cab.GetDessertID()) + " " + std::to_string(Manager.GetProductPrice(cab.GetDessertID())) + "元";
         CabinetID = "第" + std::to_string(IntCabinetID + 1) + "个面包柜";
         dessertNumber = "当前甜点数:" + std::to_string(cab.GetDessertNumber());
 
-        if(TextFont == nullptr)
+        if (TextFont == nullptr)
         {
-            TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
-            if (!TextFont) 
+            TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf", 36);
+            if (!TextFont)
             {
-            SDL_Log("字体加载失败: %s", TTF_GetError());
-            return; 
+                SDL_Log("CabinetFrame 字体加载失败: %s", TTF_GetError());
+                return;
             }
         }
-            
-        if(TitleSurface == nullptr)
-            TitleSurface = TTF_RenderUTF8_Blended(TextFont, CabinetID.c_str(), color);
-        if(DessertSurface == nullptr)
-            DessertSurface = TTF_RenderUTF8_Blended(TextFont, DessertName.c_str(), color);
-        if(DessertNumberSurface == nullptr)
-            DessertNumberSurface = TTF_RenderUTF8_Blended(TextFont, dessertNumber.c_str(), color);
 
-        if(TitleTexture == nullptr)
-            TitleTexture = SDL_CreateTextureFromSurface(Renderer,TitleSurface);
-        if(DessertNameTexture == nullptr)
-            DessertNameTexture = SDL_CreateTextureFromSurface(Renderer,DessertSurface);
-        if(DessertNumberTexture == nullptr)
-            DessertNumberTexture = SDL_CreateTextureFromSurface(Renderer, DessertNumberSurface);
+        // 每帧销毁旧纹理以刷新内容（甜点数量会变化）
+        if (TitleTexture) {
+            SDL_DestroyTexture(TitleTexture);
+            TitleTexture = nullptr;
+        }
+        if (DessertNameTexture) {
+            SDL_DestroyTexture(DessertNameTexture);
+            DessertNameTexture = nullptr;
+        }
+        if (DessertNumberTexture) {
+            SDL_DestroyTexture(DessertNumberTexture);
+            DessertNumberTexture = nullptr;
+        }
+
+        // 释放上一帧的 Surface（防御性清理）
+        if (TitleSurface) {
+            SDL_FreeSurface(TitleSurface);
+            TitleSurface = nullptr;
+        }
+        if (DessertSurface) {
+            SDL_FreeSurface(DessertSurface);
+            DessertSurface = nullptr;
+        }
+        if (DessertNumberSurface) {
+            SDL_FreeSurface(DessertNumberSurface);
+            DessertNumberSurface = nullptr;
+        }
+
+        // 创建新 Surface
+        TitleSurface = TTF_RenderUTF8_Blended(TextFont, CabinetID.c_str(), color);
+        if (!TitleSurface) {
+            SDL_Log("CabinetFrame TitleSurface 创建失败: %s", SDL_GetError());
+            return;
+        }
+
+        DessertSurface = TTF_RenderUTF8_Blended(TextFont, DessertName.c_str(), color);
+        if (!DessertSurface) {
+            SDL_Log("CabinetFrame DessertSurface 创建失败: %s", SDL_GetError());
+            return;
+        }
+
+        DessertNumberSurface = TTF_RenderUTF8_Blended(TextFont, dessertNumber.c_str(), color);
+        if (!DessertNumberSurface) {
+            SDL_Log("CabinetFrame DessertNumberSurface 创建失败: %s", SDL_GetError());
+            return;
+        }
+
+        // 从 Surface 创建 Texture
+        TitleTexture = SDL_CreateTextureFromSurface(Renderer, TitleSurface);
+        if (!TitleTexture) {
+            SDL_Log("CabinetFrame TitleTexture 创建失败: %s", SDL_GetError());
+        }
+
+        DessertNameTexture = SDL_CreateTextureFromSurface(Renderer, DessertSurface);
+        if (!DessertNameTexture) {
+            SDL_Log("CabinetFrame DessertNameTexture 创建失败: %s", SDL_GetError());
+        }
+
+        DessertNumberTexture = SDL_CreateTextureFromSurface(Renderer, DessertNumberSurface);
+        if (!DessertNumberTexture) {
+            SDL_Log("CabinetFrame DessertNumberTexture 创建失败: %s", SDL_GetError());
+        }
 
         int tw = TitleSurface->w; int th = TitleSurface->h;
         int dw = DessertSurface->w; int dh = DessertSurface->h;
 
-        TitleRect = {200,100,tw,th};
+        TitleRect = {200, 100, tw, th};
         DessertRect = {200, 400, dw, dh};
         NumberRect = {400, 300, DessertNumberSurface->w, DessertNumberSurface->h};
 
-        SDL_RenderCopy(Renderer, TitleTexture, nullptr, &TitleRect);
-        SDL_RenderCopy(Renderer, DessertNameTexture, nullptr, &DessertRect);
-        SDL_RenderCopy(Renderer, DessertNumberTexture, nullptr, &NumberRect);
-        Manager.onRender(Renderer,cab.GetDessertID());
+        if (TitleTexture)
+            SDL_RenderCopy(Renderer, TitleTexture, nullptr, &TitleRect);
+        if (DessertNameTexture)
+            SDL_RenderCopy(Renderer, DessertNameTexture, nullptr, &DessertRect);
+        if (DessertNumberTexture)
+            SDL_RenderCopy(Renderer, DessertNumberTexture, nullptr, &NumberRect);
+
+        Manager.onRender(Renderer, cab.GetDessertID());
+
+        // 释放 Surface（纹理已创建，Surface 不再需要）
         SDL_FreeSurface(TitleSurface);
+        TitleSurface = nullptr;
+        SDL_FreeSurface(DessertSurface);
+        DessertSurface = nullptr;
         SDL_FreeSurface(DessertNumberSurface);
+        DessertNumberSurface = nullptr;
     }
 
     private:

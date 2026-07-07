@@ -15,6 +15,7 @@
 #include "RUI_Cook.h"
 #include "RUI_StoreServer.h"
 #include "RUI_Chair.h"
+#include "RUI_Furniture.h"
 
 // 游戏世界 —— 管理所有游戏实体的状态和更新逻辑
 // 从 GameEvent 重构而来，Load/Save 已提取到 GameSerializer
@@ -101,7 +102,7 @@ public:
 
     bool IsReadingPage()
     {
-        return isReadingPage != -1;
+        return isReadingPage > 0;
     }
     int  GetReadingPage()
     {

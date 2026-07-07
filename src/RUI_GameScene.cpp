@@ -60,18 +60,127 @@ void RUI_GameScene::onEnter()
     summaryFrame.Init();
     checkEvent.init();
 
-    // 初始化桌椅
+    // ----- 加载 / 创建桌椅套装 -----
+    deskChairSets.clear();
+    GameSerializer::LoadDeskChairSets(deskChairSets);
+
+    if (deskChairSets.empty())
+    {
+        // 不存在存档 → 从公式计算默认 8 套（1桌+2椅），吸附到格点
+        for (int i = 0; i < 8; i++)
+        {
+            DeskChairSet set;
+            set.InitSet(i, 1, 2, PlacementType::Eating);
+
+            // 桌子位置（复用原公式，吸附到格点）
+            Desk tempDesk;
+            tempDesk.initDesk(i);
+            int dSnapX = ((tempDesk.GetX() - Furniture::offsetX + 16) / 32) * 32 + Furniture::offsetX;
+            int dSnapY = ((tempDesk.GetY() - Furniture::offsetY + 16) / 32) * 32 + Furniture::offsetY;
+            set.SetDeskPos(0, {dSnapY / 32, dSnapX / 32});  // col = y/32, row = x/32
+
+            // 两把椅子位置
+            for (int c = 0; c < 2; c++)
+            {
+                int cID = i * 2 + c;
+                Chair tempChair;
+                tempChair.InitChair(cID);
+                int cSnapX = ((tempChair.GetX() - Furniture::offsetX + 16) / 32) * 32 + Furniture::offsetX;
+                int cSnapY = ((tempChair.GetY() - Furniture::offsetY + 16) / 32) * 32 + Furniture::offsetY;
+                set.SetChairPos(c, {cSnapY / 32, cSnapX / 32});
+            }
+
+            deskChairSets.push_back(set);
+        }
+    }
+
+    // 从套装数据创建 Desk / Chair 实体
+    chairs.clear();
+    desks.clear();
+    int chairID = 0;
+    int deskID = 0;
+    for (int s = 0; s < (int)deskChairSets.size(); s++)
+    {
+        const DeskChairSet& set = deskChairSets[s];
+
+        for (int d = 0; d < set.GetDeskCount(); d++)
+        {
+            Desk desk;
+            desk.initDesk(deskID++);
+            desk.SetPosition(set.GetDeskPixelX(d), set.GetDeskPixelY(d));
+            desks.push_back(desk);
+        }
+
+        for (int c = 0; c < set.GetChairCount(); c++)
+        {
+            Chair chair;
+            chair.InitChair(chairID++);
+            chair.SetPosition(set.GetChairPixelX(c), set.GetChairPixelY(c));
+            chairs.push_back(chair);
+        }
+    }
+
+    // ----- 初始化网格 -----
+    furnitureGrids.clear();
+    int id = 0;
     for (int i = 0; i < 16; i++)
     {
-        Chair chair;
-        chair.InitChair(i);
-        chairs.push_back(chair);
+        for (int j = 0; j < 25; j++)
+        {
+            if (i < 13 || j < 13)
+            {
+                FurnitureGrid grid;
+                grid.InitFurnitureGrid({i, j}, FurnitureType::None, PlacementType::Kitchen, id++);
+                furnitureGrids.push_back(grid);
+            }
+        }
     }
-    for (int i = 0; i < 8; i++)
+    furnitureGrids[136].SetType(FurnitureType::Register);
+    furnitureGrids[137].SetType(FurnitureType::Register);
+
+    // 将 Cabinet 与 Grid 绑定
+    for (int i = 0; i < (int)cabinets.size(); i++)
     {
-        Desk desk;
-        desk.initDesk(i);
-        desks.push_back(desk);
+        int cabX = cabinets[i].GetX();
+        int cabY = cabinets[i].GetY();
+        for (int g = 0; g < (int)furnitureGrids.size(); g++)
+        {
+            if (furnitureGrids[g].GetX() == cabX &&
+                furnitureGrids[g].GetY() == cabY)
+            {
+                furnitureGrids[g].SetType(FurnitureType::Cabinet);
+                furnitureGrids[g].SetID(i);
+                break;
+            }
+        }
+    }
+
+    // 将 Desk / Chair 与 Grid 绑定
+    for (int i = 0; i < (int)desks.size(); i++)
+    {
+        for (int g = 0; g < (int)furnitureGrids.size(); g++)
+        {
+            if (furnitureGrids[g].GetX() == desks[i].GetX() &&
+                furnitureGrids[g].GetY() == desks[i].GetY())
+            {
+                furnitureGrids[g].SetType(FurnitureType::Table);
+                furnitureGrids[g].SetID(i);
+                break;
+            }
+        }
+    }
+    for (int i = 0; i < (int)chairs.size(); i++)
+    {
+        for (int g = 0; g < (int)furnitureGrids.size(); g++)
+        {
+            if (furnitureGrids[g].GetX() == chairs[i].GetX() &&
+                furnitureGrids[g].GetY() == chairs[i].GetY())
+            {
+                furnitureGrids[g].SetType(FurnitureType::Chair);
+                furnitureGrids[g].SetID(i);
+                break;
+            }
+        }
     }
 
     // 初始化时间和时钟
@@ -192,6 +301,13 @@ void RUI_GameScene::onRender(SDL_Renderer* renderer)
         cabinets[i].onRender(renderer);
     }
 
+    // 渲染放置框
+    if(isFurniturePlacing)
+    for( int i = 0; i < furnitureGrids.size(); i++)
+    {
+        furnitureGrids[i].onRender(renderer);
+    }
+
     // 图标
     icons.onRender(renderer, world.IsReadingPage());
 
@@ -267,10 +383,14 @@ void RUI_GameScene::onExit()
         world.GetCooks(), world.GetServers(),
         cabinets, totalMoney, totalCustomers, totalDessert);
 
+    GameSerializer::SaveDeskChairSets(deskChairSets);
+
     buttons.clear();
     chairs.clear();
     desks.clear();
     cabinets.clear();
+    deskChairSets.clear();
+    furnitureGrids.clear();
     icons.Quit();
     world.Quit();
     dessertManager.Save();
@@ -412,6 +532,11 @@ void RUI_GameScene::onInput(const SDL_Event& event, SDL_Renderer* renderer, bool
                             customerManager.Customers[j].GetCustomerName().c_str(),
                             customerManager.Customers[j].GetHasJoined());
                     }
+                    break;
+                    case 8: // 放置家具
+                        isFurniturePlacing ? isFurniturePlacing = false : isFurniturePlacing = true;
+                    break;
+                    default:
                     break;
                 }
             }
