@@ -38,7 +38,8 @@ public:
                   int& totalMoney,
                   int& totalCustomers,
                   int& totalDessert,
-                  int clockTime);
+                  int clockTime,
+                  const std::vector<FurnitureGrid>& furnitureGrids);
 
     // ===== 输入 =====
     void HandleInput(const SDL_Event& event);

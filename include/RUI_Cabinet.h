@@ -110,7 +110,7 @@ class Cabinet
         if(!CabinetTexture)
             CabinetTexture = ResourceManager::instance()->FindTexture("cabinet");
         // 渲染尺寸 48×48，居中于 32×32 格点
-        SDL_Rect Rect = {x , y , RENDER_SIZE, RENDER_SIZE};
+        SDL_Rect Rect = {x - RENDER_OFFSET, y - RENDER_OFFSET, RENDER_SIZE, RENDER_SIZE};
         SDL_RenderCopy(Renderer, CabinetTexture, nullptr, &Rect);
     }
     

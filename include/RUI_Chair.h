@@ -56,14 +56,14 @@ class Chair
     int GetX() { return x; }
     int GetY() { return y; }
     int GetRenderX() { return x - RENDER_OFFSET; }
-    int GetRenderY() { return y - RENDER_OFFSET; }
+    int GetRenderY() { return y - (int)(RENDER_OFFSET * 2); }
 
     void onRender(SDL_Renderer* Renderer)
     {
         if(!ChairTexture)
             ChairTexture = ResourceManager::instance()->FindTexture("chair");
         // 48×48 居中于 32×32 格点
-        SDL_Rect Rect = {x - RENDER_OFFSET, y - RENDER_OFFSET, RENDER_SIZE, RENDER_SIZE};
+        SDL_Rect Rect = {x - RENDER_OFFSET, y - RENDER_OFFSET * 2, RENDER_SIZE, RENDER_SIZE};
         if(toward == 0)
         {
             SDL_RenderCopyEx(Renderer,ChairTexture,nullptr,&Rect,0,0,SDL_FLIP_HORIZONTAL);
@@ -120,7 +120,7 @@ class Desk
             DeskTexture = ResourceManager::instance()->FindTexture("desk");
         }
         // 48×48 居中于 32×32 格点
-        SDL_Rect Rect = {x - RENDER_OFFSET, y - RENDER_OFFSET, RENDER_SIZE, RENDER_SIZE};
+        SDL_Rect Rect = {x - RENDER_OFFSET, y - RENDER_OFFSET*2, RENDER_SIZE, RENDER_SIZE};
         SDL_RenderCopy(Renderer, DeskTexture, nullptr, &Rect);
     }
 
@@ -158,6 +158,9 @@ class Register
     {
         return isPaying;
     }
+
+    int GetX() const { return x; }
+    int GetY() const { return y; }
 
     private:
     SDL_Texture* RegisterTexture;

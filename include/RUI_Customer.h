@@ -1,16 +1,18 @@
 #pragma once
 
-#include<SDL2/SDL.h>
-#include<string>
-#include<vector>
-#include<fstream>
-#include"RUI_Dessert.h"
-#include"RUI_DessertManager.h"
-#include"RUI_ResourceManager.h"
-#include"RUI_Chair.h"
-#include"RUI_Cabinet.h"
-#include"RUI_Clock.h"
-#include"RUI_ProductManager.h"
+#include <SDL2/SDL.h>
+#include <string>
+#include <vector>
+#include <fstream>
+#include "RUI_Dessert.h"
+#include "RUI_DessertManager.h"
+#include "RUI_ResourceManager.h"
+#include "RUI_Chair.h"
+#include "RUI_Cabinet.h"
+#include "RUI_Clock.h"
+#include "RUI_ProductManager.h"
+#include "RUI_Tool.h"
+#include "RUI_Pathfinding.h"
 
 enum class CustomerStage
 {
@@ -39,6 +41,8 @@ class Customer
 
         void SetCurrentStage(int i)
         {
+            path.clear();
+            pathIndex = 0;
             switch(i)
             {
                 case 0:
@@ -236,47 +240,54 @@ class Customer
         void RenderAddFrame(SDL_Renderer* Renderer);
 
         void Update(std::vector<Chair>& Chairs,
-            int currentTime, 
+            int currentTime,
             std::vector<Cabinet>& Cabtines,
             DessertManager dessertManager,
             ProductManager pManager,
             Customer& customer,
             int&  TotalMoney,
-            Register& res
+            Register& res,
+            const std::vector<FurnitureGrid>& grid
         )
         {
+            if( x > 800 || x < 0 || y > 600 || y < 0)
+            {
+                QuitFinish = 1;
+            }
             switch(CurrentStage)
             {
                 case CustomerStage::Enter:
                 {
-                    EnterStore(currentTime,Cabtines.size());
+                    EnterStore(currentTime,(int)Cabtines.size(), grid);
                     break;
                 }
                 case CustomerStage::Choose:
                 {
-                    ChooseDessert(Cabtines,currentTime,pManager);
+                    ChooseDessert(Cabtines,currentTime,pManager, grid);
                     break;
                 }
                 case CustomerStage::Buy:
                 {
-                    Pay(currentTime,TotalMoney,pManager,Cabtines,res);
+                    Pay(currentTime,TotalMoney,pManager,Cabtines,res, grid);
                     break;
                 }
                 case CustomerStage::Eat:
                 {
-                    Eat(Chairs, currentTime, customer, Cabtines, pManager);
+                    Eat(Chairs, currentTime, customer, Cabtines, pManager, grid);
                     break;
                 }
                 case CustomerStage::Leave:
                 {
-                    LeaveStore();
+                    LeaveStore(grid);
                     break;
                 }
             }
         }
 
-        void EnterStore(int currentTime, int CabinetSize)
+        void EnterStore(int currentTime, int CabinetSize,
+                       const std::vector<FurnitureGrid>& grid)
         {
+            // Enter 阶段沿用老办法：硬编码像素路径，不使用 A*
             if(x >= 450)
             {
                 toward = 0;
@@ -302,132 +313,207 @@ class Customer
             }
         }
 
-        void ChooseDessert(std::vector<Cabinet>&Cabinets, int currentTime, ProductManager pManager)
+        void ChooseDessert(std::vector<Cabinet>&Cabinets, int currentTime,
+                          ProductManager pManager,
+                          const std::vector<FurnitureGrid>& grid)
         {
             if( ChooseTime == 0)
             {
                 ChooseTime = currentTime;
             }
-            if(x < Cabinets[chooseID].GetX() + 32)
+
+            // 首次进入 / 切换橱柜后：计算到橱柜相邻格的路径
+            if (path.empty())
             {
-                toward = 1;
-                x = x + speed;
-            }
-            else if(x > Cabinets[chooseID].GetX() + 32)
-            {
-                toward = 0;
-                x = x - speed;
-            }
-            else if(y < Cabinets[chooseID].GetY() - 16)
-            {
-                toward = 0;
-                y = y + speed;
-            }
-            else if(y > Cabinets[chooseID].GetY() - 16)
-            {
-                toward = 0;
-                y = y - speed;
-            }
-            else if(x == Cabinets[chooseID].GetX() + 32 && y == Cabinets[chooseID].GetY() - 16)
+                Cabinet& cab = Cabinets[chooseID];
+                GridPos cabPos = FurniturePixelToGrid(cab.GetX(), cab.GetY());
+                GridPos start = PixelToGrid(x, y);
+
+                // 在橱柜四邻中找距离顾客最近的可行走格子
+                const int dr[] = { 0,  0, -1,  1};
+                const int dc[] = {-1,  1,  0,  0};
+                GridPos bestNeighbor = { -1, -1 };
+                int bestDist = 9999;
+                for (int i = 0; i < 4; i++)
                 {
+                    GridPos neighbor = { cabPos.col + dc[i], cabPos.row + dr[i] };
+                    if (IsPassableForCustomer(neighbor, grid))
+                    {
+                        int dist = std::abs(neighbor.col - start.col)
+                                 + std::abs(neighbor.row - start.row);
+                        if (dist < bestDist)
+                        {
+                            bestDist = dist;
+                            bestNeighbor = neighbor;
+                        }
+                    }
+                }
+
+                if (bestNeighbor.col == -1)
+                {
+                    // 无相邻可通行格：直接使用橱柜右侧
+                    bestNeighbor = { cabPos.col, cabPos.row + 1 };
+                }
+
+                path = FindPath(start, bestNeighbor, grid);
+                pathIndex = 0;
+
+                if (path.empty())
+                {
+                    SDL_Log("ChooseDessert: 无路径到橱柜%d", chooseID);
+                    x = GridToEntityPixelX(bestNeighbor.row);
+                    y = GridToEntityPixelY(bestNeighbor.col);
+                }
+            }
+
+            // 沿路径走到橱柜旁
+            MoveAlongPath();
+
+            // 到达橱柜旁 → 进行微调定位 + 选择逻辑
+            if (pathIndex >= path.size())
+            {
+                Cabinet& cab = Cabinets[chooseID];
+                int targetX = cab.GetX() + 32;
+                int targetY = cab.GetY() - 16;
+
+                // 像素级微调
+                if (x < targetX)      { toward = 1; x += speed; }
+                else if (x > targetX) { toward = 0; x -= speed; }
+                else if (y < targetY) { toward = 0; y += speed; }
+                else if (y > targetY) { toward = 0; y -= speed; }
+
+                if (std::abs(x - targetX) <= speed && std::abs(y - targetY) <= speed)
+                {
+                    x = targetX;
+                    y = targetY;
                     toward = 0;
+
                     if(Cabinets[chooseID].GetDessertNumber() < ChooseNumber)
                     {
                         SDL_Log("%d %d",Cabinets[chooseID].GetDessertNumber(),ChooseNumber);
                         ChooseNumber = Cabinets[chooseID].GetDessertNumber();
                         eatNumber = ChooseNumber;
-                        SDL_Log("由于少于需求，需求数量已更改为%d",ChooseNumber); 
+                        SDL_Log("由于少于需求，需求数量已更改为%d",ChooseNumber);
                         if( ChooseNumber == 0 && chooseChange <= 3)
                         {
                             SDL_Log("当前橱柜无甜点，切换橱柜");
                             chooseChange++;
                             chooseID = rand() % Cabinets.size();
-                            SetChooseNumber();  // 移除错误的条件判断，直接切换
-                            ChooseTime = currentTime;  
-                            removeCheck = 0;  
-                            return;  // 退出当前逻辑，重新执行选择
+                            SetChooseNumber();
+                            ChooseTime = currentTime;
+                            removeCheck = 0;
+                            path.clear();  // 重新计算到新橱柜的路径
+                            return;
                         }
                         if( chooseChange > 3 )
                         {
                             if(ChooseNumber == 0)
+                            {
+                                path.clear();
                                 CurrentStage = CustomerStage::Buy;
-                            // 三次都没买上运气确实不太好啊hhh
+                            }
                         }
                         Cabinets[chooseID].RemoveDessert(ChooseNumber);
-                        removeCheck = 1; 
+                        removeCheck = 1;
                     }
                     if(removeCheck == 0)
                     {
                         Cabinets[chooseID].RemoveDessert(ChooseNumber);
                         removeCheck = 1;
                     }
-                if(currentTime - ChooseTime >= 5000 + rand() % 500 - 250)
-                {
-                    int dID = Cabinets[chooseID].GetDessertID();
-                    SDL_Log("%s 选择了%d",CustomerName.c_str(), chooseID);
-                    int price = pManager.GetProductPrice(dID);
-                    SDL_Log("价格为%d",price);
-                    payPrice = price * ChooseNumber;
-                                   
-                    CurrentStage = CustomerStage::Buy;
-                    ChooseTime = 0;
+
+                    if(currentTime - ChooseTime >= 5000 + rand() % 500 - 250)
+                    {
+                        int dID = Cabinets[chooseID].GetDessertID();
+                        SDL_Log("%s 选择了%d",CustomerName.c_str(), chooseID);
+                        int price = pManager.GetProductPrice(dID);
+                        SDL_Log("价格为%d",price);
+                        payPrice = price * ChooseNumber;
+                        path.clear();
+                        CurrentStage = CustomerStage::Buy;
+                        ChooseTime = 0;
+                    }
                 }
             }
         }
 
-        void Pay(int CurrentTime, int& TotalMoney, ProductManager& pManager, std::vector<Cabinet>& Cabinets, Register& res)
+        void Pay(int CurrentTime, int& TotalMoney, ProductManager& pManager,
+                std::vector<Cabinet>& Cabinets, Register& res,
+                const std::vector<FurnitureGrid>& grid)
         {
-            if(y >= 150 + Queue * 2)
+            // 首次进入：计算到收银台附近的路径
+            if (path.empty())
             {
-                toward = 1;
-                y = y - speed;
-            }
-            else if(x <= maxNumber(350 - Queue * 20 , 0))
-            {
-                toward = 1;
-                x = x + speed;
-                if(x == 0)
-                    toward = 1;
-            }
-            else if(x > maxNumber(350 - Queue * 20 + 10 , -10))
-            {
-                toward = 0;
-                x = x - speed;
-                if(x == 0)
-                    toward = 1;
-            }
-            if(x > 350 && y < 150)
-            {       
-                if( PayTime == 0)
-                {
-                    PayTime = CurrentTime;
-                    // SDL_Log("%s此时的时间%d",CustomerName.c_str(),PayTime);
-                }
-                toward = 1;
-                if(CurrentTime - PayTime >= 1000 && isGoingPay == 1 && res.GetIsPaying() == 1)
-                {
-                    if(payPrice >= 1000)
-                        SDL_Log("warnning!!!!价格超标，数据异常:%d",payPrice);
-                    int dID = Cabinets[chooseID].GetDessertID();
-                    int price = pManager.GetProductPrice(dID);
-                    payPrice = price * ChooseNumber;
-                    TotalMoney = TotalMoney + payPrice;
+                GridPos start = PixelToGrid(x, y);
+                GridPos end = { 12, 5 };
+                path = FindPath(start, end, grid);
+                pathIndex = 0;
 
-                    // SDL_Log("增加价钱%d,%d,%d",payPrice,price,ChooseNumber);
-                    payCharm.SetPrice(payPrice);
-                    payCharm.SetStartTime(CurrentTime);
-                    payCharm.SetStopTime(CurrentTime);
-                    // SDL_Log("已付款，当前总金额:%d",TotalMoney);
-                    
-                    SDL_Log("此时%s数据%d,%d",CustomerName.c_str(),ChooseNumber,chooseID);
-                    CurrentStage = CustomerStage::Eat;
-                    PayTime = 0;
+                if (path.empty())
+                {
+                    SDL_Log("Pay: 无路径到收银台");
+                    x = GridToEntityPixelX(end.row);
+                    y = GridToEntityPixelY(end.col);
+                }
+            }
+
+            MoveAlongPath();
+
+            // 到达收银台附近 → 排队微调
+            if (pathIndex >= path.size())
+            {
+                if(y >= 150 + Queue * 2)
+                {
+                    toward = 1;
+                    y = y - speed;
+                }
+                else if(x <= maxNumber(350 - Queue * 20 , 0))
+                {
+                    toward = 1;
+                    x = x + speed;
+                    if(x == 0)
+                        toward = 1;
+                }
+                else if(x > maxNumber(350 - Queue * 20 + 10 , -10))
+                {
+                    toward = 0;
+                    x = x - speed;
+                    if(x == 0)
+                        toward = 1;
+                }
+                if(x > 350 && y < 150)
+                {
+                    if( PayTime == 0)
+                    {
+                        PayTime = CurrentTime;
+                    }
+                    toward = 1;
+                    if(CurrentTime - PayTime >= 1000 && isGoingPay == 1 && res.GetIsPaying() == 1)
+                    {
+                        if(payPrice >= 1000)
+                            SDL_Log("warnning!!!!价格超标，数据异常:%d",payPrice);
+                        int dID = Cabinets[chooseID].GetDessertID();
+                        int price = pManager.GetProductPrice(dID);
+                        payPrice = price * ChooseNumber;
+                        TotalMoney = TotalMoney + payPrice;
+
+                        payCharm.SetPrice(payPrice);
+                        payCharm.SetStartTime(CurrentTime);
+                        payCharm.SetStopTime(CurrentTime);
+
+                        SDL_Log("此时%s数据%d,%d",CustomerName.c_str(),ChooseNumber,chooseID);
+                        path.clear();
+                        CurrentStage = CustomerStage::Eat;
+                        PayTime = 0;
+                    }
                 }
             }
         }
 
-        void Eat(std::vector<Chair>& Chairs, int CurrentTime, Customer& customer, std::vector<Cabinet>& Cabinets, ProductManager productManager)
-        { 
+        void Eat(std::vector<Chair>& Chairs, int CurrentTime, Customer& customer,
+                std::vector<Cabinet>& Cabinets, ProductManager productManager,
+                const std::vector<FurnitureGrid>& grid)
+        {
             if(SitTime == 0)
             {
                 SitTime = CurrentTime;
@@ -445,61 +531,96 @@ class Customer
                             Chairs[i].SetUsing(1);
                             isEating = i;
                         }
-                    } 
-                }             
+                    }
+                }
                 if(isEating == -1)
                 {
                     if(x <= 600)
                         x = x + speed;
-                    // CurrentStage = CustomerStage::Leave;
+                }
+                else
+                {
+                    // 分配了椅子，清空路径让下一帧重新计算
+                    path.clear();
                 }
             }
             else
             {
-                if( x != Chairs[isEating].GetRenderX())
+                // 首次获得椅子：计算到椅子的路径
+                if (path.empty() && onSeat == 0)
                 {
-                    if(x - Chairs[isEating].GetRenderX() >= 0)
+                    GridPos start = PixelToGrid(x, y);
+                    GridPos chairPos = FurniturePixelToGrid(Chairs[isEating].GetX(), Chairs[isEating].GetY());
+                    path = FindPath(start, chairPos, grid);
+                    pathIndex = 0;
+
+                    if (path.empty())
                     {
-                        x = x - speed;
-                        toward = 0;
-                    }
-                    else
-                    {
-                        x = x + speed;
-                        toward = 1;
+                        SDL_Log("Eat: 无路径到椅子%d", isEating);
+                        x = Chairs[isEating].GetRenderX();
+                        y = Chairs[isEating].GetRenderY();
                     }
                 }
-                else if( y != Chairs[isEating].GetRenderY())
+
+                // 还未入座：沿路径走到椅子旁
+                if (onSeat == 0)
                 {
-                    if(y - Chairs[isEating].GetRenderY() >= 0)
+                    MoveAlongPath();
+                    // for(GridPos i : path)
+                    // {
+                    //     SDL_Log("路径点: (%d, %d)", i.row, i.col);
+                    // }
+                    // 路径走完 → 像素级靠近椅子
+                    if (pathIndex >= path.size())
                     {
-                        y = y - speed;
+                        int targetX = Chairs[isEating].GetRenderX();
+                        int targetY = Chairs[isEating].GetRenderY();
+
+                        if(x - targetX >= 0)
+                        {
+                            x = x - speed;
+                            toward = 0;
+                        }
+                        else
+                        {
+                            x = x + speed;
+                            toward = 1;
+                        }
+
+                        if (std::abs(x - targetX) <= speed)
+                        {
+                            x = targetX;
+                            if(y - targetY >= 0)
+                            {
+                                y = y - TargetSpeedChangeY(targetY, y, speed);
+                            }
+                            else
+                            {
+                                y = y + TargetSpeedChangeY(targetY, y, speed);
+                            }
+                        }
+
+                        if(x == targetX && y == targetY)
+                        {
+                            onSeat = 1;
+                            if(isEating % 2 == 0)
+                                toward = 1;
+                            else
+                                toward = 0;
+                        }
                     }
-                    else
-                    {
-                        y = y + speed;
-                    }        
                 }
-                if(x == Chairs[isEating].GetRenderX() && y == Chairs[isEating].GetRenderY())
+
+                // 已入座：等待计时
+                if (onSeat == 1)
                 {
-                    onSeat = 1;
-                    if(isEating % 2 == 0)
-                    {
-                        toward = 1;
-                    }
-                    else
-                    {
-                        toward = 0;
-                    }
                     if(CurrentTime - SitTime >= 18000 + rand()% 5000)
-                    {    
+                    {
                         Chairs[isEating].SetUsing(0);
-                        // 更新 manager 中的模板顾客的喜好值                       
                         customer.AddPreference(productManager.products[Cabinets[chooseID].GetDessertID()].GetDessertID(),ChooseNumber);
-                        // 将最新的喜好值同步回当前场景中的顾客实例
                         this->preference = customer.GetCustomerPreference();
-                        // 更新名字的 Surface（用于 onRenderWithName）
                         RefreshNameSurface();
+                        path.clear();
                         CurrentStage = CustomerStage::Leave;
                         SitTime = 0;
                         whetherRenderAdd = 0;
@@ -524,23 +645,24 @@ class Customer
                         customer.AddPreference(productManager.products[Cabinets[chooseID].GetDessertID()].GetDessertID(),ChooseNumber);
                         this->preference = customer.GetCustomerPreference();
                         RefreshNameSurface();
+                        path.clear();
                         CurrentStage = CustomerStage::Leave;
                         SitTime = 0;
                         waitingTime = 0;
-                    }                
+                    }
                     if( CurrentTime - EatTime > 1000 && EatTime != 0)
                     {
-                        // SDL_Log("当前时间差:%d %d %d",CurrentTime, CurrentTime - waitingTime, waitingTime);
                         eatNumber--;
                         if( eatNumber < 0)
                             eatNumber = 0;
                         EatTime = 0;
                     }
                 }
-            }     
+            }
             if( ChooseNumber == 0 )
-            {    
+            {
                 Chairs[isEating].SetUsing(0);
+                path.clear();
                 CurrentStage = CustomerStage::Leave;
             }
             payCharm.SetStopTime(CurrentTime);
@@ -580,30 +702,47 @@ class Customer
         void SetEatNumber( int number );
         int GetEatNumber();
 
-        void LeaveStore()
+        void LeaveStore(const std::vector<FurnitureGrid>& grid)
         {
-            if(x <= 580 && y <= 350)
+            // 首次进入：计算到出口的路径
+            if (path.empty())
             {
-                toward = 1;
-                x = x + speed;
+                GridPos start = PixelToGrid(x, y);
+                // 出口在右侧：目标为同一行最右侧边缘格点
+                GridPos end = { 12, 22 };
+                path = FindPath(start, end, grid);
+                pathIndex = 0;
+
+                if (path.empty())
+                {
+                    SDL_Log("LeaveStore: 无路径到出口，直接传送");
+                    x = GridToEntityPixelX(end.row);
+                    y = GridToEntityPixelY(end.col);
+                }
             }
-            else if(x > 590 && y <= 350)
+
+            // 沿路径走到出口附近
+            if (pathIndex < path.size())
             {
-                toward = 0;
-                x = x - speed;
+                MoveAlongPath();
             }
-            else if(y <= 350)
+
+            // 到达出口格点 → 继续向右走出屏幕
+            if (pathIndex >= path.size())
             {
-                y = y + speed;
-            }
-            else if(x <= 800)
-            {
-                toward = 1;
-                x = x + speed;
-            }
-            if(x > 800 && y > 350 && CurrentStage == CustomerStage::Leave)
-            {
-                QuitFinish = 1;
+                if (x <= 800)
+                {
+                    toward = 1;
+                    x = x + speed;
+                }
+                if (x > 800 && y > 350 && CurrentStage == CustomerStage::Leave)
+                {
+                    QuitFinish = 1;
+                }
+                if (x > 1000)
+                {
+                    QuitFinish = 1;
+                }
             }
         }
 
@@ -770,6 +909,43 @@ class Customer
             // TTF_CloseFont(NameFont);
         }
 
+        // 沿网格路径逐格移动
+        void MoveAlongPath()
+        {
+            if (pathIndex >= path.size()) return;
+
+            GridPos target = path[pathIndex];
+            int targetX = GridToEntityPixelX(target.row);
+            int targetY = GridToEntityPixelY(target.col);
+
+            if (x < targetX)
+            {
+                x += speed;
+                toward = 1;
+            }
+            else if (x > targetX)
+            {
+                x -= speed;
+                toward = 0;
+            }
+            else if (y < targetY)
+            {
+                y += speed;
+            }
+            else if (y > targetY)
+            {
+                y -= speed;
+            }
+
+            // 到达当前格点（含容差）
+            if (std::abs(x - targetX) <= speed && std::abs(y - targetY) <= speed)
+            {
+                x = targetX;
+                y = targetY;
+                pathIndex++;
+            }
+        }
+
     private:
         std::string CustomerName;
         std::string PathName;
@@ -779,6 +955,10 @@ class Customer
         int SitTime;
         int ChooseTime;
         CustomerStage CurrentStage;
+
+        // 寻路相关
+        std::vector<GridPos> path;
+        size_t pathIndex = 0;
 
         int chooseID;
 

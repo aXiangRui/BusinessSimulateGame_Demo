@@ -99,17 +99,17 @@ class FurnitureGrid
         this->id = id;
     }
 
-    FurnitureType GetType()
+    FurnitureType GetType() const
     {
         return type;
     }
 
-    PlacementType GetPlacement()
+    PlacementType GetPlacement() const
     {
         return placement;
     }
 
-    GridPos GetPos()
+    GridPos GetPos() const
     {
         return pos;
     }

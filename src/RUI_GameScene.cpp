@@ -121,16 +121,22 @@ void RUI_GameScene::onEnter()
     }
 
     // ----- 初始化网格 -----
+    // col (i) = y 方向，row (j) = x 方向
+    // 厨房区：col >= 12（屏幕下方），顾客不可通行
     furnitureGrids.clear();
     int id = 0;
     for (int i = 0; i < 16; i++)
     {
         for (int j = 0; j < 25; j++)
         {
-            if (i < 13 || j < 13)
+            if( i < 13 || j < 13)
             {
                 FurnitureGrid grid;
-                grid.InitFurnitureGrid({i, j}, FurnitureType::None, PlacementType::Kitchen, id++);
+                grid.InitFurnitureGrid({i, j}, FurnitureType::None, PlacementType::Showing, id++);
+                if(j < 13 && i < 5)
+                {
+                    grid.SetPlacement(PlacementType::Kitchen);
+                }
                 furnitureGrids.push_back(grid);
             }
         }
@@ -220,7 +226,8 @@ void RUI_GameScene::onUpdate()
         world.OnUpdate(chairs, cabinets, customerManager,
             dessertManager, reg,
             totalMoney, totalCustomers, totalDessert,
-            clock.ReturnHour());
+            clock.ReturnHour(),
+            furnitureGrids);
     }
     else
     {

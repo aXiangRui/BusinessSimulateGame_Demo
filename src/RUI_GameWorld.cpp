@@ -330,7 +330,8 @@ void GameWorld::OnUpdate(std::vector<Chair>& chairs,
                           int& totalMoney,
                           int& totalCustomers,
                           int& totalDessert,
-                          int clockTime)
+                          int clockTime,
+                          const std::vector<FurnitureGrid>& furnitureGrids)
 {
     // 防止溢出
     if (totalCustomers >= 10000000)
@@ -363,7 +364,8 @@ void GameWorld::OnUpdate(std::vector<Chair>& chairs,
             {
                 customers[i].Update(chairs, currentTime, cabinets,
                     dessertManager, productManager,
-                    customerManager.Customers[j], totalMoney, reg);
+                    customerManager.Customers[j], totalMoney, reg,
+                    furnitureGrids);
             }
         }
 
