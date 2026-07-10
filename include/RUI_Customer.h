@@ -109,6 +109,8 @@ class Customer
             y = my;
         }
 
+        int GetSortedY(){return y + 64 + offsetY;}
+
         void SetChooseNumber();
 
         int GetCustomerID()
@@ -184,7 +186,7 @@ class Customer
                 SDL_Log("OnRender: texture not found for customer id=%d name=%s", CustomerID, CustomerName.c_str());
                 return;
             }
-            SDL_Rect Rect = {x,y,64,64};
+            SDL_Rect Rect = {x,y+offsetY,64,64};
             if(toward == 0)
             {
                 SDL_RenderCopy(Renderer,NormalTexture,nullptr,&Rect);
@@ -215,7 +217,7 @@ class Customer
                 SDL_Log("OnRender: texture not found for customer id=%d name=%s", CustomerID, CustomerName.c_str());
                 return;
             }
-            SDL_Rect Rect = {x,y,64,64};
+            SDL_Rect Rect = {x,y+offsetY,64,64};
             if(toward == 0)
             {
                 SDL_RenderCopy(Renderer,NormalTexture,nullptr,&Rect);
@@ -227,7 +229,7 @@ class Customer
 
             // create a local texture for the name surface and destroy it immediately
             SDL_Texture* nameTex = SDL_CreateTextureFromSurface(Renderer, NameSurface);
-            NameRect = {x+15,y,NameW,NameH};
+            NameRect = {x+15,y+offsetY,NameW,NameH};
             SDL_RenderCopy(Renderer, nameTex, nullptr, &NameRect);
             SDL_DestroyTexture(nameTex);
 
@@ -1001,4 +1003,5 @@ class Customer
         int eatNumber;
         int addNumber;
         bool whetherRenderAdd;
+        int offsetY;
 };

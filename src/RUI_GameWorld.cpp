@@ -434,6 +434,28 @@ void GameWorld::RenderCustomers(SDL_Renderer* renderer)
     }
 }
 
+void GameWorld::RenderCustomer(SDL_Renderer* renderer, int i)
+{
+    if(i < 0 || i >= (int)customers.size())
+    {
+        return;
+    }
+    if (customers[i].GetIsHoverd())
+        {
+            customers[i].onRenderWithName(renderer);
+        }
+        else
+        {
+            customers[i].OnRender(renderer);
+        }
+
+        int stage = customers[i].GetCurrentStage();
+        if (stage >= 2 && stage <= 3)
+        {
+            customers[i].RenderCake(renderer);
+        }
+}
+
 void GameWorld::RenderCooks(SDL_Renderer* renderer)
 {
     for (int i = 0; i < (int)cooks.size(); i++)

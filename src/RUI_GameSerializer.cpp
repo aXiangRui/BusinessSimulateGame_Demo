@@ -97,14 +97,10 @@ void GameSerializer::Load(
                 values.push_back(val);
 
             Cabinet c;
-            if (values.size() >= 5)
+            if (values.size() >= 3)
             {
-                // 新格式：id dessertID number x y
-                c.InitCabinet(values[0], values[1], values[2], values[3], values[4]);
-            }
-            else if (values.size() >= 3)
-            {
-                // 旧格式兼容：id dessertID number（位置由公式计算）
+                // 新格式：id dessertID number（位置由 PlacementManager 统一管理）
+                // 也兼容旧格式 id dessertID number x y（忽略末尾的 x y）
                 c.InitCabinet(values[0], values[1], values[2]);
             }
             cabinets.push_back(c);
@@ -233,7 +229,7 @@ void GameSerializer::Save(
         file << totalDessert << std::endl;
     }
 
-    // ===== 3. 写入面包柜 =====
+    // ===== 3. 写入面包柜（位置由 Furniture.rui 统一管理，此处只存状态） =====
     {
         std::ofstream file("./save/Cabinet.rui");
         file << cabinets.size() << std::endl;
@@ -241,8 +237,6 @@ void GameSerializer::Save(
         {
             file << i << " " << cabinets[i].GetDessertID()
                  << " " << cabinets[i].GetDessertNumber()
-                 << " " << cabinets[i].GetX()
-                 << " " << cabinets[i].GetY()
                  << std::endl;
         }
     }

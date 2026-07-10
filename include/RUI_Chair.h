@@ -27,6 +27,15 @@ class Chair
         isUsing = 0;
     }
 
+    /// 使用像素坐标初始化（取代公式），自动吸附到格点
+    void InitChair(int id, int pixelX, int pixelY, bool flipped = false)
+    {
+        ChairID = id;
+        SetPosition(pixelX, pixelY);
+        toward = flipped ? 1 : 0;
+        isUsing = 0;
+    }
+
     void SetPosition(int mx, int my)
     {
         // 吸附到最近的格点（含 Furniture 偏移）
@@ -97,6 +106,13 @@ class Desk
         y = (DeskID % 4) * 100;
     }
 
+    /// 使用像素坐标初始化（取代公式）
+    void initDesk(int id, int pixelX, int pixelY)
+    {
+        DeskID = id;
+        SetPosition(pixelX, pixelY);
+    }
+
     void SetPosition(int newX, int newY)
     {
         x = newX;
@@ -139,7 +155,7 @@ class Register
     void InitRegister()
     {
         x = 350;
-        y = 140;
+        y = 130;
         RegisterTexture = ResourceManager::instance()->FindTexture("register");
     }
 

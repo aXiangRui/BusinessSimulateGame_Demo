@@ -19,9 +19,27 @@ void RUI_GameScene::onEnter()
         cabinets, customerManager,
         totalMoney, totalCustomers, totalDessert);
 
+    SDL_Log("Current Hour: %d", clock.ReturnAllHour());
+
+    // 加载家具位置（统一数据源，替代 Cabinet.rui 中的 x/y）
+    placeManager.Load();
+
+    // 用 PlacementManager 覆写 Cabinet 位置
+    auto cabEntries = placeManager.GetByType(FurnitureType::Cabinet);
+    for (auto& entry : cabEntries)
+    {
+        for (auto& cab : cabinets)
+        {
+            if (cab.GetCabinetID() == entry.id)
+            {
+                cab.SetPosition(entry.PixelX(), entry.PixelY());
+                break;
+            }
+        }
+    }
+
     // 初始化游戏世界
     world.OnEnter();
-    world.SetReadingPage(0);
 
     // 初始化场景 UI
     MenuButton btn0((WindowWidth - 320) / 2, 450, 320, 64, "设置新甜点", 0);
@@ -141,70 +159,38 @@ void RUI_GameScene::onEnter()
             }
         }
     }
-    furnitureGrids[136].SetType(FurnitureType::Register);
-    furnitureGrids[137].SetType(FurnitureType::Register);
-
-    // 将 Cabinet 与 Grid 绑定
-    for (int i = 0; i < (int)cabinets.size(); i++)
+    // 统一从 PlacementManager 标记所有家具网格（替代原来分散的绑定）
+    for (auto& entry : placeManager.GetEntries())
     {
-        int cabX = cabinets[i].GetX();
-        int cabY = cabinets[i].GetY();
-        for (int g = 0; g < (int)furnitureGrids.size(); g++)
+        for (auto& gridCell : furnitureGrids)
         {
-            if (furnitureGrids[g].GetX() == cabX &&
-                furnitureGrids[g].GetY() == cabY)
+            if (gridCell.GetX() == entry.PixelX() &&
+                gridCell.GetY() == entry.PixelY())
             {
-                furnitureGrids[g].SetType(FurnitureType::Cabinet);
-                furnitureGrids[g].SetID(i);
+                gridCell.SetType(entry.type);
+                gridCell.SetID(entry.id);
                 break;
             }
         }
     }
 
-    // 将 Desk / Chair 与 Grid 绑定
-    for (int i = 0; i < (int)desks.size(); i++)
-    {
-        for (int g = 0; g < (int)furnitureGrids.size(); g++)
-        {
-            if (furnitureGrids[g].GetX() == desks[i].GetX() &&
-                furnitureGrids[g].GetY() == desks[i].GetY())
-            {
-                furnitureGrids[g].SetType(FurnitureType::Table);
-                furnitureGrids[g].SetID(i);
-                break;
-            }
-        }
-    }
-    for (int i = 0; i < (int)chairs.size(); i++)
-    {
-        for (int g = 0; g < (int)furnitureGrids.size(); g++)
-        {
-            if (furnitureGrids[g].GetX() == chairs[i].GetX() &&
-                furnitureGrids[g].GetY() == chairs[i].GetY())
-            {
-                furnitureGrids[g].SetType(FurnitureType::Chair);
-                furnitureGrids[g].SetID(i);
-                break;
-            }
-        }
-    }
+    borderBox.InitBorderBox(0, 0, 200, 500, "borderBox");
 
     // 初始化时间和时钟
     timeState = {};
     timeState.lastTime = SDL_GetTicks();
+    world.SetClock(clock);
     clock.SetStartTime(world.GetClockTime());
     materialFrame.Init();
 
     // 重置 UI 状态
-    isReadingProduct = false;
-    isSettingNewProduct = false;
-    isCheckingSetting = false;
+    uiState = GameStage::Normal;
     readingPage = -1;
     currentCabinet = -1;
     chatDelayTime = 0;
-    isMaterialFrameShowing = false;
     isChatShowing = false;
     isSummaryShowing = false;
+    isMaterialFrameShowing = false;
 
     SDL_Log("进入游戏场景");
 }
@@ -254,30 +240,37 @@ void RUI_GameScene::onUpdate()
 
 void RUI_GameScene::onRender(SDL_Renderer* renderer)
 {
-    // 加载字体
+    // 加载字体（仅一次）
     if (!textFont)
     {
         textFont = TTF_OpenFont("./resources/font/namidiansong.ttf", 36);
     }
 
-    // 金额颜色（负数变红）
-    SDL_Color moneyColor = textColor;
-    if (totalMoney < 0)
-    {
-        moneyColor = {200, 40, 40, 255};
-    }
+    // 缓存金额纹理 —— 仅在金额变化时重建，避免每帧创建/销毁 GPU 纹理
+    static int lastRenderedMoney = -999999;
+    static SDL_Texture* cachedMoneyTexture = nullptr;
+    static SDL_Rect cachedMoneyRect = {0, 0, 0, 0};
 
-    // 渲染金额文字
-    std::string title = "总金额" + std::to_string(totalMoney);
-    SDL_Surface* image = TTF_RenderUTF8_Blended(textFont, title.c_str(), moneyColor);
-    SDL_Rect textRect = {10, 60, image->w, image->h};
-    SDL_Texture* moneyTexture = SDL_CreateTextureFromSurface(renderer, image);
-    SDL_FreeSurface(image);
+    if (totalMoney != lastRenderedMoney || !cachedMoneyTexture)
+    {
+        if (cachedMoneyTexture)
+            SDL_DestroyTexture(cachedMoneyTexture);
+
+        SDL_Color moneyColor = textColor;
+        if (totalMoney < 0)
+            moneyColor = {200, 40, 40, 255};
+
+        std::string title = "总金额" + std::to_string(totalMoney);
+        SDL_Surface* image = TTF_RenderUTF8_Blended(textFont, title.c_str(), moneyColor);
+        cachedMoneyRect = {10, 60, image->w, image->h};
+        cachedMoneyTexture = SDL_CreateTextureFromSurface(renderer, image);
+        SDL_FreeSurface(image);
+        lastRenderedMoney = totalMoney;
+    }
 
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, background, nullptr, &backgroundRect);
-    SDL_RenderCopy(renderer, moneyTexture, nullptr, &textRect);
-    SDL_DestroyTexture(moneyTexture);
+    SDL_RenderCopy(renderer, cachedMoneyTexture, nullptr, &cachedMoneyRect);
 
     // 渲染桌椅
     for (int i = 0; i < (int)chairs.size(); i++)
@@ -295,7 +288,7 @@ void RUI_GameScene::onRender(SDL_Renderer* renderer)
     world.RenderServers(renderer);
 
     reg.onRender(renderer);
-    world.RenderCustomers(renderer);
+    // world.RenderCustomers(renderer);  // ← 已由下方 Y 排序渲染替代
 
     // 黑夜遮罩
     SDL_SetTextureAlphaMod(nightTexture, timeState.currentAlpha);
@@ -303,9 +296,39 @@ void RUI_GameScene::onRender(SDL_Renderer* renderer)
 
     // 时间和面包柜
     clock.RenderHour(renderer);
-    for (int i = 0; i < (int)cabinets.size(); i++)
+    
+    // for (int i = 0; i < (int)cabinets.size(); i++)
+    // {
+    //     cabinets[i].onRender(renderer);
+    // }
+
+    renderCommands.clear();
+
+    for(int i = 0; i < (int)cabinets.size(); i++)
     {
-        cabinets[i].onRender(renderer);
+        renderCommands.push_back({cabinets[i].GetSortedY(), 1, i});
+    }
+
+    for(int i = 0 ; i < (int)world.GetCustomerCount(); i++)
+    {
+        renderCommands.push_back({world.GetCustomers()[i].GetSortedY(), 2, i});
+    }
+
+    std::sort(renderCommands.begin(), renderCommands.end(), [](const RenderCommand& a, const RenderCommand& b)
+    {
+        return a.y < b.y;
+    });
+
+    for(auto& r : renderCommands)
+    {
+        if(r.type == 1)
+        {
+            cabinets[r.index].onRender(renderer);
+        }
+        else
+        {
+            world.RenderCustomer(renderer, r.index);
+        }
     }
 
     // 渲染放置框
@@ -315,8 +338,11 @@ void RUI_GameScene::onRender(SDL_Renderer* renderer)
         furnitureGrids[i].onRender(renderer);
     }
 
-    // 图标
-    icons.onRender(renderer, world.IsReadingPage());
+    borderBox.onRender(renderer);
+
+    // 图标（翻页按钮在 ReadProduct / CheckingProduct 状态下显示）
+    bool showPageNav = (uiState == GameStage::ReadProduct || uiState == GameStage::CheckingProduct);
+    icons.onRender(renderer, showPageNav);
 
     // 面包柜详情框
     if (cabinetFrame.GetCabinetID() != -1)
@@ -325,7 +351,7 @@ void RUI_GameScene::onRender(SDL_Renderer* renderer)
     }
 
     // 产品查看页
-    if (isReadingProduct)
+    if (uiState == GameStage::ReadProduct)
     {
         world.RenderProductPage(renderer, readingPage, dessertManager, materialManager);
     }
@@ -333,7 +359,7 @@ void RUI_GameScene::onRender(SDL_Renderer* renderer)
     // 按钮
     for (int i = 0; i < (int)buttons.size(); i++)
     {
-        if (isSettingNewProduct && !isReadingProduct)
+        if (uiState == GameStage::SettingNewProduct)
         {
             buttons[i].ButtonRender(renderer);
         }
@@ -346,11 +372,9 @@ void RUI_GameScene::onRender(SDL_Renderer* renderer)
     }
 
     // 产品设置页
-    if (isCheckingSetting)
+    if (uiState == GameStage::CheckingProduct)
     {
         world.RenderSettingProduct(renderer, readingPage, dessertManager, materialManager);
-        icons.Icons[4].onRender(renderer);
-        icons.Icons[5].onRender(renderer, 1);
     }
 
     // 总结框
@@ -392,6 +416,9 @@ void RUI_GameScene::onExit()
 
     GameSerializer::SaveDeskChairSets(deskChairSets);
 
+    // 家具位置统一存档
+    placeManager.Save();
+
     buttons.clear();
     chairs.clear();
     desks.clear();
@@ -419,14 +446,13 @@ void RUI_GameScene::onInput(const SDL_Event& event, SDL_Renderer* renderer, bool
         int my = event.button.y;
 
         // 产品设置点击
-        if (isCheckingSetting)
+        if (uiState == GameStage::CheckingProduct)
         {
             if (mx >= 200 && mx <= 600 && my >= 0 && my <= 600)
             {
                 int offset = ((mx > 400) ? 3 : 0) + (my / 200);
                 cabinets[currentCabinet].SetDessertID(readingPage * 6 + offset);
-                isCheckingSetting = false;
-                isSettingNewProduct = true;
+                uiState = GameStage::SettingNewProduct;
             }
         }
 
@@ -452,16 +478,15 @@ void RUI_GameScene::onInput(const SDL_Event& event, SDL_Renderer* renderer, bool
         // 按钮点击
         for (int i = 0; i < (int)buttons.size(); i++)
         {
-            if (isSettingNewProduct)
+            if (uiState == GameStage::SettingNewProduct)
             {
                 if (buttons[i].RUI_isClicked(mx, my))
                 {
                     buttons[i].setClicked(true);
                     if (i == 0)
                     {
-                        isCheckingSetting = true;
+                        uiState = GameStage::CheckingProduct;
                         readingPage = 0;
-                        isSettingNewProduct = false;
                     }
                 }
                 else
@@ -485,10 +510,9 @@ void RUI_GameScene::onInput(const SDL_Event& event, SDL_Renderer* renderer, bool
                     SceneManager.ChooseScene(RUI_SceneManager::SceneType::Menu);
                     break;
                 case 3: // 查看产品
-                    if (!isReadingProduct)
+                    if (uiState != GameStage::ReadProduct)
                     {
-                        isReadingProduct = true;
-                        world.SetReadingPage(1);
+                        uiState = GameStage::ReadProduct;
                         readingPage = 0;
                         if (isMaterialFrameShowing)
                         {
@@ -497,13 +521,12 @@ void RUI_GameScene::onInput(const SDL_Event& event, SDL_Renderer* renderer, bool
                     }
                     else
                     {
-                        isReadingProduct = false;
-                        world.SetReadingPage(0);
+                        uiState = GameStage::Normal;
                         readingPage = -1;
                     }
                     break;
                 case 4: // 下一页
-                    if (world.IsReadingPage() || isCheckingSetting)
+                    if (uiState == GameStage::ReadProduct || uiState == GameStage::CheckingProduct)
                     {
                         readingPage++;
                         int maxPage = world.GetProductCount() / 6;
@@ -514,7 +537,7 @@ void RUI_GameScene::onInput(const SDL_Event& event, SDL_Renderer* renderer, bool
                     }
                     break;
                 case 5: // 上一页
-                    if (world.IsReadingPage() || isCheckingSetting)
+                    if (uiState == GameStage::ReadProduct || uiState == GameStage::CheckingProduct)
                     {
                         readingPage--;
                         if (readingPage < 0)
@@ -552,13 +575,13 @@ void RUI_GameScene::onInput(const SDL_Event& event, SDL_Renderer* renderer, bool
         // 面包柜点击
         for (int i = 0; i < (int)cabinets.size(); i++)
         {
-            if (!isSettingNewProduct && !world.IsRenderingCustomerFrame())
+            if (uiState != GameStage::SettingNewProduct && !world.IsRenderingCustomerFrame())
             {
                 if (cabinets[i].isClicked(mx, my))
                 {
                     currentCabinet = i;
                     cabinetFrame.SetCabinetID(i);
-                    isSettingNewProduct = true;
+                    uiState = GameStage::SettingNewProduct;
                 }
             }
         }
@@ -569,7 +592,7 @@ void RUI_GameScene::onInput(const SDL_Event& event, SDL_Renderer* renderer, bool
             if (mx >= 580 && mx <= 612 && my >= 100 && my <= 132)
             {
                 cabinetFrame.SetCabinetID(-1);
-                isSettingNewProduct = false;
+                uiState = GameStage::Normal;
                 cabinetFrame.quit();
             }
         }
@@ -582,23 +605,29 @@ void RUI_GameScene::onInput(const SDL_Event& event, SDL_Renderer* renderer, bool
         int my = event.motion.y;
         bool cursorSet = false;
 
-        if (isCheckingSetting)
+        // 缓存光标，避免每次鼠标移动都创建新光标（内存泄漏 + 性能损耗）
+        static SDL_Cursor* handCursor  = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
+        static SDL_Cursor* arrowCursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
+
+        borderBox.onMotionInput( isFurniturePlacing, mx, my );
+
+        if (uiState == GameStage::CheckingProduct)
         {
             if (mx >= 200 && mx <= 600 && my >= 0 && my <= 600)
             {
-                SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                SDL_SetCursor(handCursor);
                 cursorSet = true;
             }
         }
 
         for (int i = 0; i < (int)buttons.size(); i++)
         {
-            if (isSettingNewProduct)
+            if (uiState == GameStage::SettingNewProduct)
             {
                 if (buttons[i].RUI_isHovered(mx, my))
                 {
                     buttons[i].setHovered(true);
-                    SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                    SDL_SetCursor(handCursor);
                     cursorSet = true;
                 }
                 else
@@ -615,14 +644,14 @@ void RUI_GameScene::onInput(const SDL_Event& event, SDL_Renderer* renderer, bool
             {
                 if (i <= 3 || i >= 6)
                 {
-                    SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                    SDL_SetCursor(handCursor);
                     cursorSet = true;
                 }
                 else
                 {
-                    if (world.IsReadingPage())
+                    if (uiState == GameStage::ReadProduct || uiState == GameStage::CheckingProduct)
                     {
-                        SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                        SDL_SetCursor(handCursor);
                         cursorSet = true;
                     }
                 }
@@ -631,11 +660,11 @@ void RUI_GameScene::onInput(const SDL_Event& event, SDL_Renderer* renderer, bool
 
         for (int i = 0; i < (int)cabinets.size(); i++)
         {
-            if (!isCheckingSetting)
+            if (uiState != GameStage::CheckingProduct)
             {
                 if (cabinets[i].isClicked(mx, my))
                 {
-                    SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                    SDL_SetCursor(handCursor);
                     cursorSet = true;
                 }
             }
@@ -645,14 +674,14 @@ void RUI_GameScene::onInput(const SDL_Event& event, SDL_Renderer* renderer, bool
         {
             if (mx >= 580 && mx <= 612 && my >= 100 && my <= 132)
             {
-                SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+                SDL_SetCursor(handCursor);
                 cursorSet = true;
             }
         }
 
         if (!cursorSet)
         {
-            SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
+            SDL_SetCursor(arrowCursor);
         }
         break;
     }

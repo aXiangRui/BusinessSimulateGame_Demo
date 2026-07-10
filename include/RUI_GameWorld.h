@@ -128,6 +128,8 @@ public:
         return productManager.GetProductSize();
     }
 
+    void RenderCustomer(SDL_Renderer* renderer, int i);
+
 private:
     // ===== 内部方法 =====
     void SwapCustomer(Customer& a, Customer& b);

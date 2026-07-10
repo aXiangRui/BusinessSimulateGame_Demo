@@ -108,8 +108,9 @@ inline std::vector<GridPos> GetNeighbors(GridPos pos,
                                          GridPos end)
 {
     std::vector<GridPos> neighbors;
-    const int dr[] = { 0,  0, -1,  1};  // row  变化（x 方向）
-    const int dc[] = {-1,  1,  0,  0};  // col 变化（y 方向）
+    // 方向顺序：右、上、左、下 —— 优先探索右上方向（收银台在右上角）
+    const int dr[] = { 0,  -1,  0, 1};  // row 变化：不动、+1(右)、不动、-1(左)
+    const int dc[] = {-1,  0,  1,  0};  // col 变化：-1(上)、不动、+1(下)、不动
 
     for (int i = 0; i < 4; i++)
     {
@@ -175,8 +176,11 @@ inline std::vector<GridPos> FindPath(GridPos start, GridPos end,
             if (it == gCost.end() || newG < it->second)
             {
                 gCost[next] = newG;
-                int h = std::abs(next.col - end.col)
-                      + std::abs(next.row - end.row);  // 曼哈顿距离
+                int dx = std::abs(next.col - end.col);
+                int dy = std::abs(next.row - end.row);
+                // 曼哈顿距离 × 1.001 打破平局，优先探索启发值更小的节点
+                // 配合邻居顺序（右/上优先），让顾客自然走向右上角的收银台
+                int h = (dx + dy) * 1001 / 1000;
                 openSet.push({ next, newG, h });
                 cameFrom[next] = current;
             }

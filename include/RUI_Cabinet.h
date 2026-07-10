@@ -54,6 +54,8 @@ class Cabinet
     int GetY() { return y; }
     int GetRenderX() { return x - RENDER_OFFSET; }
     int GetRenderY() { return y - RENDER_OFFSET; }
+    int GetCabinetID() const { return CabinetID; }
+    int GetSortedY() { return y + GRID_SIZE; }
 
     int GetDessertID()
     {

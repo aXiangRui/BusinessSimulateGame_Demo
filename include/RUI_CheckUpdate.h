@@ -44,14 +44,14 @@ class CheckUpdate
         }
 
         void update(CustomerManager& customerManager, DessertManager& dessertManager, MaterialManager& materialManager, ChatFrame& chatFrame, TextManager& textManager, UnlockFrame& unlockFrame,bool& isShowing, std::vector<Customer>&Customers)
-        {           
-            CheckStructure Structure(chatFrame, textManager, unlockFrame, isShowing); 
-            UnlockDessert(customerManager, 0, dessertManager, 3, chatFrame, textManager, unlockFrame,isShowing,1,50);  
-            /*蛋糕胚解锁区*/          
+        {
+            CheckStructure Structure(chatFrame, textManager, unlockFrame, isShowing);
+            UnlockDessert(customerManager, 0, dessertManager, 3, chatFrame, textManager, unlockFrame,isShowing,1,50);
+            /*蛋糕胚解锁区*/
             for(int i = 0; i < UnlockCustomers.size();i++)
             {
                 UnlockCustomer(customerManager, Structure, UnlockCustomers[i], Customers);
-            }   
+            }
             /*顾客解锁区*/
             UnlockMaterial( customerManager, 1, materialManager, 4, chatFrame, textManager,unlockFrame, isShowing,1,100);
             /*材料解锁区*/

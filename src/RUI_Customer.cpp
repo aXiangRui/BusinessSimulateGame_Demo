@@ -50,27 +50,28 @@ void Customer::InitCustomer(int id, int preferid, std::string name, std::string 
     payCharm.Init();
     CakeTexture = ResourceManager::instance()->FindTexture("smallcake");
     PlateTexture = ResourceManager::instance()->FindTexture("tinyplate");
+    offsetY = -8;
 }
 
 void Customer::RenderCake(SDL_Renderer* Renderer)
 {  
     if(toward == 0)
     {
-        PlateRect = { x - 16, y - 8, 64, 64};
+        PlateRect = { x - 16, y - 8 + offsetY, 64, 64};
     }
     else
     {
-        PlateRect = {x + 16, y - 8, 64, 64};
+        PlateRect = {x + 16, y - 8 + offsetY, 64, 64};
     }
     if(onSeat)
     {
         if( toward == 0)
         {
-            PlateRect = { x - 24, y - 12, 64, 64};
+            PlateRect = { x - 24, y - 12 + offsetY, 64, 64};
         }
         else
         {
-            PlateRect = { x + 24, y - 12, 64, 64};
+            PlateRect = { x + 24, y - 12 + offsetY, 64, 64};    
         }
     }
     if(toward == 0)
@@ -86,23 +87,23 @@ void Customer::RenderCake(SDL_Renderer* Renderer)
     {
         if(toward == 0)
         {
-            CakeRect = {x - 16, y - i * 8 - 12, 64, 64};
+            CakeRect = {x - 16, y - i * 8 - 12 + offsetY, 64, 64};
         }    
         else
         {
-            CakeRect = {x + 16, y - i * 8 - 12, 64, 64};
-            PlateRect = { x + 16, y, 64, 64};
+            CakeRect = {x + 16, y - i * 8 - 12 + offsetY, 64, 64};
+            PlateRect = { x + 16, y + offsetY, 64, 64}; 
         }
         if(CurrentStage == CustomerStage::Eat && onSeat == 1)
         {
             if(toward == 0)
             {
-                CakeRect = {x - 24, y - i * 8 - 14, 64, 64};
+                CakeRect = {x - 24, y - i * 8 - 12 + offsetY, 64, 64};
             }
             
             else
             {
-                CakeRect = {x + 24, y - i * 8 - 14, 64, 64};    
+                CakeRect = {x + 24, y - i * 8 - 12 + offsetY, 64, 64};    
             }
         }
         if(toward == 0)

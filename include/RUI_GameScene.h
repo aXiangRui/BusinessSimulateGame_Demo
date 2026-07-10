@@ -23,6 +23,10 @@
 #include "RUI_CheckUpdate.h"
 #include "RUI_SceneManager.h"
 #include "RUI_Furniture.h"
+#include "RUI_PlacementManager.h"
+#include "RUI_GameStage.h"
+#include "RUI_PlacementTools.h"
+#include "RUI_Tool.h"
 
 extern RUI_SceneManager SceneManager;
 extern MusicPlayer BackgroundMusic;
@@ -65,6 +69,7 @@ private:
     DessertManager dessertManager;
     TextManager textManager;
     MaterialManager materialManager;
+    PlacementManager placeManager;
 
     // ===== 场景实体 =====
     std::vector<MenuButton> buttons;
@@ -72,6 +77,7 @@ private:
     std::vector<Desk> desks;
     std::vector<Cabinet> cabinets;
     std::vector<DeskChairSet> deskChairSets;
+    std::vector<RenderCommand> renderCommands;
     Register reg;
     GameIcon icons;
 
@@ -85,7 +91,7 @@ private:
 
     // ===== 家具网格 =====
     std::vector<FurnitureGrid> furnitureGrids;
-
+    BorderBox borderBox;
     // ===== 音频 =====
     MusicPlayer gameMusic;
 
@@ -98,13 +104,11 @@ private:
     int totalDessert = 0;
     int totalCustomers = 0;
 
-    // ===== UI 状态标志 =====
-    bool isChatShowing = false;
+    // ===== UI 状态 =====
+    GameStage uiState = GameStage::Normal;
     int  chatDelayTime = 0;
-    bool isReadingProduct = false;
-    bool isSettingNewProduct = false;
-    bool isCheckingSetting = false;
-    bool isSummaryShowing = false;
+    bool isChatShowing = false;         // 聊天框（叠加层）
+    bool isSummaryShowing = false;      // 每日总结（叠加层）
     bool isMaterialFrameShowing = false;
     bool isFurniturePlacing = false;
     int  readingPage = -1;
