@@ -25,12 +25,6 @@ class MenuButton: public Button
     {
 
     }
-    void ClickApplication()
-    {
-        switch(id)
-        {
-        }
-    }
     void ButtonRender(SDL_Renderer* Renderer)
     {     
         SDL_Texture* texture = ResourceManager::instance()->FindTexture("buttonDemo");        
@@ -128,5 +122,18 @@ class MenuButton: public Button
                     SDL_Log("TTF_RenderUTF8_Blended failed: %s", TTF_GetError());
                 }
             
-    }      
+    } 
+    void SetOnClick(std::function<void()> onClick)
+    {
+        this->onClick = onClick;
+    }
+    void ClickApplication()
+    {
+        if(onClick)
+        {
+            onClick();
+        }
+    }    
+    private:
+        std::function<void()> onClick; 
 };

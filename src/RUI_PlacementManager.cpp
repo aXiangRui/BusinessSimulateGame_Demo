@@ -134,7 +134,7 @@ void PlacementManager::GenerateDefaults()
 
         PlacementEntry entry;
         entry.id      = i;
-        entry.type    = FurnitureType::Table;
+        entry.type    = FurnitureType::Desk;
         entry.pos     = PixelToGridPos(x, y);
         entry.flipped = false;
         entry.zone    = PlacementType::Eating;

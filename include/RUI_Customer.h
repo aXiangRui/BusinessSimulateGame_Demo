@@ -180,7 +180,6 @@ class Customer
                 SDL_Log("OnRender: Renderer is null for customer id=%d name=%s", CustomerID, CustomerName.c_str());
                 return;
             }
-            NormalTexture = ResourceManager::instance()->FindTexture(PathName.c_str());
             if(!NormalTexture)
             {
                 SDL_Log("OnRender: texture not found for customer id=%d name=%s", CustomerID, CustomerName.c_str());
@@ -205,13 +204,12 @@ class Customer
         }
 
         void onRenderWithName(SDL_Renderer* Renderer)
-        {      
+        {
             if(!Renderer)
             {
                 SDL_Log("OnRender: Renderer is null for customer id=%d name=%s", CustomerID, CustomerName.c_str());
                 return;
             }
-            NormalTexture = ResourceManager::instance()->FindTexture(PathName.c_str());
             if(!NormalTexture)
             {
                 SDL_Log("OnRender: texture not found for customer id=%d name=%s", CustomerID, CustomerName.c_str());
@@ -332,9 +330,9 @@ class Customer
                 GridPos start = PixelToGrid(x, y);
 
                 // 在橱柜四邻中找距离顾客最近的可行走格子
-                const int dr[] = { 0,  0, -1,  1};
-                const int dc[] = {-1,  1,  0,  0};
-                GridPos bestNeighbor = { -1, -1 };
+                const int dr[] = { 0,  1,  0,  -1};
+                const int dc[] = {-1,  0,  1,  0};
+                GridPos bestNeighbor = { 1, -1 };
                 int bestDist = 9999;
                 for (int i = 0; i < 4; i++)
                 {
@@ -354,7 +352,7 @@ class Customer
                 if (bestNeighbor.col == -1)
                 {
                     // 无相邻可通行格：直接使用橱柜右侧
-                    bestNeighbor = { cabPos.col, cabPos.row + 1 };
+                    bestNeighbor = { cabPos.row, cabPos.col + 1 };
                 }
 
                 path = FindPath(start, bestNeighbor, grid);
@@ -447,10 +445,13 @@ class Customer
             if (path.empty())
             {
                 GridPos start = PixelToGrid(x, y);
-                GridPos end = { 12, 5 };
+                GridPos end = { 6, 11 };  // 收银台像素(350,130) → 格点 col≈4, row≈11
                 path = FindPath(start, end, grid);
                 pathIndex = 0;
-
+                for(auto& o : path)
+                {
+                    SDL_Log("%d %d",o.row,o.col);
+                }
                 if (path.empty())
                 {
                     SDL_Log("Pay: 无路径到收银台");
@@ -711,7 +712,7 @@ class Customer
             {
                 GridPos start = PixelToGrid(x, y);
                 // 出口在右侧：目标为同一行最右侧边缘格点
-                GridPos end = { 12, 22 };
+                GridPos end = { 12,22 };
                 path = FindPath(start, end, grid);
                 pathIndex = 0;
 
@@ -917,8 +918,8 @@ class Customer
             if (pathIndex >= path.size()) return;
 
             GridPos target = path[pathIndex];
-            int targetX = GridToEntityPixelX(target.row);
-            int targetY = GridToEntityPixelY(target.col);
+            int targetX = GridToEntityPixelX(target.row);  // row → X
+            int targetY = GridToEntityPixelY(target.col);  // col → Y
 
             if (x < targetX)
             {

@@ -18,6 +18,7 @@
 #include "RUI_GameSerializer.h"
 #include "RUI_TimeOfDaySystem.h"
 #include "RUI_Cabinet.h"
+#include "RUI_MoneyDisplay.h"
 #include "RUI_ChatFrame.h"
 #include "RUI_TextManager.h"
 #include "RUI_CheckUpdate.h"
@@ -56,8 +57,6 @@ private:
     SDL_Texture* background = nullptr;
     SDL_Texture* backgroundWall = nullptr;
     SDL_Texture* nightTexture = nullptr;
-    TTF_Font* textFont = nullptr;
-    SDL_Color textColor = {10, 10, 10, 255};
     SDL_Rect backgroundRect = {0, 0, 800, 600};
 
     // ===== 游戏世界 =====
@@ -88,6 +87,7 @@ private:
     SummaryFrame summaryFrame;
     CheckUpdate checkEvent;
     UnlockFrame unlockFrame;
+    MoneyDisplay moneyDisplay;
 
     // ===== 家具网格 =====
     std::vector<FurnitureGrid> furnitureGrids;

@@ -38,6 +38,8 @@ void Customer::InitCustomer(int id, int preferid, std::string name, std::string 
     chooseChange = 0;
     removeCheck = 0;
 
+    NormalTexture = ResourceManager::instance()->FindTexture(path);
+
     NameFont = TTF_OpenFont("./resources/font/namidiansong.ttf",16);
     color = {10,10,10,255};
     std::string totalname = CustomerName + " " + std::to_string(preference);

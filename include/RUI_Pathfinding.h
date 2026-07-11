@@ -3,12 +3,20 @@
 #include <queue>
 #include <vector>
 #include <cstdlib>
+#include <algorithm>
 #include <functional>
 #include <unordered_map>
 #include "RUI_Furniture.h"
 
 // ===== A* 寻路模块 =====
 // 纯函数，零耦合游戏逻辑，只依赖 RUI_Furniture.h 的 GridPos 和 FurnitureGrid
+//
+// 坐标约定（与 RUI_Furniture.h 一致）：
+//   GridPos { col, row }
+//   row → PixelX（水平，第几列像素）
+//   col → PixelY（竖直，第几行像素）
+//   GridToPixelX(row) / GridToPixelY(col)
+//   所以：row++ = 右移，row-- = 左移，col++ = 下移，col-- = 上移
 
 struct PathNode
 {
@@ -20,7 +28,12 @@ struct PathNode
 
     bool operator>(const PathNode& other) const
     {
-        return fCost() > other.fCost();
+        int fA = fCost(), fB = other.fCost();
+        if (fA != fB) return fA > fB;
+        // fCost 相同 → 优先离目标更近的（hCost 更小）
+        if (hCost != other.hCost) return hCost > other.hCost;
+        // 全相同 → 优先右上（row大=右/X大, col小=上/Y小）
+        return (pos.row - pos.col) < (other.pos.row - other.pos.col);
     }
 };
 
@@ -108,9 +121,10 @@ inline std::vector<GridPos> GetNeighbors(GridPos pos,
                                          GridPos end)
 {
     std::vector<GridPos> neighbors;
-    // 方向顺序：右、上、左、下 —— 优先探索右上方向（收银台在右上角）
-    const int dr[] = { 0,  -1,  0, 1};  // row 变化：不动、+1(右)、不动、-1(左)
-    const int dc[] = {-1,  0,  1,  0};  // col 变化：-1(上)、不动、+1(下)、不动
+    // row=X轴, col=Y轴
+    // 方向顺序：右(row++)、上(col--)、左(row--)、下(col++)
+    const int dr[] = { 1,  0, -1,  0};  // row(X轴)：+1右、不变、-1左、不变
+    const int dc[] = { 0, -1,  0,  1};  // col(Y轴)：不变、-1上、不变、+1下
 
     for (int i = 0; i < 4; i++)
     {
@@ -170,7 +184,9 @@ inline std::vector<GridPos> FindPath(GridPos start, GridPos end,
 
         for (const auto& next : GetNeighbors(current, grid, end))
         {
-            int newG = gCost[current] + 1;
+            // 基础代价 1，A* 自身保证最短路径
+            int stepCost = 1;
+            int newG = gCost[current] + stepCost;
 
             auto it = gCost.find(next);
             if (it == gCost.end() || newG < it->second)
@@ -178,9 +194,7 @@ inline std::vector<GridPos> FindPath(GridPos start, GridPos end,
                 gCost[next] = newG;
                 int dx = std::abs(next.col - end.col);
                 int dy = std::abs(next.row - end.row);
-                // 曼哈顿距离 × 1.001 打破平局，优先探索启发值更小的节点
-                // 配合邻居顺序（右/上优先），让顾客自然走向右上角的收银台
-                int h = (dx + dy) * 1001 / 1000;
+                int h = dx + dy;  // 曼哈顿距离
                 openSet.push({ next, newG, h });
                 cameFrom[next] = current;
             }
@@ -193,6 +207,8 @@ inline std::vector<GridPos> FindPath(GridPos start, GridPos end,
 // ===== 坐标转换工具 =====
 // 格点 32×32，实体（顾客/家具）渲染尺寸 64×64
 // 转换时以实体中心为参考，确保格点 ↔ 像素往返一致
+//
+// 与 Furniture 保持一致：row → PixelX, col → PixelY
 
 const int ENTITY_RENDER_SIZE = 64;
 const int GRID_CELL_SIZE     = 32;
@@ -214,8 +230,8 @@ inline int GridToPixelY(int col)
 inline GridPos PixelToGrid(int px, int py)
 {
     return {
-        (py + HALF_ENTITY - Furniture::offsetY) / Furniture::FurnitureHeight,  // col
-        (px + HALF_ENTITY - Furniture::offsetX) / Furniture::FurnitureWidth     // row
+        (py + HALF_ENTITY - Furniture::offsetY) / Furniture::FurnitureHeight,  // col ← py(Y)
+        (px + HALF_ENTITY - Furniture::offsetX) / Furniture::FurnitureWidth     // row ← px(X)
     };
 }
 
@@ -234,7 +250,7 @@ inline int GridToEntityPixelY(int col)
 inline GridPos FurniturePixelToGrid(int px, int py)
 {
     return {
-        (py - Furniture::offsetY) / Furniture::FurnitureHeight,
-        (px - Furniture::offsetX) / Furniture::FurnitureWidth
+        (py - Furniture::offsetY) / Furniture::FurnitureHeight,  // col ← py(Y)
+        (px - Furniture::offsetX) / Furniture::FurnitureWidth     // row ← px(X)
     };
 }

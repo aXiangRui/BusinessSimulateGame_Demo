@@ -3,6 +3,7 @@
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_image.h>
 #include<iostream>
+#include<functional>
 #include<string>
 #include"RUI_ResourceManager.h"
 
@@ -65,12 +66,25 @@ class RUI_Icon
         return false;
     }
 
+    void SetOnClick(std::function<void()> onClick)
+    {
+        this->onClick = onClick;
+    }
+    void ClickApplication()
+    {
+        if(onClick)
+        {
+            onClick();
+        }
+    }
+
     private:
     int x,y,w,h;
     SDL_Rect Rect;
     int id;
     std::string address;
     SDL_Texture* IconTexture;
+    std::function<void()> onClick;
 };
 
 class GameIcon
@@ -142,4 +156,5 @@ class GameIcon
 
     std::vector<RUI_Icon>Icons;
     private:
+
 };

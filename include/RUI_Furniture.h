@@ -10,7 +10,7 @@ enum class FurnitureType
     None = 000,
     Cabinet = 101,
     Register = 102,
-    Table = 201,
+    Desk = 201,
     Chair = 202,
 };
 
@@ -210,4 +210,23 @@ private:
     PlacementType placement = PlacementType::Eating;
     std::vector<GridPos> deskPositions;
     std::vector<GridPos> chairPositions;
+};
+
+struct FurnitureTemplate
+{
+    FurnitureType type;
+    std::string name;
+    std::string address;
+    int cost;
+    int gridWidth;
+    int gridHeight;
+    SDL_Texture* texture = nullptr;
+    SDL_Rect textureRect;
+};
+
+inline FurnitureTemplate FurnitureTemplates[] = 
+{
+    {FurnitureType::Cabinet, "面包柜", "cabinet", 1000, 1, 1, nullptr, {0,0,32,32}},
+    {FurnitureType::Chair, "椅子", "chair", 500, 1, 1, nullptr, {0,0,32,32}},
+    {FurnitureType::Desk, "桌子", "desk", 1000, 1, 1, nullptr, {0,0,32,32}},
 };

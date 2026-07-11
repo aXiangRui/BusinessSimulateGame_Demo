@@ -104,9 +104,10 @@ void GameWorld::HandleInput(const SDL_Event& event)
                 if (my >= customers[i].getY() && my <= customers[i].getY() + 64)
                 {
                     std::string dessertAddress;
-                    if (customers[i].GetPreferDessertID() != -1)
+                    int preferID = customers[i].GetPreferDessertID();
+                    if (preferID != -1)
                     {
-                        dessertAddress = "";
+                        dessertAddress = productManager.GetDessertPath(preferID);
                     }
                     else
                     {

@@ -108,6 +108,11 @@ class ProductManager
         return products.size();
     }
 
+    std::string GetDessertPath(int dessertID)
+    {
+        return dManager.GetDessertPath(dessertID);
+    }
+
     private:
     std::vector<Plate> plates;
     DessertManager dManager;

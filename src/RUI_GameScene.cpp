@@ -1,6 +1,7 @@
 #include "../include/RUI_GameScene.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <algorithm>
 
 extern int WindowWidth;
 extern int WindowHeight;
@@ -72,7 +73,6 @@ void RUI_GameScene::onEnter()
     background = ResourceManager::instance()->FindTexture("hall");
     backgroundWall = ResourceManager::instance()->FindTexture("hallwall");
     nightTexture = ResourceManager::instance()->FindTexture("night");
-    textFont = nullptr;
 
     cabinetFrame.InitFrame();
     summaryFrame.Init();
@@ -174,7 +174,24 @@ void RUI_GameScene::onEnter()
         }
     }
 
+    // 兜底：遍历所有 Cabinet 实体，确保其所在网格被标记为 Cabinet
+    // Cabinet 的存储与 PlacementManager 可能不一致，以实际 Cabinet 为准
+    for (auto& cab : cabinets)
+    {
+        GridPos gp = FurniturePixelToGrid(cab.GetX(), cab.GetY());
+        for (auto& gridCell : furnitureGrids)
+        {
+            if (gridCell.GetPos().col == gp.col && gridCell.GetPos().row == gp.row)
+            {
+                gridCell.SetType(FurnitureType::Cabinet);
+                gridCell.SetID(cab.GetCabinetID());
+                break;
+            }
+        }
+    }
+
     borderBox.InitBorderBox(0, 0, 200, 500, "borderBox");
+    borderBox.SetFurnitureTemplates(FurnitureTemplates, 3);
 
     // 初始化时间和时钟
     timeState = {};
@@ -192,6 +209,72 @@ void RUI_GameScene::onEnter()
     isSummaryShowing = false;
     isMaterialFrameShowing = false;
 
+    moneyDisplay.Init(10, 60);
+
+    icons.Icons[1].SetOnClick([]()
+    {
+        SceneManager.ChooseScene(RUI_SceneManager::SceneType::Create);
+    });
+    icons.Icons[2].SetOnClick([](){
+        SceneManager.ChooseScene(RUI_SceneManager::SceneType::Menu);
+    });
+    icons.Icons[3].SetOnClick([this](){
+        if (uiState != GameStage::ReadProduct)
+        {
+            uiState = GameStage::ReadProduct;
+            readingPage = 0;
+        }
+        else
+        {
+            uiState = GameStage::Normal;
+            readingPage = -1;
+        }
+    });
+    icons.Icons[4].SetOnClick([this](){
+        if (uiState == GameStage::ReadProduct || uiState == GameStage::CheckingProduct)
+        {
+            readingPage++;
+            int maxPage = world.GetProductCount() / 6;
+            if (readingPage > maxPage)
+            {
+                readingPage = maxPage;
+            }
+        }
+    });
+    icons.Icons[5].SetOnClick([this](){
+        if (uiState == GameStage::ReadProduct || uiState == GameStage::CheckingProduct)
+        {
+            readingPage--;
+            if (readingPage < 0)
+            {
+                readingPage = 0;
+            }
+        }
+    });
+    icons.Icons[6].SetOnClick([this](){
+        if ((int)cabinets.size() < 24)
+        {
+            Cabinet a;
+            a.InitCabinet((int)cabinets.size(), 0, 0);
+            cabinets.push_back(a);
+            totalMoney = totalMoney - 1000 * (int)cabinets.size() - 1000;
+        }
+    });
+    icons.Icons[7].SetOnClick([this](){
+        for (int j = 0; j < 5; j++)
+        {
+            SDL_Log("%s %d",
+                customerManager.Customers[j].GetCustomerName().c_str(),
+                customerManager.Customers[j].GetHasJoined());
+        }
+    });
+    icons.Icons[8].SetOnClick([this](){
+        isFurniturePlacing ? isFurniturePlacing = false : isFurniturePlacing = true;
+        if(!isFurniturePlacing)
+        {
+            borderBox.CancelPlace();
+        }
+    });
     SDL_Log("进入游戏场景");
 }
 
@@ -240,47 +323,11 @@ void RUI_GameScene::onUpdate()
 
 void RUI_GameScene::onRender(SDL_Renderer* renderer)
 {
-    // 加载字体（仅一次）
-    if (!textFont)
-    {
-        textFont = TTF_OpenFont("./resources/font/namidiansong.ttf", 36);
-    }
-
-    // 缓存金额纹理 —— 仅在金额变化时重建，避免每帧创建/销毁 GPU 纹理
-    static int lastRenderedMoney = -999999;
-    static SDL_Texture* cachedMoneyTexture = nullptr;
-    static SDL_Rect cachedMoneyRect = {0, 0, 0, 0};
-
-    if (totalMoney != lastRenderedMoney || !cachedMoneyTexture)
-    {
-        if (cachedMoneyTexture)
-            SDL_DestroyTexture(cachedMoneyTexture);
-
-        SDL_Color moneyColor = textColor;
-        if (totalMoney < 0)
-            moneyColor = {200, 40, 40, 255};
-
-        std::string title = "总金额" + std::to_string(totalMoney);
-        SDL_Surface* image = TTF_RenderUTF8_Blended(textFont, title.c_str(), moneyColor);
-        cachedMoneyRect = {10, 60, image->w, image->h};
-        cachedMoneyTexture = SDL_CreateTextureFromSurface(renderer, image);
-        SDL_FreeSurface(image);
-        lastRenderedMoney = totalMoney;
-    }
+    moneyDisplay.SetMoney(totalMoney);
 
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, background, nullptr, &backgroundRect);
-    SDL_RenderCopy(renderer, cachedMoneyTexture, nullptr, &cachedMoneyRect);
-
-    // 渲染桌椅
-    for (int i = 0; i < (int)chairs.size(); i++)
-    {
-        chairs[i].onRender(renderer);
-    }
-    for (int i = 0; i < (int)desks.size(); i++)
-    {
-        desks[i].onRender(renderer);
-    }
+    moneyDisplay.onRender(renderer);
 
     // 渲染游戏世界实体
     world.RenderCooks(renderer);
@@ -288,19 +335,6 @@ void RUI_GameScene::onRender(SDL_Renderer* renderer)
     world.RenderServers(renderer);
 
     reg.onRender(renderer);
-    // world.RenderCustomers(renderer);  // ← 已由下方 Y 排序渲染替代
-
-    // 黑夜遮罩
-    SDL_SetTextureAlphaMod(nightTexture, timeState.currentAlpha);
-    SDL_RenderCopy(renderer, nightTexture, nullptr, &backgroundRect);
-
-    // 时间和面包柜
-    clock.RenderHour(renderer);
-    
-    // for (int i = 0; i < (int)cabinets.size(); i++)
-    // {
-    //     cabinets[i].onRender(renderer);
-    // }
 
     renderCommands.clear();
 
@@ -314,6 +348,16 @@ void RUI_GameScene::onRender(SDL_Renderer* renderer)
         renderCommands.push_back({world.GetCustomers()[i].GetSortedY(), 2, i});
     }
 
+    for(int i = 0; i < (int)chairs.size(); i++)
+    {
+        renderCommands.push_back({chairs[i].GetRenderY(), 3, i});
+    }
+
+    for(int i = 0; i < (int)desks.size(); i++)
+    {
+        renderCommands.push_back({desks[i].GetRenderY(), 4, i});
+    }
+
     std::sort(renderCommands.begin(), renderCommands.end(), [](const RenderCommand& a, const RenderCommand& b)
     {
         return a.y < b.y;
@@ -325,11 +369,24 @@ void RUI_GameScene::onRender(SDL_Renderer* renderer)
         {
             cabinets[r.index].onRender(renderer);
         }
-        else
+        else if( r.type == 2)
         {
             world.RenderCustomer(renderer, r.index);
         }
+        else if( r.type == 3)
+        {
+            chairs[r.index].onRender(renderer);
+        }
+        else if( r.type == 4)
+        {
+            desks[r.index].onRender(renderer);
+        }
     }
+
+    clock.RenderHour(renderer);
+        // 黑夜遮罩
+    SDL_SetTextureAlphaMod(nightTexture, timeState.currentAlpha);
+    SDL_RenderCopy(renderer, nightTexture, nullptr, &backgroundRect);
 
     // 渲染放置框
     if(isFurniturePlacing)
@@ -338,11 +395,10 @@ void RUI_GameScene::onRender(SDL_Renderer* renderer)
         furnitureGrids[i].onRender(renderer);
     }
 
-    borderBox.onRender(renderer);
-
     // 图标（翻页按钮在 ReadProduct / CheckingProduct 状态下显示）
     bool showPageNav = (uiState == GameStage::ReadProduct || uiState == GameStage::CheckingProduct);
     icons.onRender(renderer, showPageNav);
+    borderBox.onRender(renderer);
 
     // 面包柜详情框
     if (cabinetFrame.GetCabinetID() != -1)
@@ -430,6 +486,7 @@ void RUI_GameScene::onExit()
     dessertManager.Save();
     dessertManager.quit();
     gameMusic.quit();
+    moneyDisplay.Quit();
 }
 
 // ===== 输入处理 ================================================================
@@ -444,6 +501,9 @@ void RUI_GameScene::onInput(const SDL_Event& event, SDL_Renderer* renderer, bool
     {
         int mx = event.button.x;
         int my = event.button.y;
+
+        // 家具放置面板
+        borderBox.onClickInput(isFurniturePlacing, mx, my);
 
         // 产品设置点击
         if (uiState == GameStage::CheckingProduct)
@@ -501,74 +561,7 @@ void RUI_GameScene::onInput(const SDL_Event& event, SDL_Renderer* renderer, bool
         {
             if (icons.Icons[i].isClicked(mx, my))
             {
-                switch (i)
-                {
-                case 1: // 烹饪场景
-                    SceneManager.ChooseScene(RUI_SceneManager::SceneType::Create);
-                    break;
-                case 2: // 退出到菜单
-                    SceneManager.ChooseScene(RUI_SceneManager::SceneType::Menu);
-                    break;
-                case 3: // 查看产品
-                    if (uiState != GameStage::ReadProduct)
-                    {
-                        uiState = GameStage::ReadProduct;
-                        readingPage = 0;
-                        if (isMaterialFrameShowing)
-                        {
-                            isMaterialFrameShowing = false;
-                        }
-                    }
-                    else
-                    {
-                        uiState = GameStage::Normal;
-                        readingPage = -1;
-                    }
-                    break;
-                case 4: // 下一页
-                    if (uiState == GameStage::ReadProduct || uiState == GameStage::CheckingProduct)
-                    {
-                        readingPage++;
-                        int maxPage = world.GetProductCount() / 6;
-                        if (readingPage > maxPage)
-                        {
-                            readingPage = maxPage;
-                        }
-                    }
-                    break;
-                case 5: // 上一页
-                    if (uiState == GameStage::ReadProduct || uiState == GameStage::CheckingProduct)
-                    {
-                        readingPage--;
-                        if (readingPage < 0)
-                        {
-                            readingPage = 0;
-                        }
-                    }
-                    break;
-                case 6: // 添加面包柜
-                    if ((int)cabinets.size() < 24)
-                    {
-                        Cabinet a;
-                        a.InitCabinet((int)cabinets.size(), 0, 0);
-                        cabinets.push_back(a);
-                        totalMoney = totalMoney - 1000 * (int)cabinets.size() - 1000;
-                    }
-                    break;
-                case 7: // 调试：打印顾客状态
-                    for (int j = 0; j < 5; j++)
-                    {
-                        SDL_Log("%s %d",
-                            customerManager.Customers[j].GetCustomerName().c_str(),
-                            customerManager.Customers[j].GetHasJoined());
-                    }
-                    break;
-                    case 8: // 放置家具
-                        isFurniturePlacing ? isFurniturePlacing = false : isFurniturePlacing = true;
-                    break;
-                    default:
-                    break;
-                }
+                icons.Icons[i].ClickApplication();
             }
         }
 
