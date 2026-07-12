@@ -155,6 +155,14 @@ void RUI_GameScene::onEnter()
                 {
                     grid.SetPlacement(PlacementType::Kitchen);
                 }
+                else if( j < 13)
+                {
+                    grid.SetPlacement(PlacementType::Showing);
+                }
+                else
+                {
+                    grid.SetPlacement(PlacementType::Eating);
+                }
                 furnitureGrids.push_back(grid);
             }
         }
@@ -174,21 +182,6 @@ void RUI_GameScene::onEnter()
         }
     }
 
-    // 兜底：遍历所有 Cabinet 实体，确保其所在网格被标记为 Cabinet
-    // Cabinet 的存储与 PlacementManager 可能不一致，以实际 Cabinet 为准
-    for (auto& cab : cabinets)
-    {
-        GridPos gp = FurniturePixelToGrid(cab.GetX(), cab.GetY());
-        for (auto& gridCell : furnitureGrids)
-        {
-            if (gridCell.GetPos().col == gp.col && gridCell.GetPos().row == gp.row)
-            {
-                gridCell.SetType(FurnitureType::Cabinet);
-                gridCell.SetID(cab.GetCabinetID());
-                break;
-            }
-        }
-    }
 
     borderBox.InitBorderBox(0, 0, 200, 500, "borderBox");
     borderBox.SetFurnitureTemplates(FurnitureTemplates, 3);
@@ -502,10 +495,94 @@ void RUI_GameScene::onInput(const SDL_Event& event, SDL_Renderer* renderer, bool
         int mx = event.button.x;
         int my = event.button.y;
 
-        // 家具放置面板
+        // 放置家具（先判断放置，再判断选模板——避免同一帧选了模板又立刻放置）
+        if (borderBox.IsPlacing() && !borderBox.IsInPanel(mx, my))
+        {
+            const FurnitureTemplate* tpl = borderBox.GetSelectedTemplate();
+            if (tpl && totalMoney >= tpl->cost)
+            {
+                // 光标→格点：用格子中心偏移(+16)，不用实体中心(+32)
+                GridPos pos;
+                pos.row = (mx + Furniture::FurnitureWidth / 2) / Furniture::FurnitureWidth;
+                pos.col = (my - Furniture::offsetY + Furniture::FurnitureHeight / 2) / Furniture::FurnitureHeight;
+
+                // 在网格中查找该格点
+                FurnitureGrid* targetCell = nullptr;
+                for (auto& cell : furnitureGrids)
+                {
+                    if (cell.GetPos().col == pos.col && cell.GetPos().row == pos.row)
+                    {
+                        targetCell = &cell;
+                        break;
+                    }
+                }
+
+                // 格点存在、未被占用
+                if (targetCell && targetCell->GetType() == FurnitureType::None)
+                {
+                    PlacementType zone = targetCell->GetPlacement();
+
+                    // 区域校验：Cabinet→Showing，Chair/Desk→Eating
+                    bool zoneOk = false;
+                    switch (tpl->type)
+                    {
+                    case FurnitureType::Cabinet:
+                        zoneOk = (zone == PlacementType::Showing);
+                        break;
+                    case FurnitureType::Chair:
+                    case FurnitureType::Desk:
+                        zoneOk = (zone == PlacementType::Eating);
+                        break;
+                    default:
+                        break;
+                    }
+                    if (zoneOk)
+                    {
+                        totalMoney -= tpl->cost;
+                        int px = GridToPixelX(pos.row);
+                        int py = GridToPixelY(pos.col);
+                        int newId = placeManager.GetNextId(tpl->type);
+
+                        switch (tpl->type)
+                        {
+                        case FurnitureType::Desk:
+                        {
+                            Desk desk;
+                            desk.initDesk(newId, px, py);
+                            desks.push_back(desk);
+                            break;
+                        }
+                        case FurnitureType::Chair:
+                        {
+                            Chair chair;
+                            chair.InitChair(newId, px, py);
+                            chairs.push_back(chair);
+                            break;
+                        }
+                        case FurnitureType::Cabinet:
+                        {
+                            Cabinet cabinet;
+                            cabinet.InitCabinet(newId, 0, 0, px, py);
+                            cabinets.push_back(cabinet);
+                            break;
+                        }
+                        default:
+                            break;
+                        }
+
+                        // 标记网格 + 持久化
+                        targetCell->SetType(tpl->type);
+                        targetCell->SetID(newId);
+                        placeManager.TryPlace(newId, tpl->type, pos, false, zone);
+                    }
+                }
+            }
+            borderBox.ConfirmPlace();
+            break;  // 放置模式下不触发其他点击逻辑
+        }
+
         borderBox.onClickInput(isFurniturePlacing, mx, my);
 
-        // 产品设置点击
         if (uiState == GameStage::CheckingProduct)
         {
             if (mx >= 200 && mx <= 600 && my >= 0 && my <= 600)
@@ -589,6 +666,7 @@ void RUI_GameScene::onInput(const SDL_Event& event, SDL_Renderer* renderer, bool
                 cabinetFrame.quit();
             }
         }
+
         break;
     }
 
@@ -603,6 +681,43 @@ void RUI_GameScene::onInput(const SDL_Event& event, SDL_Renderer* renderer, bool
         static SDL_Cursor* arrowCursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
 
         borderBox.onMotionInput( isFurniturePlacing, mx, my );
+
+        // 放置预览：吸附到网格 + 半透明 + 绿/红
+        if (borderBox.IsPlacing() && !borderBox.IsInPanel(mx, my))
+        {
+            // 光标→格点：用格子中心偏移，与放置逻辑一致
+            GridPos pos;
+            pos.row = (mx + Furniture::FurnitureWidth / 2) / Furniture::FurnitureWidth;
+            pos.col = (my - Furniture::offsetY + Furniture::FurnitureHeight / 2) / Furniture::FurnitureHeight;
+            bool valid = false;
+
+            for (auto& cell : furnitureGrids)
+            {
+                if (cell.GetPos().col == pos.col && cell.GetPos().row == pos.row)
+                {
+                    if (cell.GetType() == FurnitureType::None)
+                    {
+                        PlacementType zone = cell.GetPlacement();
+                        const FurnitureTemplate* ptpl = borderBox.GetSelectedTemplate();
+                        if (ptpl)
+                        {
+                            switch (ptpl->type)
+                            {
+                            case FurnitureType::Cabinet:
+                                valid = (zone == PlacementType::Showing); break;
+                            case FurnitureType::Chair:
+                            case FurnitureType::Desk:
+                                valid = (zone == PlacementType::Eating); break;
+                            default: break;
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+
+            borderBox.SetPreviewPos(pos, valid);
+        }
 
         if (uiState == GameStage::CheckingProduct)
         {

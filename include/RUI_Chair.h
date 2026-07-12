@@ -36,6 +36,12 @@ class Chair
         isUsing = 0;
     }
 
+    void InitChair(int id, GridPos pos)
+    {
+        InitChair(id);
+        SetPosition(pos.col * Furniture::FurnitureWidth + Furniture::offsetX, pos.row * Furniture::FurnitureHeight + Furniture::offsetY);
+    }
+
     void SetPosition(int mx, int my)
     {
         // 吸附到最近的格点（含 Furniture 偏移）
@@ -111,6 +117,12 @@ class Desk
     {
         DeskID = id;
         SetPosition(pixelX, pixelY);
+    }
+
+    void initDesk(int id, GridPos pos)
+    {
+        DeskID = id;
+        SetPosition(pos.col * Furniture::FurnitureWidth + Furniture::offsetX, pos.row * Furniture::FurnitureHeight + Furniture::offsetY);
     }
 
     void SetPosition(int newX, int newY)

@@ -44,6 +44,13 @@ class Cabinet
         dessertNumber = number;
     }
 
+    void InitCabinet(int id, GridPos pos)
+    {
+        InitCabinet(id, pos.row, pos.col);
+        DessertID = 0;
+        dessertNumber = 0;
+    }
+
     void SetPosition(int newX, int newY)
     {
         x = SnapToGrid(newX, Furniture::offsetX);

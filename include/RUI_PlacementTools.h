@@ -6,6 +6,16 @@
 #include <iostream>
 #include <string>
 #include "RUI_Furniture.h"
+#include "RUI_Pathfinding.h"
+
+namespace RUI_Furniture
+{
+    enum class stage
+    {
+        choose,
+        place
+    };
+}
 
 struct ChooseFurniture
 {
@@ -93,20 +103,24 @@ class BorderBox
     {
         if (!isFurniturePlacing || !isChoosing) return;
 
-        for (int i = 0; i < TemplateCount; i++)
+        if(currentStage == RUI_Furniture::stage::choose)
         {
-            const SDL_Rect& r = furnitureTemplates[i].textureRect;
-            if (bx >= r.x && bx <= r.x + r.w &&
-                by >= r.y && by <= r.y + r.h)
+            for (int i = 0; i < TemplateCount; i++)
             {
-                selectedIndex = i;
-                isPlacing = true;   // 进入"放置预览"状态
-                SDL_Log("选中家具: %s", furnitureTemplates[i].name.c_str());
-                chooseFurniture.texture = furnitureTemplates[i].texture;
-                chooseFurniture.textureRect = furnitureTemplates[i].textureRect;
-                chooseFurniture.textureRect.w = 64;
-                chooseFurniture.textureRect.h = 64;
-                return;
+                const SDL_Rect& r = furnitureTemplates[i].textureRect;
+                if (bx >= r.x && bx <= r.x + r.w &&
+                    by >= r.y && by <= r.y + r.h)
+                {
+                    selectedIndex = i;
+                    isPlacing = true;   // 进入"放置预览"状态
+                    SDL_Log("选中家具: %s", furnitureTemplates[i].name.c_str());
+                    chooseFurniture.texture = furnitureTemplates[i].texture;
+                    chooseFurniture.textureRect = furnitureTemplates[i].textureRect;
+                    chooseFurniture.textureRect.w = 64;
+                    chooseFurniture.textureRect.h = 64;
+                    currentStage = RUI_Furniture::stage::place;
+                    return;
+                }
             }
         }
     }
@@ -126,8 +140,31 @@ class BorderBox
         chooseFurniture.textureRect = furnitureTemplates[index].textureRect;
     }
     bool IsPlacing() const { return isPlacing; }
-    void ConfirmPlace() { isPlacing = false; selectedIndex = -1; }
-    void CancelPlace()  { isPlacing = false; selectedIndex = -1; }
+    bool IsInPanel(int mx, int my) const
+    {
+        if (isPlacing) return false;  // 放置预览时面板不可见，不拦截
+        return mx >= borderBoxRect.x && mx <= borderBoxRect.x + borderBoxRect.w
+            && my >= borderBoxRect.y && my <= borderBoxRect.y + borderBoxRect.h;
+    }
+    void ConfirmPlace() { isPlacing = false; selectedIndex = -1; currentStage = RUI_Furniture::stage::choose; }
+    void CancelPlace()  { isPlacing = false; selectedIndex = -1; currentStage = RUI_Furniture::stage::choose; }
+
+    // 设置吸附到网格的预览位置（由 GameScene 每帧调用）
+    // 传入格点坐标，内部根据家具类型计算正确的渲染偏移
+    void SetPreviewPos(GridPos pos, bool valid)
+    {
+        int px = GridToPixelX(pos.row);
+        int py = GridToPixelY(pos.col);
+
+        // 根据家具类型修正 Y 偏移（Chair/Desk 比 Cabinet 多 16px 上移）
+        const FurnitureTemplate* tpl = GetSelectedTemplate();
+        if (tpl && (tpl->type == FurnitureType::Chair || tpl->type == FurnitureType::Desk))
+            py -= 16;
+
+        previewX = px - 16;   // 64x64 居中于 32x32 格点
+        previewY = py - 16;
+        previewValid = valid;
+    }
 
     void onRender(SDL_Renderer* Renderer)
     {
@@ -146,10 +183,26 @@ class BorderBox
         }
         else
         {
-            SDL_RenderCopy(Renderer,chooseFurniture.texture,nullptr,&chooseFurniture.textureRect);
+            // 半透明预览：绿色=可放置，红色=不可放置
+            if (previewValid)
+                SDL_SetTextureColorMod(chooseFurniture.texture, 100, 255, 100);   // 绿
+            else
+                SDL_SetTextureColorMod(chooseFurniture.texture, 255, 100, 100);   // 红
+            SDL_SetTextureAlphaMod(chooseFurniture.texture, 160);                  // 半透明
+
+            SDL_Rect previewRect = {previewX, previewY, 64, 64};
+            SDL_RenderCopy(Renderer, chooseFurniture.texture, nullptr, &previewRect);
+
+            // 恢复默认
+            SDL_SetTextureColorMod(chooseFurniture.texture, 255, 255, 255);
+            SDL_SetTextureAlphaMod(chooseFurniture.texture, 255);
         }
 
     }
+    RUI_Furniture::stage GetCurrentStage() const { return currentStage; }
+
+    int GetCostByIndex(int index) const { return furnitureTemplates[index].cost; }
+    int GetCurrentCost() const {return GetCostByIndex(selectedIndex); }
 
     void onUpdate()
     {
@@ -171,4 +224,7 @@ class BorderBox
     FurnitureTemplate* furnitureTemplates;
     int TemplateCount = 0;
     ChooseFurniture chooseFurniture;
+    RUI_Furniture::stage currentStage = RUI_Furniture::stage::choose;
+    int previewX = 0, previewY = 0;
+    bool previewValid = false;
 };

@@ -80,10 +80,29 @@ void GameSerializer::Load(
     // ===== 3. 读取面包柜 =====
     {
         std::ifstream file("./save/Cabinet.rui");
-        int cabinetCount;
+        int cabinetCount = 0;
         file >> cabinetCount;
-        // 跳过第一行剩余内容（换行符）
         file.ignore();
+
+        // 首次运行/文件为空：从 Furniture.rui 反推 Cabinet 数量
+        if (cabinetCount == 0)
+        {
+            std::ifstream furnFile("./save/Furniture.rui");
+            if (furnFile.is_open())
+            {
+                std::string fline;
+                while (std::getline(furnFile, fline))
+                {
+                    if (fline.empty() || fline[0] == '#') continue;
+                    std::istringstream fiss(fline);
+                    int ftype;
+                    fiss >> ftype;
+                    if (ftype == static_cast<int>(FurnitureType::Cabinet))
+                        cabinetCount++;
+                }
+            }
+        }
+
         for (int i = 0; i < cabinetCount; i++)
         {
             std::string line;
@@ -99,11 +118,40 @@ void GameSerializer::Load(
             Cabinet c;
             if (values.size() >= 3)
             {
-                // 新格式：id dessertID number（位置由 PlacementManager 统一管理）
-                // 也兼容旧格式 id dessertID number x y（忽略末尾的 x y）
-                c.InitCabinet(values[0], values[1], values[2]);
+                // 位置由 Furniture.rui 统一管理，此处用 0,0 占位
+                c.InitCabinet(values[0], values[1], values[2], 0, 0);
             }
             cabinets.push_back(c);
+        }
+
+        // 兜底：Furniture.rui 中有 Cabinet 但 Cabinet.rui 中没有对应条目
+        // 为每个缺少的 Cabinet 创建默认实体
+        {
+            std::ifstream furnFile("./save/Furniture.rui");
+            if (furnFile.is_open())
+            {
+                std::string fline;
+                while (std::getline(furnFile, fline))
+                {
+                    if (fline.empty() || fline[0] == '#') continue;
+                    std::istringstream fiss(fline);
+                    int ftype, fid;
+                    fiss >> ftype >> fid;
+                    if (ftype != static_cast<int>(FurnitureType::Cabinet)) continue;
+
+                    bool found = false;
+                    for (auto& cab : cabinets)
+                    {
+                        if (cab.GetCabinetID() == fid) { found = true; break; }
+                    }
+                    if (!found)
+                    {
+                        Cabinet c;
+                        c.InitCabinet(fid, 0, 0, 0, 0);  // 空柜子，位置后续覆写
+                        cabinets.push_back(c);
+                    }
+                }
+            }
         }
     }
 
@@ -235,8 +283,9 @@ void GameSerializer::Save(
         file << cabinets.size() << std::endl;
         for (int i = 0; i < (int)cabinets.size(); i++)
         {
-            file << i << " " << cabinets[i].GetDessertID()
-                 << " " << cabinets[i].GetDessertNumber()
+            file << cabinets[i].GetCabinetID() << " "
+                 << cabinets[i].GetDessertID() << " "
+                 << cabinets[i].GetDessertNumber()
                  << std::endl;
         }
     }

@@ -400,6 +400,7 @@ class Customer
                             chooseChange++;
                             chooseID = rand() % Cabinets.size();
                             SetChooseNumber();
+                            eatNumber = ChooseNumber;   // 重置吃蛋糕数量
                             ChooseTime = currentTime;
                             removeCheck = 0;
                             path.clear();  // 重新计算到新橱柜的路径
