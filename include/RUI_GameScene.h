@@ -111,6 +111,8 @@ private:
     bool isSummaryShowing = false;      // 每日总结（叠加层）
     bool isMaterialFrameShowing = false;
     bool isFurniturePlacing = false;
+    int  cursorGridCol = -1;     // 放置模式下鼠标悬停的格点
+    int  cursorGridRow = -1;
     int  readingPage = -1;
     int  currentCabinet = -1;
 };

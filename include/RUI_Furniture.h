@@ -12,6 +12,7 @@ enum class FurnitureType
     Register = 102,
     Desk = 201,
     Chair = 202,
+    DeskAndChair = 301,
 };
 
 enum class PlacementType
@@ -114,20 +115,25 @@ class FurnitureGrid
         return pos;
     }
 
+    int GetID() const
+    {
+        return id;
+    }
+
     void onRender(SDL_Renderer* renderer)
     {
         if (type == FurnitureType::None)
         {
             // 空格子：绿色网格，ALPHA=50
             SDL_SetTextureColorMod(boxTexture, 0, 255, 0);
-            SDL_SetTextureAlphaMod(boxTexture, 255);
+            SDL_SetTextureAlphaMod(boxTexture, 127);
             SDL_RenderCopy(renderer, boxTexture, nullptr, &Rect);
         }
         else
         {
             // 已占用：红色网格，不渲染原始材质
             SDL_SetTextureColorMod(boxTexture, 255, 0, 0);
-            SDL_SetTextureAlphaMod(boxTexture, 255);
+            SDL_SetTextureAlphaMod(boxTexture, 127);
             SDL_RenderCopy(renderer, boxTexture, nullptr, &Rect);
         }
         // 恢复默认值
@@ -212,21 +218,38 @@ private:
     std::vector<GridPos> chairPositions;
 };
 
-struct FurnitureTemplate
+struct FurnitureTile
 {
-    FurnitureType type;
-    std::string name;
-    std::string address;
-    int cost;
-    int gridWidth;
-    int gridHeight;
-    SDL_Texture* texture = nullptr;
-    SDL_Rect textureRect;
+    FurnitureType type;            // 这个格子放什么
+    int offsetCol;                 // 相对锚点列偏移
+    int offsetRow;                 // 相对锚点行偏移
+    bool flipped = false;          // 是否翻转
+    std::string address;           // 此格子的贴图地址
+    SDL_Texture* texture = nullptr;// 贴图（由 BorderBox 加载）
 };
 
-inline FurnitureTemplate FurnitureTemplates[] = 
+struct FurnitureTemplate
 {
-    {FurnitureType::Cabinet, "面包柜", "cabinet", 1000, 1, 1, nullptr, {0,0,32,32}},
-    {FurnitureType::Chair, "椅子", "chair", 500, 1, 1, nullptr, {0,0,32,32}},
-    {FurnitureType::Desk, "桌子", "desk", 1000, 1, 1, nullptr, {0,0,32,32}},
+    std::string name;
+    int cost;
+    SDL_Texture* previewTexture = nullptr;
+    SDL_Rect previewRect;
+    std::vector<FurnitureTile> tiles;
+
+    // 构造函数：只需要名字、价格、子格列表
+    FurnitureTemplate(const std::string& name, int cost,
+                      std::initializer_list<FurnitureTile> tiles)
+        : name(name), cost(cost), tiles(tiles) {}
+};
+
+inline FurnitureTemplate FurnitureTemplates[] =
+{
+    {"面包柜",   1000, {
+        {FurnitureType::Cabinet, 0, 0, false, "cabinet"},
+    }},
+    {"双人桌椅", 2000, {
+        {FurnitureType::Desk,   0,  0, false, "desk"},
+        {FurnitureType::Chair,  0, -1, true,  "chair"},
+        {FurnitureType::Chair,  0,  1, false, "chair"},
+    }},
 };

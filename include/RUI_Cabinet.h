@@ -180,12 +180,15 @@ class CabinetFrame
         return IntCabinetID;
     }
 
+    SDL_Rect GetDeleteRect() const { return DeleteRect; }
+
     void InitFrame()
     {
         CabinetFrameTexture = ResourceManager::instance()->FindTexture("saving");
         QuitIcon = ResourceManager::instance()->FindTexture("quiticon");
         Rect = {150,50,500,500};
         QuitRect = {580,100,32,32};
+        DeleteRect = {520, 480, 80, 36};   // 右侧底部"拆除"按钮
         TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
         color = {10,10,10,255};
         IntCabinetID = -1;
@@ -322,6 +325,22 @@ class CabinetFrame
 
         Manager.onRender(Renderer, cab.GetDessertID());
 
+        // 渲染"拆除"按钮
+        SDL_SetRenderDrawBlendMode(Renderer, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(Renderer, 200, 60, 60, 220);
+        SDL_RenderFillRect(Renderer, &DeleteRect);
+        {
+            SDL_Surface* delSurf = TTF_RenderUTF8_Blended(TextFont, "拆除", SDL_Color{255,255,255,255});
+            if (delSurf)
+            {
+                SDL_Texture* delTex = SDL_CreateTextureFromSurface(Renderer, delSurf);
+                SDL_Rect delTextRect = {DeleteRect.x + 8, DeleteRect.y + 2, delSurf->w, delSurf->h};
+                SDL_RenderCopy(Renderer, delTex, nullptr, &delTextRect);
+                SDL_DestroyTexture(delTex);
+                SDL_FreeSurface(delSurf);
+            }
+        }
+
         // 释放 Surface（纹理已创建，Surface 不再需要）
         SDL_FreeSurface(TitleSurface);
         TitleSurface = nullptr;
@@ -340,6 +359,7 @@ class CabinetFrame
     SDL_Texture* DessertNumberTexture = nullptr;
     SDL_Rect Rect;
     SDL_Rect QuitRect;
+    SDL_Rect DeleteRect;
     SDL_Rect TitleRect;
     SDL_Rect DessertRect;
     SDL_Rect NumberRect;

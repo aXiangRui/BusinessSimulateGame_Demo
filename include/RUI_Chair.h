@@ -42,6 +42,11 @@ class Chair
         SetPosition(pos.col * Furniture::FurnitureWidth + Furniture::offsetX, pos.row * Furniture::FurnitureHeight + Furniture::offsetY);
     }
 
+    void SetToward(bool x)
+    {
+        toward = x;
+    }
+
     void SetPosition(int mx, int my)
     {
         // 吸附到最近的格点（含 Furniture 偏移）
