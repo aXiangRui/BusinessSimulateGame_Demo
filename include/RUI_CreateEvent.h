@@ -535,6 +535,8 @@ class CreateRUIEvent
 
     void quit()
     {
+        if (TextFont) TTF_CloseFont(TextFont);
+        TextFont = nullptr;
         Icons.clear();
         plates.clear();
         DessertSize.clear();
@@ -544,7 +546,7 @@ class CreateRUIEvent
         dessertManager.quit();
         materialManager.quit();
         DecorationFrames.clear();
-        DecorationMaterials.clear();  
+        DecorationMaterials.clear();
         productManager.quit();
         RedCloth.SetWhetherRender(0);
     }

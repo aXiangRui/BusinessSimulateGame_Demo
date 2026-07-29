@@ -372,7 +372,7 @@ void GameWorld::OnUpdate(std::vector<Chair>& chairs,
 
         // 离开的顾客
         if (customers[i].GetQuit()
-            && customers[i].getX() > 800
+            && (customers[i].getX() > 800 || customers[i].getX() < -50)
             && customers[i].getY() > 350)
         {
             SDL_Log("顾客准备离开，此时id:%d, x:%d, y:%d",

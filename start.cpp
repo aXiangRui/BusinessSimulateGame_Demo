@@ -32,8 +32,9 @@ MusicPlayer BackgroundMusic;
 // ResourceManager* ResourceManager::Manager = nullptr;
 const int FPS = 60;
 
-int main(int argc, char* argv[]) 
+int main(int argc, char* argv[])
 {
+    SetConsoleOutputCP(65001);  // 终端 UTF-8 输出，防止中文乱码
     SDL_Init(SDL_INIT_VIDEO);
     SDL_Init(SDL_INIT_AUDIO);
     IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);

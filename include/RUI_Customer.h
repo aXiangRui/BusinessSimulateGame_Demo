@@ -360,7 +360,7 @@ class Customer
 
                 if (path.empty())
                 {
-                    SDL_Log("ChooseDessert: 无路径到橱柜%d", chooseID);
+                    // SDL_Log("ChooseDessert: 无路径到橱柜%d", chooseID);
                     x = GridToEntityPixelX(bestNeighbor.row);
                     y = GridToEntityPixelY(bestNeighbor.col);
                 }
