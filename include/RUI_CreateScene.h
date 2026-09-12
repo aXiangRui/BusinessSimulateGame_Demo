@@ -39,7 +39,6 @@ class RUI_CreateScene : public RUI_Scene
         MenuButton Btn0((WindowWidth-320)/2,520,320,64,"返回店中",0);
         Btn0.SetOnClick([this]()
         {
-            onExit();
             SceneManager.ChooseScene(RUI_SceneManager::SceneType::Game);
         });
         buttons.push_back(Btn0);
@@ -55,7 +54,6 @@ class RUI_CreateScene : public RUI_Scene
                 classicMode.onUpdate();
                 if(classicMode.GetWhetherBack())
                 {
-                    onExit();
                     SceneManager.ChooseScene(RUI_SceneManager::SceneType::Game);
                 }
                 break;
@@ -63,7 +61,6 @@ class RUI_CreateScene : public RUI_Scene
                 diyMode.onUpdate();
                 if(diyMode.GetWhetherBack())
                 {
-                    onExit();
                     SceneManager.ChooseScene(RUI_SceneManager::SceneType::Game);
                 }
                 break;
@@ -109,7 +106,10 @@ class RUI_CreateScene : public RUI_Scene
         for(auto& btn : buttons)
         {
             if(btn.RUI_isClicked(mx,my))
+            {
                 btn.ClickApplication();
+                return; // 场景级按钮(如返回店中)消费掉本次点击,不再派发给子模式
+            }
         }
 
         switch(currentMode)
@@ -118,11 +118,13 @@ class RUI_CreateScene : public RUI_Scene
             {
                 if(mx >= 100 && mx <= 350 && my >= 230 && my <= 310)
                 {
+                    buttons.clear(); // 模式选择界面按钮不再参与后续点击
                     classicMode.onEnter();
                     currentMode = CreateMode::Classic;
                 }
                 else if(mx >= 450 && mx <= 700 && my >= 230 && my <= 310)
                 {
+                    buttons.clear();
                     diyMode.onEnter();
                     currentMode = CreateMode::DIY;
                 }

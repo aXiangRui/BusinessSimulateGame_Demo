@@ -352,7 +352,6 @@ void GameWorld::OnUpdate(std::vector<Chair>& chairs,
             pendingCustomers.pop_back();
         }
     }
-
     // 生成新顾客（加入待处理队列）
     SpawnCustomers(customerManager, totalCustomers, totalDessert, currentTime);
 
@@ -369,7 +368,6 @@ void GameWorld::OnUpdate(std::vector<Chair>& chairs,
                     furnitureGrids);
             }
         }
-
         // 离开的顾客
         if (customers[i].GetQuit()
             && (customers[i].getX() > 800 || customers[i].getX() < -50)

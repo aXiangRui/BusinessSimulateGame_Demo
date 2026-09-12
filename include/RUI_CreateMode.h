@@ -229,6 +229,14 @@ public:
 
     void InitBakeStage()
     {
+        // 每次进入DIY模式都重置烘烤状态,避免上次的进度残留
+        tempLevel = 1;
+        internalTemp = 0.0f;
+        surfaceBrown = 0.0f;
+        moisture = 1.0f;
+        bakeTime = 0.0f;
+        isBaking = false;
+        bakeStartTime = 0;
         tempButtons[0] = {100, 350, 120, 50};
         tempButtons[1] = {250, 350, 120, 50};
         tempButtons[2] = {400, 350, 120, 50};

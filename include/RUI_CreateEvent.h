@@ -41,7 +41,7 @@ class CreateRUIEvent
     {
         CStage = Stage::size;
         TextFont = TTF_OpenFont("./resources/font/namidiansong.ttf",36);
-        ChooseFrameTexture = ResourceManager::instance()->FindTexture("chooseframe");     
+        ChooseFrameTexture = ResourceManager::instance()->FindTexture("chooseframe");
         dessertManager.InitDessertManager();
         materialManager.InitMaterialManager();
         productManager.InitProductManager();
@@ -374,7 +374,7 @@ class CreateRUIEvent
             case SDL_MOUSEBUTTONDOWN:
             {
                 int mx = event.button.x; int my = event.button.y;
-                for(int i = 0; i <= Icons.size(); i++)
+                for(int i = 0; i < (int)Icons.size(); i++)
                 {
                     if(Icons[i].isClicked(mx,my))
                     {
@@ -382,8 +382,9 @@ class CreateRUIEvent
                         {
                             case 0:
                             {
+                                // 场景已切换、数据已清理,剩余点击不再处理
                                 SceneManager.ChooseScene(RUI_SceneManager::SceneType::Game);
-                                break;
+                                return;
                             }
                             case 1:
                             {
